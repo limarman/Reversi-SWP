@@ -1,0 +1,100 @@
+/**
+ * 
+ */
+package swpg3;
+
+/**
+ * A Class to represent Tiles with their current status/occupation and arbitrary
+ * Transitions attached to them
+ * 
+ * @author eric
+ *
+ */
+public class Tile {
+	private TileStatus status;
+	/**
+	 * Pseudo 2D-Array to house Transitions. Can be indexed with directions
+	 */
+	private Transition[] arbitraryTransitions;
+
+	/**
+	 * Initializes Tile as empty with no Transitions
+	 */
+	public Tile()
+	{
+		this.status = TileStatus.HOLE;
+		arbitraryTransitions = new Transition[9];
+		for (int i = 0; i < 9; i++)
+		{
+			arbitraryTransitions[i] = null;
+		}
+	}
+
+	/**
+	 * Initializes Tile with status and no Transitions
+	 * 
+	 * @param status
+	 */
+	public Tile(TileStatus status)
+	{
+		this.status = status;
+		arbitraryTransitions = new Transition[9];
+		for (int i = 0; i < 9; i++)
+		{
+			arbitraryTransitions[i] = null;
+		}
+	}
+
+	/**
+	 * Adds a Transition to the Tile
+	 * 
+	 * @param tran Transition to be added
+	 * 
+	 * @throws IllegalArgumentException If two Transitions in same direction are added or a Transition in no direction is added
+	 */
+	public void addTransition(Transition tran, Vector2i direction) throws IllegalArgumentException
+	{
+		if (!hasTransitionTo(direction) && !direction.isZero())
+			arbitraryTransitions[direction.x + direction.y * 3] = tran;
+		else
+			throw new IllegalArgumentException(); // might be overkill
+	}
+
+	/**
+	 * Checks if a Transition in the given direction is present
+	 * 
+	 * @param direction
+	 *            to check in
+	 * @return true, if Transition is found; false, otherwise
+	 */
+	public boolean hasTransitionTo(Vector2i direction)
+	{
+		return arbitraryTransitions[direction.x + direction.y * 3] != null;
+	}
+
+	/**
+	 * @param direction
+	 * @return Transition in given direction
+	 */
+	public Transition getTransitionTo(Vector2i direction)
+	{
+		return arbitraryTransitions[direction.x + direction.y * 3];
+	}
+
+	/**
+	 * @return the status of the Tile
+	 */
+	public TileStatus getStatus()
+	{
+		return status;
+	}
+
+	/**
+	 * @param status
+	 *            the status to set
+	 */
+	public void setStatus(TileStatus status)
+	{
+		this.status = status;
+	}
+}
