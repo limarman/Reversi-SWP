@@ -219,7 +219,7 @@ public class Map {
 		return grid[(pos.x+1) + (pos.y+1) * height];
 	}
 
-	private Vector2i mapDirToVector(int dir)
+	public static Vector2i mapDirToVector(int dir)
 	{
 		switch (dir)
 		{

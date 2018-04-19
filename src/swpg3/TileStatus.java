@@ -9,23 +9,27 @@ package swpg3;
  * @author eric
  */
 public enum TileStatus {
-	HOLE, 
-	EMPTY, 
-	PLAYER_1, 
-	PLAYER_2, 
-	PLAYER_3, 
-	PLAYER_4, 
-	PLAYER_5, 
-	PLAYER_6, 
-	PLAYER_7, 
-	PLAYER_8, 
-	CHOICE, 
-	INVERSION, 
-	BONUS, 
-	EXPANSION,
-	INVALID;
+	HOLE(0), 
+	PLAYER_1(1), 
+	PLAYER_2(2), 
+	PLAYER_3(3),
+	PLAYER_4(4), 
+	PLAYER_5(5), 
+	PLAYER_6(6), 
+	PLAYER_7(7), 
+	PLAYER_8(8),
+	EMPTY(9), 
+	CHOICE(10), 
+	INVERSION(11), 
+	BONUS(12), 
+	EXPANSION(13),
+	INVALID(-1);
 	
-	
+	public final byte value;
+	TileStatus(int value)
+	{
+		this.value = (byte)value;
+	}
 	/**
 	 * @param c char to be mapped
 	 * @return TileStatus represented by char or TileStatus.INVALID if c cannot be mapped

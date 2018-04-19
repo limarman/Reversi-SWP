@@ -107,4 +107,20 @@ public class Tile {
 	{
 		return this.status == TileStatus.HOLE;
 	}
+	
+	/**
+	 * @return true, if Tile is occupied by a player or an expansion stone; false, otherwise
+	 */
+	public boolean isOccupied()
+	{
+		 return isOccupiedbyPlayer() || status == TileStatus.EXPANSION;
+	}
+	
+	/**
+	 * @return true, if Tile is occupied by a player; false, otherwise
+	 */
+	public boolean isOccupiedbyPlayer()
+	{
+		return (status.value >= 1 && status.value <= 8);
+	}
 }
