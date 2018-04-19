@@ -11,8 +11,8 @@ package swpg3;
  * 
  */
 public class Vector2i {
-	public int x;
-	public int y;
+	public int	x;
+	public int	y;
 
 	/**
 	 * Initialise as (0,0)
@@ -45,6 +45,18 @@ public class Vector2i {
 	}
 
 	/**
+	 * Scale Vector by factor
+	 * 
+	 * @param factor
+	 *            factor to be scaled by
+	 */
+	public void scale(int factor)
+	{
+		this.x *= factor;
+		this.y *= factor;
+	}
+
+	/**
 	 * Compare this to another Vector
 	 * 
 	 * @param b
@@ -62,5 +74,31 @@ public class Vector2i {
 	public boolean isZero()
 	{
 		return this.x == 0 && this.y == 0;
+	}
+
+	/**
+	 * Creates a new Vector equal to the sum of a and b
+	 * @param a doesn't get changed by function
+	 * @param b doesn't get changed by function
+	 * @return new Vector = a+b
+	 */
+	public static Vector2i sum(Vector2i a, Vector2i b)
+	{
+		Vector2i ret = new Vector2i(a.x, a.y);
+		ret.add(b);
+		return ret;
+	}
+
+	/**
+	 * Creates a new Vector equal to the scaled Vetor a
+	 * @param a doesn't get changed by function
+	 * @param factor to be scaled by
+	 * @return a new vector
+	 */
+	public static Vector2i scaled(Vector2i a, int factor)
+	{
+		Vector2i ret = new Vector2i(a.x, a.y);
+		ret.scale(factor);
+		return ret;
 	}
 }

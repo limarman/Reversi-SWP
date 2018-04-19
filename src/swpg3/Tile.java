@@ -49,13 +49,14 @@ public class Tile {
 	 * Adds a Transition to the Tile
 	 * 
 	 * @param tran Transition to be added
+	 * @param leavingDirection Direction in which the Transition goes
 	 * 
 	 * @throws IllegalArgumentException If two Transitions in same direction are added or a Transition in no direction is added
 	 */
-	public void addTransition(Transition tran, Vector2i direction) throws IllegalArgumentException
+	public void addTransition(Transition tran, Vector2i leavingDirection) throws IllegalArgumentException
 	{
-		if (!hasTransitionTo(direction) && !direction.isZero())
-			arbitraryTransitions[direction.x + direction.y * 3] = tran;
+		if (!hasTransitionTo(leavingDirection) && !leavingDirection.isZero())
+			arbitraryTransitions[(leavingDirection.x+1) + (leavingDirection.y+1 )* 3] = tran;
 		else
 			throw new IllegalArgumentException(); // might be overkill
 	}
@@ -69,7 +70,7 @@ public class Tile {
 	 */
 	public boolean hasTransitionTo(Vector2i direction)
 	{
-		return arbitraryTransitions[direction.x + direction.y * 3] != null;
+		return arbitraryTransitions[(direction.x+1) + (direction.y +1)* 3] != null;
 	}
 
 	/**
@@ -78,7 +79,7 @@ public class Tile {
 	 */
 	public Transition getTransitionTo(Vector2i direction)
 	{
-		return arbitraryTransitions[direction.x + direction.y * 3];
+		return arbitraryTransitions[(direction.x+1) + (direction.y +1)* 3];
 	}
 
 	/**
@@ -96,5 +97,14 @@ public class Tile {
 	public void setStatus(TileStatus status)
 	{
 		this.status = status;
+	}
+	
+	/**
+	 * Check if a Tile is a Hole
+	 * @return true, if TileStatus == HOLE;false, otherwise
+	 */
+	public boolean isHole()
+	{
+		return this.status == TileStatus.HOLE;
 	}
 }

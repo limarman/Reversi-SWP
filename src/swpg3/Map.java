@@ -15,28 +15,9 @@ public class Map {
 	private int	bombStrength;
 	private int	height;
 	private int	width;
+	private int	transitionCount;
 
 	private Tile[] grid;
-
-	/**
-	 * @param numberOfPlayers
-	 * @param numberOfOverrides
-	 * @param numberOfBombs
-	 * @param bombStrength
-	 * @param height
-	 * @param width
-	 */
-	public Map(int numberOfPlayers, int numberOfOverrides, int numberOfBombs, int bombStrength, int height, int width)
-	{
-		this.numberOfPlayers = numberOfPlayers;
-		this.numberOfOverrides = numberOfOverrides;
-		this.numberOfBombs = numberOfBombs;
-		this.bombStrength = bombStrength;
-		this.height = height;
-		this.width = width;
-
-		this.grid = new Tile[width * height];
-	}
 
 	/**
 	 * Creates a Map from String formatted as described in courseRules.pdf
@@ -47,7 +28,7 @@ public class Map {
 	public Map(String inputString)
 	{
 		Scanner scan = new Scanner(inputString);
-
+		this.transitionCount = 0;
 		try
 		{
 			this.numberOfPlayers = scan.nextInt();
@@ -56,85 +37,108 @@ public class Map {
 			this.bombStrength = scan.nextInt();
 			this.height = scan.nextInt() + 2;
 			this.width = scan.nextInt() + 2;
+			scan.nextLine();
 			// 2 extra lines and rows to surround the map with holes
 		} catch (Exception e)
 		{
 			scan.close();
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Metadata Error");
 		}
 		this.grid = new Tile[width * height];
 
 		// read in grid
 		for (int y = 0; y < height; y++)
 		{
-			String row;
-
-			try
+			String row = null;
+			if(!(y == 0 || y == height-1))
 			{
-				row = scan.nextLine();
-			} catch (Exception e)
-			{
-				scan.close();
-				throw new IllegalArgumentException();
+				try
+				{
+					row = scan.nextLine();
+				} catch (Exception e)
+				{
+					scan.close();
+					throw new IllegalArgumentException("Mapdata Row Error ("+ y + ")");
+				}
 			}
-
-			for (int x = 0; x < width + 2; x++)
+			int rowInd = 0;
+			for (int x = 0; x < width; x++)
 			{
 				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
 				{
 					grid[x + y * height] = new Tile(TileStatus.HOLE);
 				} else
 				{
-					switch (row.charAt(x))
+					char curTile;
+					try
 					{
-						case '0':
-							grid[x + y * height] = new Tile(TileStatus.EMPTY);
-							break;
-						case '1':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_1);
-							break;
-						case '2':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_2);
-							break;
-						case '3':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_3);
-							break;
-						case '4':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_4);
-							break;
-						case '5':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_5);
-							break;
-						case '6':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_6);
-							break;
-						case '7':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_7);
-							break;
-						case '8':
-							grid[x + y * height] = new Tile(TileStatus.PLAYER_8);
-							break;
-						case '-':
-							grid[x + y * height] = new Tile(TileStatus.HOLE);
-							break;
-						case 'i':
-							grid[x + y * height] = new Tile(TileStatus.INVERSION);
-							break;
-						case 'b':
-							grid[x + y * height] = new Tile(TileStatus.BONUS);
-							break;
-						case 'x':
-							grid[x + y * height] = new Tile(TileStatus.EXPANSION);
-							break;
-						default:
-							scan.close();
-							throw new IllegalArgumentException();
+						curTile = row.charAt(rowInd);
+						rowInd++;
+						while(curTile == ' ') 
+						{
+							curTile = row.charAt(rowInd);
+							rowInd++;
+						}
+					} catch (Exception e)
+					{
+						scan.close();
+						throw new IllegalArgumentException("Mapdata Col Error: ("+ y + "," + x + ")" + row);
 					}
+
+					TileStatus newStatus = TileStatus.mapCharToTileStatus(curTile);
+					if (newStatus == TileStatus.INVALID)
+					{
+						scan.close();
+						throw new IllegalArgumentException("Invalid Tiletype Error ("+ y + "," + x  + ")");
+					}
+					grid[x + y * height] = new Tile(newStatus);
 				}
 			}
 		}
 		// TODO read in Transitions
+		while (scan.hasNextLine() && scan.hasNextInt())
+		{
+			//System.out.println(scan.toString());
+			int point1X;
+			int point1Y;
+			int point1D;
+			int point2X;
+			int point2Y;
+			int point2D;
+			try
+			{
+				point1X = scan.nextInt();
+				point1Y = scan.nextInt();
+				point1D = scan.nextInt();
+				scan.next(); // Skip "<->"
+				point2X = scan.nextInt();
+				point2Y = scan.nextInt();
+				point2D = scan.nextInt();
+				//if(scan.hasNextLine()) scan.nextLine();
+			} catch (Exception e)
+			{
+				scan.close();
+				throw new IllegalArgumentException("Transition Error Trans:" + transitionCount);
+			}
 
+			Vector2i p1 = new Vector2i(point1X, point1Y);
+			Vector2i p2 = new Vector2i(point2X, point2Y); // compensate new Holes around map
+			Vector2i p1OutDir = mapDirToVector(point1D);
+			Vector2i p2OutDir = mapDirToVector(point2D);
+			Vector2i p1InDir = Vector2i.scaled(p1OutDir, -1); // Inverse Direction: You go out going right but come in
+			Vector2i p2InDir = Vector2i.scaled(p2OutDir, -1); // going left
+
+			// Check for Validity of Transitions:
+			if(!getTileAt(Vector2i.sum(p1, p1OutDir)).isHole() ||
+					!getTileAt(Vector2i.sum(p2,  p2OutDir)).isHole())
+			{
+				scan.close();
+				throw new IllegalArgumentException("Transition Error");
+			}
+			getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
+			getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
+			transitionCount++;
+		}
 		scan.close();
 	}
 
@@ -175,7 +179,7 @@ public class Map {
 	 */
 	public int getHeight()
 	{
-		return height;
+		return height - 2;
 	}
 
 	/**
@@ -183,7 +187,15 @@ public class Map {
 	 */
 	public int getWidth()
 	{
-		return width;
+		return width - 2;
+	}
+
+	/**
+	 * @return the transitionCount
+	 */
+	public int getTransitionCount()
+	{
+		return transitionCount;
 	}
 
 	/**
@@ -195,7 +207,41 @@ public class Map {
 	 */
 	public Tile getTileAt(int x, int y)
 	{
-		return grid[x + height * y];
+		return grid[(x+1) + (y+1) * height]; //TODO Assertion?
+	}
+
+	/**
+	 * @param pos Position of Tile
+	 * @return Tile at Vector pos
+	 */
+	public Tile getTileAt(Vector2i pos)
+	{
+		return grid[(pos.x+1) + (pos.y+1) * height];
+	}
+
+	private Vector2i mapDirToVector(int dir)
+	{
+		switch (dir)
+		{
+			case 0:
+				return new Vector2i(0, -1);
+			case 1:
+				return new Vector2i(1, -1);
+			case 2:
+				return new Vector2i(1, 0);
+			case 3:
+				return new Vector2i(1, 1);
+			case 4:
+				return new Vector2i(0, 1);
+			case 5:
+				return new Vector2i(-1, 1);
+			case 6:
+				return new Vector2i(-1, 0);
+			case 7:
+				return new Vector2i(-1, -1);
+			default:
+				return new Vector2i(0, 0);
+		}
 	}
 
 }

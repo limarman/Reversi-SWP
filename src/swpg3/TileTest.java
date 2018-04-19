@@ -19,15 +19,15 @@ class TileTest {
 		Tile toTest = new Tile();
 
 		assertTrue(toTest.getStatus() == TileStatus.HOLE, "New Tile not a hole");
-		for (int x = 0; x < 3; x++)
-			for (int y = 0; y < 3; y++)
+		for (int x = -1; x < 2; x++)
+			for (int y = -1; y < 1; y++)
 				assertFalse(toTest.hasTransitionTo(new Vector2i(x, y)), "New Tile has a Transition");
 
 		toTest = new Tile(TileStatus.CHOICE);
 
 		assertTrue(toTest.getStatus() == TileStatus.CHOICE, "New Tile not a CHOICE");
-		for (int x = 0; x < 3; x++)
-			for (int y = 0; y < 3; y++)
+		for (int x = -1; x < 2; x++)
+			for (int y = -1; y < 2; y++)
 				assertFalse(toTest.hasTransitionTo(new Vector2i(x, y)), "New Tile has a Transition");
 	}
 
@@ -35,7 +35,7 @@ class TileTest {
 	void testAddTransition()
 	{
 		Tile toTest = new Tile();
-		Tile target = new Tile(TileStatus.BONUS);
+		Vector2i target = new Vector2i(3,4);
 
 		Vector2i dir1 = new Vector2i(1,0);
 		
@@ -45,7 +45,7 @@ class TileTest {
 		
 		// Test retrieving transition
 		Transition trans = toTest.getTransitionTo(dir1);
-		assertTrue(trans != null && trans.getEndpoint() == target, "Not correct Transition");
+		assertTrue(trans != null && trans.getTargetPoint() == target, "Not correct Transition");
 
 		try
 		{

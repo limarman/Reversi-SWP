@@ -11,36 +11,36 @@ package swpg3;
  *
  */
 public class Transition {
-	private Tile endpoint;
-	private Vector2i outputDir;
+	private Vector2i targetPoint;
+	private Vector2i targetIncomingDir;
 
 	/**
 	 * Simple Constructor initialising everything
 	 * 
-	 * @param endpoint
+	 * @param targetPoint
 	 * @param inputDir
-	 * @param outputDir
+	 * @param targetIncomingDir
 	 */
-	public Transition(Tile endpoint, Vector2i outputDir)
+	public Transition(Vector2i targetPoint, Vector2i targetIncomingDir)
 	{
-		this.endpoint = endpoint;
-		this.outputDir = outputDir;
+		this.targetPoint = targetPoint;
+		this.targetIncomingDir = targetIncomingDir;
 	}
 
 	/**
 	 * @return the endpoint
 	 */
-	public Tile getEndpoint()
+	public Vector2i getTargetPoint()
 	{
-		return endpoint;
+		return targetPoint;
 	}
 
 	/**
 	 * @return the outputDir
 	 */
-	public Vector2i getOutputDir()
+	public Vector2i getTargetIncomingDir()
 	{
-		return outputDir;
+		return targetIncomingDir;
 	}
 
 }
