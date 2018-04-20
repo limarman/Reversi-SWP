@@ -11,6 +11,7 @@ public class Player {
 	private int	overrideStones;
 	private int	bombs;
 	private int	number;
+	private boolean isDisqualified = false;
 
 	/**
 	 * @param number
@@ -56,6 +57,22 @@ public class Player {
 	{
 		return number;
 	}
+	
+	/**
+	 * @return disqualification
+	 */
+	public boolean isDisqualified()
+	{
+		return isDisqualified;
+	}
+	
+	/**
+	 * disqualifies player
+	 */
+	public void disqualify() 
+	{
+		isDisqualified = true;
+	}
 
 	/**
 	 * Decrements number of bombs by one
@@ -64,13 +81,30 @@ public class Player {
 	{
 		this.bombs--;
 	}
-
+	
 	/**
 	 * Decrements number of Override stones by one
 	 */
-	public void useOverridestone()
+	public void useOverrideStone()
 	{
 		this.overrideStones--;
+	}
+	
+	
+	/**
+	 * Increments number of Override stones by one
+	 */
+	public void addOverrideStone()
+	{
+		this.overrideStones++;
+	}
+	
+	/**
+	 * Increments number of Bomb stones by one
+	 */
+	public void addBomb()
+	{
+		this.bombs++;
 	}
 
 	public static TileStatus mapPlayerNumberToTileStatus(int playerNumber)

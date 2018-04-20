@@ -123,8 +123,8 @@ public class Map {
 
 			Vector2i p1 = new Vector2i(point1X, point1Y);
 			Vector2i p2 = new Vector2i(point2X, point2Y); // compensate new Holes around map
-			Vector2i p1OutDir = mapDirToVector(point1D);
-			Vector2i p2OutDir = mapDirToVector(point2D);
+			Vector2i p1OutDir = Vector2i.mapDirToVector(point1D);
+			Vector2i p2OutDir = Vector2i.mapDirToVector(point2D);
 			Vector2i p1InDir = Vector2i.scaled(p1OutDir, -1); // Inverse Direction: You go out going right but come in
 			Vector2i p2InDir = Vector2i.scaled(p2OutDir, -1); // going left
 
@@ -209,7 +209,7 @@ public class Map {
 	{
 		return grid[(x+1) + (y+1) * height]; //TODO Assertion?
 	}
-
+	
 	/**
 	 * @param pos Position of Tile
 	 * @return Tile at Vector pos
@@ -218,30 +218,4 @@ public class Map {
 	{
 		return grid[(pos.x+1) + (pos.y+1) * height];
 	}
-
-	public static Vector2i mapDirToVector(int dir)
-	{
-		switch (dir)
-		{
-			case 0:
-				return new Vector2i(0, -1);
-			case 1:
-				return new Vector2i(1, -1);
-			case 2:
-				return new Vector2i(1, 0);
-			case 3:
-				return new Vector2i(1, 1);
-			case 4:
-				return new Vector2i(0, 1);
-			case 5:
-				return new Vector2i(-1, 1);
-			case 6:
-				return new Vector2i(-1, 0);
-			case 7:
-				return new Vector2i(-1, -1);
-			default:
-				return new Vector2i(0, 0);
-		}
-	}
-
 }
