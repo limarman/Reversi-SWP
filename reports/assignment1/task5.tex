@@ -1,4 +1,4 @@
-\section{Exercise 5}
+\section{Task 5}
 Eine kurze Recherche über die klassische Variante des Spiels und einige Testspiele gegen eine Reversi-KI ergaben folgenden Vorschlag für eine Evaluationsfunktion:
 \subsection{Building phase}
 Entgegengesetzt dem eigentlichen Spielziel in der building phase, welches wäre am Ende mit den meisten Steinen dazustehen, ergab sich aus empirischen Beobachtungen, dass die Anzahl der Steine am Anfang und in der Mitte des Spieles (fast) keinerlei Rolle spielt. Erst gegen Ende des Spieles wird dieser Faktor entscheidend.\\
@@ -34,3 +34,8 @@ Um einen sanfteren Übergang von Mittelspiel zu Endspiel zu schaffen, fließen a
 \end{enumerate}
 
 \subsection{Bombing phase}
+Diese Funktion ist hingegen recht einfach gehalten. Wir zählen die Anzahl der Steine, welche 'gesprengt' werden müssen, damit der jeweilige Spieler den ersten Platz einnimmt. Also 
+$$PosVal := -(\#SteineBisPlatz1).$$Befindet man sich auf dem ersten Platz, so zählt die Anzahl der Steine, die man mehr als der zweite Platz hat:
+$$PosVal := \#EigeneSteine - \#SteinePlatz2$$
+Als Beispiel: Befindet man sich auf dem dritten Platz und der erste Spieler hat 20 und der zweite Spieler hat 10 Steine mehr, dann liefert die Bewertungsfunktion $-30=-(10+20)$ als Wert.\\
+Wir differenzieren nicht zwischen den Plätzen 2-8, da diese alle für uns als 'verloren' gelten.
