@@ -45,11 +45,11 @@ public class MoveManager {
 	public boolean isMoveValid(Move move)
 	{
 		Tile movePos = map.getTileAt(move.getCoordinates());
-		int playerIndex = move.getPlayerNumber() - 1;
+		int playerIndex = move.getPlayerNumber() - 1; // Array starts at 0, Player numbers with 1
 		if (gamePhase == GamePhase.BOMB_PHASE)
 		{
-			return (!movePos.isHole()) && (playerInfo[move.getPlayerNumber() - 1].getBombs() > 0);
-		} else
+			return (!movePos.isHole()) && (playerInfo[playerIndex].getBombs() > 0);
+		} else // BUILD_PHASE
 		{
 			if (movePos.isHole())
 				return false;
