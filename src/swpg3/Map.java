@@ -97,7 +97,7 @@ public class Map {
 					}
 					else if(newStatus.value >= 1 && newStatus.value <= 8) //occupied by player
 					{
-						startingFields.add(new Vector2i(x,y));
+						startingFields.add(new Vector2i(x-1,y-1));
 					}
 					grid[x + y * height] = new Tile(newStatus);
 				}

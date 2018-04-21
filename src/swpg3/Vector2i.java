@@ -101,6 +101,15 @@ public class Vector2i {
 		ret.scale(factor);
 		return ret;
 	}
+	
+	/**
+	 * creates an identical copy of Vector, for reference problems
+	 * @return an identical copy of Vector
+	 */
+	public Vector2i getCopy() 
+	{
+		return new Vector2i(this.x, this.y);
+	}
 
 	public static Vector2i mapDirToVector(int dir)
 	{

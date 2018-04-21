@@ -93,7 +93,7 @@ public class MapWalker {
 		{
 			this.position.add(this.direction);
 			return true;
-		} else if (!nextTile.isHole() && thisTile.hasTransitionTo(direction))
+		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) //TODO: check the condition?
 		{
 			this.position = thisTile.getTransitionTo(direction).getTargetPoint();
 			this.direction = thisTile.getTransitionTo(direction).getTargetIncomingDir();

@@ -65,6 +65,7 @@ public class MoveManager {
 			boolean hasAdjacentTile = false;
 			for(int i = 0; i < 8; i++)
 			{
+				//There might be a bug, because move is reference and changed during stepping
 				walker[i] = new MapWalker(map, move.getCoordinates(), Vector2i.mapDirToVector(i));
 				if(walker[i].step())
 				{
@@ -147,26 +148,26 @@ public class MoveManager {
 			
 			//create Walker in every direction
 			for(int i = 0; i<8; i++) {
-				MapWalker mw = new MapWalker(map, move.getCoordinates(), Vector2i.mapDirToVector(i));
-				
+				MapWalker mw = new MapWalker(map, move.getCoordinates().getCopy(),Vector2i.mapDirToVector(i));
+				mw.step();
+
 				//walk until hole, a non-occupied square or an own stone
 				while(mw.getCurrentTile().isOccupied() && mw.canStep() &&
 						mw.getCurrentTile().getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())) 
 				{
-					mw.step();
+					mw.step();					
 				}
 				if(mw.getCurrentTile().getStatus() ==
 						Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()) &&
 						!(mw.getPosition().equals(move.getCoordinates()))) { 
 					//if mw stopped cause of own stone and it is not the placed one
-					//create MapWalker in the other direction and flip stones
-					MapWalker mw_inversed = new MapWalker(map, mw.getPosition(),
-							Vector2i.scaled(mw.getDirection(), -1));
+					//set MapWalker in the other direction and flip stones
+					mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
 					mw.step();
-					while(!(mw_inversed.getPosition().equals(move.getCoordinates())))
+					while(!(mw.getPosition().equals(move.getCoordinates())))
 					{
-						flipStone(mw_inversed.getPosition(), move.getPlayerNumber());
-						mw_inversed.step();
+						flipStone(mw.getPosition(), move.getPlayerNumber());
+						mw.step();
 					}		
 				}
 			}
@@ -199,7 +200,7 @@ public class MoveManager {
 		}
 		else {
 			//Bombing phase
-			bombField(map.getBombStrength(), move.getCoordinates());
+			bombField(map.getBombStrength(), move.getCoordinates().getCopy());
 		}
 	}
 	
@@ -208,11 +209,13 @@ public class MoveManager {
 	 * @param position where to flip the stone
 	 * @param playerNumber which 'color' the stone will be flipped to
 	 */
-	private void flipStone(Vector2i position, byte playerNumber) {
-		
+	private void flipStone(Vector2i position, byte playerNumber)
+	{
 		Tile t = map.getTileAt(position);
-		playerInfo[t.getStatus().value-1].removeStone(position); //removing the oppenent's stone
-		playerInfo[playerNumber].addStone(position); //adding the players stone
+		if(t.isOccupiedbyPlayer()) {
+			playerInfo[t.getStatus().value-1].removeStone(position); //removing the oppenent's stone
+		}
+		playerInfo[playerNumber-1].addStone(position); //adding the players stone
 		map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber)); //actualizing the map
 		
 	}
@@ -261,7 +264,7 @@ public class MoveManager {
 			mw.setDirection(Vector2i.mapDirToVector(i));
 			if(mw.canStep()){ //adjacent Field is not a hole
 				mw.step();
-				bombField(radius-1, mw.getPosition());
+				bombField(radius-1, mw.getPosition().getCopy());
 				mw.setPosition(position);
 			}
 		}
