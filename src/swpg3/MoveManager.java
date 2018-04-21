@@ -3,6 +3,7 @@
  */
 package swpg3;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -121,28 +122,66 @@ public class MoveManager {
 	 * 
 	 * @param move to be applied to the map
 	 */
-	public void applyMove(Move m)
+	public void applyMove(Move move)
 	{
 		if(gamePhase == GamePhase.BUILDING_PHASE) {
+			
+			int playerIndex  = move.getPlayerNumber()-1;
+			
 			//if tile is occupied
-			Tile t = map.getTileAt(m.getCoordinates());
+			Tile t = map.getTileAt(move.getCoordinates());
 			if(t.isOccupied()) { 
-				playerInfo[m.getPlayerNumber()].useOverrideStone();
+				playerInfo[playerIndex].useOverrideStone();
 			}
+			
+			//flip set stone
+			flipStone(move.getCoordinates(), move.getPlayerNumber());
+			
+			//create Walker in every direction
+			for(int i = 0; i<8; i++) {
+				MapWalker mw = new MapWalker(map, move.getCoordinates(), Vector2i.mapDirToVector(i));
+				
+				//walk until hole, a non-occupied square or an own stone
+				while(mw.getCurrentTile().isOccupied() && mw.canStep() &&
+						mw.getCurrentTile().getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())) 
+				{
+					mw.step();
+				}
+				if(mw.getCurrentTile().getStatus() ==
+						Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()) &&
+						!(mw.getPosition().equals(move.getCoordinates()))) { 
+					//if mw stopped cause of own stone and it is not the placed one
+					//create MapWalker in the other direction and flip stones
+					MapWalker mw_inversed = new MapWalker(map, mw.getPosition(),
+							Vector2i.scaled(mw.getDirection(), -1));
+					mw.step();
+					while(!(mw_inversed.getPosition().equals(move.getCoordinates())))
+					{
+						flipStone(mw_inversed.getPosition(), move.getPlayerNumber());
+						mw_inversed.step();
+					}		
+				}
+			}
+			
 			//handle special fields
 			switch(t.getStatus()) {
 			
 			case CHOICE:
-				
+				switchStones(move.getSpecialFieldInfo(), move.getPlayerNumber());
+				//specialFieldInfo is expected to be a value between 1 and #player
 				break;
 			case INVERSION:
+				for(int i=map.getNumberOfPlayers(); i>1; i--) 
+				{
+					switchStones(i, i-1);
+				}
 				break;
 			case BONUS:
-				if(m.getSpecialFieldInfo() == 42) { //increase Overridestone count
-					playerInfo[m.getPlayerNumber()].addOverrideStone();
+				if(move.getSpecialFieldInfo() == Move.ADD_OVERRIDESTONE) { //increase Overridestone count
+					playerInfo[playerIndex].addOverrideStone();
 				}
-				else { //increase Bomb count
-					playerInfo[m.getPlayerNumber()].addBomb();
+				else if(move.getSpecialFieldInfo() == Move.ADD_BOMBSTONE) { //increase Bomb count
+					playerInfo[playerIndex].addBomb();
 				}
 				break;
 			default:
@@ -155,5 +194,45 @@ public class MoveManager {
 		}
 		
 		//TODO: implement
+	}
+	
+	/**
+	 * 
+	 * @param position where to flip the stone
+	 * @param playerNumber which 'color' the stone will be flipped to
+	 */
+	private void flipStone(Vector2i position, byte playerNumber) {
+		
+		Tile t = map.getTileAt(position);
+		playerInfo[t.getStatus().ordinal()-1].removeStone(position); //removing the oppenent's stone
+		playerInfo[playerNumber].addStone(position); //adding the players stone
+		map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber)); //actualizing the map
+		
+	}
+	
+	/**
+	 * Switches the stone coordinates between the Players with playerNumber1 and playernumber2
+	 * updates the map accordingly
+	 * @param playerNumber1
+	 * @param playerNumber2
+	 */
+	private void switchStones(int playerNumber1 , int playerNumber2) 
+	{
+		HashSet<Vector2i> stonePos1, stonePos2;
+		stonePos1 = playerInfo[playerNumber1-1].getStonePositions();
+		stonePos2 = playerInfo[playerNumber2-1].getStonePositions();
+		
+		//updating the map
+		for(Vector2i position : stonePos1) {
+			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
+		}
+		
+		for(Vector2i position : stonePos2) {
+			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
+		}
+		
+		//switching the coordinates
+		playerInfo[playerNumber1-1].switchStones(playerInfo[playerNumber2-1]);
+		
 	}
 }

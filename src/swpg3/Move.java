@@ -8,6 +8,10 @@ package swpg3;
  *
  */
 public class Move {
+	
+	public static final byte ADD_BOMBSTONE = 21;
+	public static final byte ADD_OVERRIDESTONE = 42;	
+	
 	private Vector2i	coordinates;
 	private byte		specialFieldInfo;
 	private byte		playerNumber;

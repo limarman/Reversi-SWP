@@ -3,6 +3,8 @@
  */
 package swpg3;
 
+import java.util.HashSet;
+
 /**
  * @author eric
  *
@@ -12,6 +14,7 @@ public class Player {
 	private int	bombs;
 	private int	number;
 	private boolean isDisqualified = false;
+	private HashSet<Vector2i> stonePositions;
 
 	/**
 	 * @param number
@@ -23,6 +26,7 @@ public class Player {
 		this.number = number;
 		this.overrideStones = overrideStones;
 		this.bombs = bombs;
+		this.stonePositions = new HashSet<Vector2i>();
 	}
 
 	/**
@@ -105,6 +109,54 @@ public class Player {
 	public void addBomb()
 	{
 		this.bombs++;
+	}
+	
+	/**
+	 * 
+	 * @param position where stone is deleted/flipped
+	 */
+	public void removeStone(Vector2i position)
+	{
+		stonePositions.remove(position);
+	}
+	
+	/**
+	 * 
+	 * @param position
+	 * @return whether player has a stone at the given position
+	 */
+	public boolean containsStone(Vector2i position)
+	{
+		return stonePositions.contains(position);
+	}
+	
+	/**
+	 * 
+	 * @param position
+	 */
+	public void addStone(Vector2i position)
+	{
+		stonePositions.add(position);
+	}
+	
+	/**
+	 * 
+	 * @return the stone Positions
+	 */
+	public HashSet<Vector2i> getStonePositions()
+	{
+		return stonePositions;
+	}
+	
+	/**
+	 *  Switches the stone coordinates with another player
+	 * @param p
+	 */
+	public void switchStones(Player p) 
+	{
+		HashSet<Vector2i> temp = p.stonePositions;
+		p.stonePositions = this.stonePositions;
+		this.stonePositions = temp;
 	}
 
 	public static TileStatus mapPlayerNumberToTileStatus(int playerNumber)
