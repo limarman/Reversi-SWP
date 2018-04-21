@@ -30,5 +30,14 @@ class MoveManagerTest {
 	{
 		fail("Not yet implemented");
 	}
+	
+	/**
+	 *  Test method for {@link swpg3.MoveManager#applyMove(swpg3.Move)}.
+	 */
+	@Test
+	void testApplyMove() 
+	{
+		fail("Not yet implemented");
+	}
 
 }

@@ -19,12 +19,20 @@ public class MoveManager {
 	public MoveManager(Map map)
 	{
 		this.map = map;
+		gamePhase = GamePhase.BUILDING_PHASE;
+		
+		//initializing players
 		playerInfo = new Player[map.getNumberOfPlayers()];
 		for (int i = 0; i < map.getNumberOfPlayers(); i++)
 		{
 			playerInfo[i] = new Player(i + 1, map.getNumberOfOverrides(), map.getNumberOfBombs());
 		}
-		gamePhase = GamePhase.BUILDING_PHASE;
+		for(Vector2i position : map.getStartingFields()) //initializing the players starting fields
+		{
+			int playerIndex = map.getTileAt(position).getStatus().value-1;
+			playerInfo[playerIndex].addStone(position);
+		}
+		
 	}
 
 	/**
@@ -190,10 +198,9 @@ public class MoveManager {
 			}
 		}
 		else {
-			
+			//Bombing phase
+			bombField(map.getBombStrength(), move.getCoordinates());
 		}
-		
-		//TODO: implement
 	}
 	
 	/**
@@ -204,7 +211,7 @@ public class MoveManager {
 	private void flipStone(Vector2i position, byte playerNumber) {
 		
 		Tile t = map.getTileAt(position);
-		playerInfo[t.getStatus().ordinal()-1].removeStone(position); //removing the oppenent's stone
+		playerInfo[t.getStatus().value-1].removeStone(position); //removing the oppenent's stone
 		playerInfo[playerNumber].addStone(position); //adding the players stone
 		map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber)); //actualizing the map
 		
@@ -234,5 +241,30 @@ public class MoveManager {
 		//switching the coordinates
 		playerInfo[playerNumber1-1].switchStones(playerInfo[playerNumber2-1]);
 		
+	}
+	
+	/**
+	 * recursive method for bombing
+	 * @param radius of the bomb
+	 * @param position of bombed field
+	 */
+	private void bombField(int radius, Vector2i position) 
+	{
+		if(radius < 0) return; //recursion end
+		
+		map.getTileAt(position).setStatus(TileStatus.HOLE); //bombing the positionField
+		
+		MapWalker mw = new MapWalker(map); //TODO: might be possible to work with just 1 MapWalker
+		mw.setPosition(position);
+		
+		for(int i = 0; i<8; i++) { //execute method for every neighbour with decremented radius
+			mw.setDirection(Vector2i.mapDirToVector(i));
+			if(mw.canStep()){ //adjacent Field is not a hole
+				mw.step();
+				bombField(radius-1, mw.getPosition());
+				mw.setPosition(position);
+			}
+		}
+		//actualizing the stones in the player's view not necessary.
 	}
 }

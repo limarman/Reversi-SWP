@@ -1,5 +1,6 @@
 package swpg3;
 
+import java.util.HashSet;
 import java.util.Scanner;
 
 /**
@@ -16,7 +17,8 @@ public class Map {
 	private int	height;
 	private int	width;
 	private int	transitionCount;
-
+	private HashSet<Vector2i> startingFields;
+	
 	private Tile[] grid;
 
 	/**
@@ -27,6 +29,8 @@ public class Map {
 	 */
 	public Map(String inputString)
 	{
+		startingFields = new HashSet<>();
+		
 		Scanner scan = new Scanner(inputString);
 		this.transitionCount = 0;
 		try
@@ -90,6 +94,10 @@ public class Map {
 					{
 						scan.close();
 						throw new IllegalArgumentException("Invalid Tiletype Error ("+ y + "," + x  + ")");
+					}
+					else if(newStatus.value >= 1 && newStatus.value <= 8) //occupied by player
+					{
+						startingFields.add(new Vector2i(x,y));
 					}
 					grid[x + y * height] = new Tile(newStatus);
 				}
@@ -188,6 +196,14 @@ public class Map {
 	public int getWidth()
 	{
 		return width - 2;
+	}
+	
+	/**
+	 * @return the starting fields
+	 */
+	public HashSet<Vector2i> getStartingFields()
+	{
+		return startingFields;
 	}
 
 	/**

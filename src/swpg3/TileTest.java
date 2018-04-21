@@ -66,5 +66,15 @@ class TileTest {
 		finally {}
 
 	}
+	
+	@Test
+	void testIsOccupiedByPlayer() 
+	{
+		Tile toTest = new Tile();
+		toTest.setStatus(TileStatus.PLAYER_3);
+		assertTrue(toTest.isOccupiedbyPlayer(), "Was occupied by player");
+		toTest.setStatus(TileStatus.CHOICE);
+		assertFalse(toTest.isOccupiedbyPlayer(), "Was not occupied by player");
+	}
 
 }
