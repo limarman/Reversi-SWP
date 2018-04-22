@@ -135,5 +135,25 @@ public class Vector2i {
 				return new Vector2i(0, 0);
 		}
 	}
+	
+	/**
+	 * Compare this to another Vector, Overwriting the standard method
+	 * 
+	 * @param b
+	 *            Other Vector to be added
+	 * @return true, if vectors are equal
+	 */
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof Vector2i)
+		{
+			return ((this.x == ((Vector2i)o).x) && (this.y == ((Vector2i)o).y));
+		}
+		else 
+		{
+			return false;
+		}
+	}
 
 }

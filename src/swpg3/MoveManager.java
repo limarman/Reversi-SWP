@@ -139,6 +139,8 @@ public class MoveManager {
 			
 			//if tile is occupied
 			Tile t = map.getTileAt(move.getCoordinates());
+			TileStatus beforeStatus = t.getStatus();
+			
 			if(t.isOccupied()) { 
 				playerInfo[playerIndex].useOverrideStone();
 			}
@@ -173,7 +175,7 @@ public class MoveManager {
 			}
 			
 			//handle special fields
-			switch(t.getStatus()) {
+			switch(beforeStatus) {
 			
 			case CHOICE:
 				switchStones(move.getSpecialFieldInfo(), move.getPlayerNumber());
@@ -231,14 +233,16 @@ public class MoveManager {
 		HashSet<Vector2i> stonePos1, stonePos2;
 		stonePos1 = playerInfo[playerNumber1-1].getStonePositions();
 		stonePos2 = playerInfo[playerNumber2-1].getStonePositions();
-		
+				
 		//updating the map
 		for(Vector2i position : stonePos1) {
-			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
+			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
+			System.out.println("Overriden stone from Player: " + playerNumber1 + " Position: " + position.x + " " + position.y);
 		}
 		
 		for(Vector2i position : stonePos2) {
-			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
+			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
+			System.out.println("Overriden stone from Player: " + playerNumber2 + " Position: " + position.x + " " + position.y);
 		}
 		
 		//switching the coordinates
