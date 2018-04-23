@@ -1,0 +1,22 @@
+<project name="swpg3" default="compile" basedir=".">
+  <description>
+    Buildfile for our Software Praktikum Group 3 Project
+  </description>
+  <property name="src" location="src" />
+  <property name="bin" location="bin" />
+  
+  <target name="compile">
+    <javac srcdir="${src}" destdir="${bin}" />
+  </target>
+  
+  <target name="clean">
+    <delete includeemptydirs="true">
+      <fileset dir="${bin}">
+        <include name="**/*" />
+        <exclude name=".gitkeep" />
+        <exclude name=".gitignore" />
+      </fileset>
+    </delete>
+  </target>
+  
+</project>
