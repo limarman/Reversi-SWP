@@ -3,6 +3,7 @@
  */
 package swpg3;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -281,10 +282,10 @@ public class MoveManager {
 	 */
 	private void bombField(int radius, Vector2i position) 
 	{	
-		HashSet<Vector2i> positionsToBomb = new HashSet<>();
+		HashMap<Vector2i, Integer> positionsToBomb = new HashMap<>();
 		checkFieldsToBomb(radius, position.clone(), positionsToBomb);
 		
-		for(Vector2i positionToBomb : positionsToBomb) 
+		for(Vector2i positionToBomb : positionsToBomb.keySet()) 
 		{
 			Tile t = map.getTileAt(positionToBomb);
 						
@@ -303,15 +304,27 @@ public class MoveManager {
 	 * recursive help Method for getting the fields which have to be bombed
 	 * @param radius
 	 * @param position
-	 * @param fieldsToBomb - HashSet which is going to be filled with positions
+	 * @param fieldsToBomb - HashMap which is going to be filled with positions
 	 */
-	private void checkFieldsToBomb(int radius, Vector2i position, HashSet<Vector2i> positionsToBomb)
+	private void checkFieldsToBomb(int radius, Vector2i position, HashMap<Vector2i, Integer> positionsToBomb)
 	{
 		if(radius < 0)
 			return; //no bombing
 		
-		positionsToBomb.add(position.clone());
-
+		if(!positionsToBomb.containsKey(position))
+		{
+			positionsToBomb.put(position.clone(), radius); //adding to the HashMap
+		}
+		else if(positionsToBomb.get(position) >= radius) //Tile has already been visited with bigger radius
+		{
+			return; //No need for further recursion as all reachable tiles were already reached
+		}
+		else //Tile has already been visited, but with smaller radius
+		{
+			positionsToBomb.remove(position);
+			positionsToBomb.put(position, radius); //actualize the radius the tile was visited for coming visitors
+		}
+		
 		if(radius == 0) // only current position has to be bombed
 			return; //usual recursion end
 		
