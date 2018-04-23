@@ -106,7 +106,8 @@ public class Vector2i {
 	 * creates an identical copy of Vector, for reference problems
 	 * @return an identical copy of Vector
 	 */
-	public Vector2i getCopy() 
+	@Override
+	public Vector2i clone()
 	{
 		return new Vector2i(this.x, this.y);
 	}
@@ -136,24 +137,37 @@ public class Vector2i {
 		}
 	}
 	
-	/**
-	 * Compare this to another Vector, Overwriting the standard method
-	 * 
-	 * @param b
-	 *            Other Vector to be added
-	 * @return true, if vectors are equal
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-	public boolean equals(Object o)
-	{
-		if(o instanceof Vector2i)
-		{
-			return ((this.x == ((Vector2i)o).x) && (this.y == ((Vector2i)o).y));
-		}
-		else 
-		{
-			return false;
-		}
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Vector2i other = (Vector2i) obj;
+		if (x != other.x)
+			return false;
+		if (y != other.y)
+			return false;
+		return true;
+	}
+
+	
 
 }

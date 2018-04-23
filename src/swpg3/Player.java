@@ -136,7 +136,7 @@ public class Player {
 	 */
 	public void addStone(Vector2i position)
 	{
-		stonePositions.add(position);
+		stonePositions.add(position); 
 	}
 	
 	/**

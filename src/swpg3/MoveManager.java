@@ -146,11 +146,11 @@ public class MoveManager {
 			}
 			
 			//flip set stone
-			flipStone(move.getCoordinates(), move.getPlayerNumber());
+			flipStone(move.getCoordinates().clone(), move.getPlayerNumber());
 			
 			//create Walker in every direction
 			for(int i = 0; i<8; i++) {
-				MapWalker mw = new MapWalker(map, move.getCoordinates().getCopy(),Vector2i.mapDirToVector(i));
+				MapWalker mw = new MapWalker(map, move.getCoordinates().clone(),Vector2i.mapDirToVector(i));
 				mw.step();
 
 				//walk until hole, a non-occupied square or an own stone
@@ -168,7 +168,7 @@ public class MoveManager {
 					mw.step();
 					while(!(mw.getPosition().equals(move.getCoordinates())))
 					{
-						flipStone(mw.getPosition(), move.getPlayerNumber());
+						flipStone(mw.getPosition().clone(), move.getPlayerNumber());
 						mw.step();
 					}		
 				}
@@ -202,9 +202,35 @@ public class MoveManager {
 		}
 		else {
 			//Bombing phase
-			bombField(map.getBombStrength(), move.getCoordinates().getCopy());
+			bombField(map.getBombStrength(), move.getCoordinates().clone());
 		}
 	}
+	
+	/**
+	 * 
+	 * @param playernumber
+	 * @return the PlayerObject with the corresponding playernumber
+	 */
+	public Player getPlayer(int playernumber) {
+		if(playernumber < 1 || playernumber-1 >= playerInfo.length)
+			return null;
+		
+		return playerInfo[playernumber-1];
+	}
+	
+	/**
+	 * toggles the GamePhase 
+	 * Bombing <-> Building
+	 */
+	public void toggleGamePhase() {
+		if(this.gamePhase == GamePhase.BUILDING_PHASE) {
+			this.gamePhase = GamePhase.BOMBING_PHASE; 
+		}else{
+			this.gamePhase = GamePhase.BUILDING_PHASE; //this should not be used
+		}
+	}
+	
+	
 	
 	/**
 	 * 
@@ -237,12 +263,10 @@ public class MoveManager {
 		//updating the map
 		for(Vector2i position : stonePos1) {
 			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
-			System.out.println("Overriden stone from Player: " + playerNumber1 + " Position: " + position.x + " " + position.y);
 		}
 		
 		for(Vector2i position : stonePos2) {
 			map.getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
-			System.out.println("Overriden stone from Player: " + playerNumber2 + " Position: " + position.x + " " + position.y);
 		}
 		
 		//switching the coordinates
@@ -251,27 +275,56 @@ public class MoveManager {
 	}
 	
 	/**
-	 * recursive method for bombing
+	 * method bombing  the field with given radius and center of bomb
 	 * @param radius of the bomb
 	 * @param position of bombed field
 	 */
 	private void bombField(int radius, Vector2i position) 
-	{
-		if(radius < 0) return; //recursion end
+	{	
+		HashSet<Vector2i> positionsToBomb = new HashSet<>();
+		checkFieldsToBomb(radius, position.clone(), positionsToBomb);
 		
-		map.getTileAt(position).setStatus(TileStatus.HOLE); //bombing the positionField
+		for(Vector2i positionToBomb : positionsToBomb) 
+		{
+			Tile t = map.getTileAt(positionToBomb);
+						
+			//Managing the players' view
+			if(t.isOccupiedbyPlayer()) 
+			{
+				playerInfo[t.getStatus().value-1].removeStone(positionToBomb);
+			}
+			
+			t.setStatus(TileStatus.HOLE); //bombing the positionField
+		}
+		
+	}
+	
+	/**
+	 * recursive help Method for getting the fields which have to be bombed
+	 * @param radius
+	 * @param position
+	 * @param fieldsToBomb - HashSet which is going to be filled with positions
+	 */
+	private void checkFieldsToBomb(int radius, Vector2i position, HashSet<Vector2i> positionsToBomb)
+	{
+		if(radius < 0)
+			return; //no bombing
+		
+		positionsToBomb.add(position.clone());
+
+		if(radius == 0) // only current position has to be bombed
+			return; //usual recursion end
 		
 		MapWalker mw = new MapWalker(map); //TODO: might be possible to work with just 1 MapWalker
-		mw.setPosition(position);
+		mw.setPosition(position.clone());
 		
-		for(int i = 0; i<8; i++) { //execute method for every neighbour with decremented radius
+		for(int i = 0; i<8; i++) { //execute method for every neighbor with decremented radius
 			mw.setDirection(Vector2i.mapDirToVector(i));
 			if(mw.canStep()){ //adjacent Field is not a hole
 				mw.step();
-				bombField(radius-1, mw.getPosition().getCopy());
-				mw.setPosition(position);
+				checkFieldsToBomb(radius-1, mw.getPosition().clone(), positionsToBomb);
+				mw.setPosition(position.clone());
 			}
 		}
-		//actualizing the stones in the player's view not necessary.
 	}
 }
