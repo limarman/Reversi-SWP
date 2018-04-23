@@ -1,1 +1,20 @@
-\section{Exercise 2}
+\section{Task 4}
+Einige Erläuterungen zur Implementierung der Funktionalität, welche einen Spielzug durchführt und den momentanen Zustand in den Nachfolgezustand überführt.
+\subsection{Zugehörigkeit der Funktion}
+Die Methode mit der Signatur $applyMove(Move\ m)$ und die jeweils benötigten Hilfsmethoden wurden funktional passend untergebracht in der Klasse MoveManager, welche verantwortlich ist für das Verwalten und Verändern der Spielsituationen.
+\subsection{Aufbau der Methode}
+Zunächst wird in der Methode davon ausgegangen, dass der übergebene Zug valide ist. Ansonsten verhält sich die Methode beliebig.
+Die Methode spaltet sich auf in einen Teil, welcher in der Bauphase und einen welcher in der Bombphase arbeitet.
+\subsubsection{Building phase}
+Durch Nutzung unseres Werkzeugs für eine Iteration über die Map, der MapWalker, wird in jede Richtung von der gesetzten Steinposition aus über die Map iteriert bis entweder
+\begin{enumerate}
+\item[\textbf{a)}] ein eigener Stein gefunden wird, dann müssen alle dazwischen in die eigene Farbe gebracht werden) 
+\item[\textbf{b)}] ein nicht besetztes Feld (oder Loch) gefunden wird, dann hat der Spielzug in diese Himmelsrichtung keine Auswirkung.
+\end{enumerate}
+Das 'Drehen' der Steine geschieht durch die Methode\\ $flipStone(Vector2i\ pos, int\ playernumber)$, welche das Spielfeld aktualisiert und außerdem noch die Datenstruktur anpasst, die jeder Spieler hält. In dieser Felder, unsere Wahl war das HashSet, werden die Positionen der Steine gespeichert, die der Spieler gerade belegt hat.\\
+Die Wahl des HashSets, begründet sich dadurch, dass keine Positionen doppelt vorkommen sollen/können und die Reihenfolge der Elemente beim Iterieren über das Set keine Rolle spielt.\\
+Der zusätzliche Speicherbedarf und Verwaltungsaufwand soll ein effizientes Verfahren bei den Bonusfeldern ermöglichen.
+So ist das Tauschen von den Steinen zweier Spieler mit relativ wenig Aufwand möglich, da die Positionen stets bekannt sind. Der Effekt des Inversionfeldes wird durch eine Reihe von Vertauschungen zwischen den Steinen zweier Spieler umgesetzt.
+\subsubsection{Bombing phase}
+Hier wird auf eine rekursive Hilfsmethode zurückgegriffen, welche um alle Felder zu bomben, welche zum Bombfeld höchstens eine Entfernung von $n$ haben, sich selber aufruft für die Nachbarn mit dem Radius $n-1$.\\
+Um effizienter zu arbeiten, wird hier eine HashMap genutzt, welche speichert an welchen Positionen man mit welchem Radius bereits war. Dann vermeidet man es von derselben Position aus mit kleinerem oder gleichgroßen Radius erneut zu suchen und bereits gefundene Felder zum wiederholten Male zu finden.
