@@ -1,11 +1,16 @@
 /**
  * 
  */
-package swpg3;
+package swpg3Tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import swpg3.Map;
+import swpg3.Tile;
+import swpg3.TileStatus;
+import swpg3.Vector2i;
 
 /**
  * @author eric

@@ -15,6 +15,7 @@ public class Player {
 	private int	number;
 	private boolean isDisqualified = false;
 	private HashSet<Vector2i> stonePositions;
+	private int numberOfStones;
 
 	/**
 	 * @param number
@@ -117,7 +118,8 @@ public class Player {
 	 */
 	public void removeStone(Vector2i position)
 	{
-		stonePositions.remove(position);
+		if(stonePositions.remove(position))
+			numberOfStones--;
 	}
 	
 	/**
@@ -136,7 +138,8 @@ public class Player {
 	 */
 	public void addStone(Vector2i position)
 	{
-		stonePositions.add(position); 
+		if(stonePositions.add(position))
+			numberOfStones++;
 	}
 	
 	/**
@@ -157,8 +160,25 @@ public class Player {
 		HashSet<Vector2i> temp = p.stonePositions;
 		p.stonePositions = this.stonePositions;
 		this.stonePositions = temp;
+		// switch stone numbers too
+		int tempCount = p.numberOfStones;
+		p.numberOfStones = this.numberOfStones;
+		this.numberOfStones = tempCount;
 	}
 
+	/**
+	 * @return number of stones currently in the set of this player
+	 */
+	public int getNumberOfStones()
+	{
+		return numberOfStones;
+	}
+	
+	/**
+	 * 
+	 * @param playerNumber
+	 * @return
+	 */
 	public static TileStatus mapPlayerNumberToTileStatus(int playerNumber)
 	{
 		switch(playerNumber)

@@ -141,7 +141,7 @@ public class Map {
 					!getTileAt(Vector2i.sum(p2,  p2OutDir)).isHole())
 			{
 				scan.close();
-				throw new IllegalArgumentException("Transition Error");
+				throw new IllegalArgumentException("Transition Error: Tile not Connected to Hole");
 			}
 			getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
 			getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);

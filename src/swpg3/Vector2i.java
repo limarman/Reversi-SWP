@@ -112,6 +112,10 @@ public class Vector2i {
 		return new Vector2i(this.x, this.y);
 	}
 
+	/**
+	 * @param dir
+	 * @return
+	 */
 	public static Vector2i mapDirToVector(int dir)
 	{
 		switch (dir)

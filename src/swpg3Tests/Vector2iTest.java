@@ -1,8 +1,10 @@
-package swpg3;
+package swpg3Tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import swpg3.Vector2i;
 
 class Vector2iTest {
 

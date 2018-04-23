@@ -57,7 +57,18 @@ public class MoveManager {
 
 			if (movePos.isOccupied() && playerInfo[playerIndex].getOverrideStones() == 0)
 				return false;
-
+			// Check Move special Field:
+			// Not a special Field but Special attributes?
+			if((movePos.getStatus() != TileStatus.CHOICE && movePos.getStatus() != TileStatus.BONUS) && move.getSpecialFieldInfo() != 0)
+				return false;
+			// Bonus field but not a bonus attribute?
+			if(movePos.getStatus() == TileStatus.BONUS && (move.getSpecialFieldInfo() != Move.ADD_BOMBSTONE && move.getSpecialFieldInfo() != Move.ADD_OVERRIDESTONE))
+				return false;
+			// Choice field but not a valid playernumber?
+			if(movePos.getStatus() == TileStatus.CHOICE && !(move.getSpecialFieldInfo() >= 1 && move.getSpecialFieldInfo() <= map.getNumberOfPlayers()))
+				return false;
+			
+			
 			if(movePos.getStatus() == TileStatus.EXPANSION) return true;
 			
 			// Left over: Check Tiles around and flip Rule
@@ -66,8 +77,7 @@ public class MoveManager {
 			boolean hasAdjacentTile = false;
 			for(int i = 0; i < 8; i++)
 			{
-				//There might be a bug, because move is reference and changed during stepping
-				walker[i] = new MapWalker(map, move.getCoordinates(), Vector2i.mapDirToVector(i));
+				walker[i] = new MapWalker(map, move.getCoordinates().clone(), Vector2i.mapDirToVector(i));
 				if(walker[i].step())
 				{
 					Tile t = walker[i].getCurrentTile();

@@ -1,8 +1,9 @@
 /**
  * 
  */
-package swpg3;
+package swpg3Tests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -10,6 +11,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
+
+import swpg3.Map;
+import swpg3.Move;
+import swpg3.MoveManager;
+import swpg3.TileStatus;
+import swpg3.Vector2i;
 
 /**
  * @author eric
@@ -23,7 +30,21 @@ class MoveManagerTest {
 	@Test
 	void testMoveManager()
 	{
-		fail("Not yet implemented");
+		String mapString = "3\n3\n2 3\n6 6\n000100\n000120\n0c-100\n0031i0\n000200\n000b00\n3 0 0 <-> 3 5 4";
+		Map map = null;
+		try
+		{
+			map = new Map(mapString);
+		} catch (Exception e)
+		{
+			fail("map could not be read." + e.getMessage());
+		}
+		assertTrue(map.getTileAt(4, 1).getStatus() == TileStatus.PLAYER_2, "map was not read correctly.");
+		assertTrue(map.getTileAt(1, 4).getStatus() == TileStatus.EMPTY, "map was not read correctly.");
+
+		MoveManager mm = new MoveManager(map);
+
+		assertEquals(4, mm.getPlayer(1).getNumberOfStones(), "Difference in player stone count");
 	}
 
 	/**
@@ -32,7 +53,34 @@ class MoveManagerTest {
 	@Test
 	void testIsMoveValid()
 	{
-		fail("Not yet implemented");
+		String mapString = "3\n3\n2 3\n6 6\n000100\n000120\n0c-100\n0031i0\n000230\n000000\n3 0 0 <-> 3 5 4";
+		Map map = null;
+		try{
+			map = new Map(mapString);
+		}
+		catch(Exception e) {
+			fail("map could not be read.");
+		}
+		assertTrue(map.getTileAt(4,1).getStatus() == TileStatus.PLAYER_2, "map was not read correctly.");
+		assertTrue(map.getTileAt(1,4).getStatus() == TileStatus.EMPTY, "map was not read correctly.");
+		
+		MoveManager mm = new MoveManager(map);
+		
+		Move invalid1 = new Move(0, 5, (byte)0, (byte)1);
+		Move invalid2 = new Move(2, 1, (byte)1, (byte)2);
+		Move invalid3 = new Move(2, 2, (byte)4, (byte)2);
+		Move invalid4 = new Move(2, 2, (byte)0, (byte)3);
+		
+		Move valid1 = new Move(2, 1, (byte)0, (byte)2);
+		Move valid2 = new Move(3, 5, (byte)0, (byte)2);
+		
+		assertFalse(mm.isMoveValid(invalid1), "Considered Valid: No stones flipped");
+		assertFalse(mm.isMoveValid(invalid2), "Considered Valid: Wrong special field value");
+		assertFalse(mm.isMoveValid(invalid3), "Considered Valid: Not present player selected in Choice");
+		assertFalse(mm.isMoveValid(invalid4), "Considered Valid: Move in Hole");
+		
+		assertTrue(mm.isMoveValid(valid1), "Considered unvalid: Simple Move");
+		assertTrue(mm.isMoveValid(valid2), "Considered unvalid: Flip over Transition");
 	}
 	
 	/**

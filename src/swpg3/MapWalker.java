@@ -71,6 +71,12 @@ public class MapWalker {
 		this.direction = direction;
 	}
 
+	/**
+	 * Checks if the walker can step in the current direction. 
+	 * 
+	 * It can step, if the next Tile isn't a Hole or there is a transition in that direction.
+	 * @return true, if Walker can step; false, otherwise
+	 */
 	public boolean canStep()
 	{
 		return !map.getTileAt(Vector2i.sum(position, direction)).isHole()
@@ -130,7 +136,7 @@ public class MapWalker {
 	/**
 	 * @return true, if Walkers movement isn't blocked; false, otherwise
 	 */
-	public boolean ismovementEnabled()
+	public boolean isMovementEnabled()
 	{
 		return !movementStopped;
 	}
