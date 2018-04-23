@@ -144,9 +144,8 @@ public class MoveManager {
 	 */
 	public void applyMove(Move move)
 	{
+		int playerIndex  = move.getPlayerNumber()-1;
 		if(gamePhase == GamePhase.BUILDING_PHASE) {
-			
-			int playerIndex  = move.getPlayerNumber()-1;
 			
 			//if tile is occupied
 			Tile t = map.getTileAt(move.getCoordinates());
@@ -213,6 +212,7 @@ public class MoveManager {
 		}
 		else {
 			//Bombing phase
+			playerInfo[playerIndex].useBomb();
 			bombField(map.getBombStrength(), move.getCoordinates().clone());
 		}
 	}
