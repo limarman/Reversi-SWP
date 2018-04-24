@@ -4,8 +4,11 @@
 package swpg3;
 
 /**
+ * A class to walk over a Map in a specified direction.
+ * This class will automatically follow Transitions and adjust its walking direction
+ * accordingly 
+ * 
  * @author eric
- *
  */
 public class MapWalker {
 	private Map			map;

@@ -8,10 +8,10 @@ package swpg3;
  *
  */
 public class Move {
-	
-	public static final byte ADD_BOMBSTONE = 20;    // Now compliant with network specification
-	public static final byte ADD_OVERRIDESTONE = 21;	
-	
+
+	public static final byte	ADD_BOMBSTONE		= 20;	// Now compliant with network specification
+	public static final byte	ADD_OVERRIDESTONE	= 21;
+
 	private Vector2i	coordinates;
 	private byte		specialFieldInfo;
 	private byte		playerNumber;
@@ -27,7 +27,7 @@ public class Move {
 		this.specialFieldInfo = specialFieldInfo;
 		this.playerNumber = playerNumber;
 	}
-	
+
 	/**
 	 * @param x
 	 * @param y
@@ -36,7 +36,7 @@ public class Move {
 	 */
 	public Move(int x, int y, byte specialFieldInfo, byte playerNumber)
 	{
-		this.coordinates = new Vector2i(x,y);
+		this.coordinates = new Vector2i(x, y);
 		this.specialFieldInfo = specialFieldInfo;
 		this.playerNumber = playerNumber;
 	}

@@ -1,1 +1,33 @@
-\section{Task 2}
+\section{Task 3}
+Um diesen Task zu bearbeiten wurden wieder mehrere Klassen hinzugefügt.
+\subsection{Player}
+\label{PLayer}
+Die Player Klasse ist eine recht simple Klasse, die Informationen zu einem, am Spiel teilnehmenden, Spieler bereithält. So wird etwa die Spielernummer, sowie die Anzahl der Bomben und Overridestones gespeichert. All diese Daten müssen zur Initialisierung vorliegen, können später allerdings über Getter und Setter verändert werden.
+\subsection{Move}
+\label{Move}
+Diese Klasse beinhaltet einen Vector2i, der die Koordinaten des Feldes codiert, sowie die Spielernummer und die eventuell anfallenden Sonderinformationen des Spielzuges. Diese Daten müssen zur Initialisierung angegeben werden und können danach nur noch abgefragt werden.
+\subsection{GamePhase}
+\label{GamePhase}
+GamePhase ist ein sehr simples Enum, dass Einträge für die beiden Spielphasen, Bombing Phase und Building Phase, enthält.
+\subsection{MapWalker}
+\label{MapWalker}
+Dies ist eine Klasse, die dazu genutzt wird, über die Map zu laufen. Sie beinhaltet eine Referenz auf die Spielkarte, eine Position und eine Richtung in Form zweier Vector2i, sowie eine bool Variable, die dazu dient diesen Läufer zu deaktivieren.
+Ein Läufer funktioniert so, dass er an einer Position startet und in eine feste Richtung läuft. Dabei folgt er automatisch Transitionen und passt die Laufrichtung entsprechend an. Bei einem Aufruf der Methode \textit{step()} macht der Walker genau einen Schritt in die gegebene Richtung, falls dies möglich ist. Außerdem gibt sie einen boolean zurück, der angibt ob ein Schritt gemacht wurde. Man kann mittels der \textit{canStep()}-Methode auch prüfen ob der Walker einen Schritt machen kann, oder ob ein Loch den Weg in diese Richtung blockiert.
+
+Um einen Schritt zu machen, prüft ein MapWalker zuerst, ob ob er aktiv ist und ob er einen Schritt nach vorne machen kann. Danach wird geprüft ob das nächste Tile ein Loch ist. Ist es kein Loch, so wird einfach die Position verändert. Ein Richtungswechsel findet nicht statt. Sollte das nächste Tile jedoch ein Loch sein, so wird die Position des Walkers auf den Endpunkt, sowie die Richtung des Walkers auf die Richtung der Transition gesetzt.
+
+Durch den Einsatz einer solchen Klasse, erspart man sich das komplette iterieren über die Karte und vereinfacht den Umgang mit den Transitionen.
+\subsection{MoveManager}
+\label{MoveManager}
+Der MoveManager verwaltet die Spielzüge, die getätigt werden und getätigt werden können. Dafür hat auch er eine Referenz auf die Spielkarte. Des weiteren pflegt er ein Array mit \hyperref[Player]{Playern} um die Daten der Spieler parat zu haben. Als letztes hat er noch eine Variable, die die aktuelle Phase in Form eines \hyperref[GamePhase]{GamePhase} des Spiels beinhaltet, auch wenn diese zur Zeit nicht beeinflusst werden kann, da noch kein richtiges Spiel stattfindet.
+Der MoveManager muss mit einer fertigen Map initialisiert werden und extrahiert alle für ihn notwendigen Informationen aus dieser.
+Er stellt auch eine Methode bereit, die einen \hyperref[Move]{Move} auf dessen Korrektheit.
+\subsection{Algorithmus}
+Der Algorithmus prüft zuerst denn Fall, dass das Spiel in der Bombing Phase ist, da dieser sehr einfach zu prüfen ist:
+Es wird überprüft, ob das getroffene Feld ein Loch ist, ob der ausführende Spieler noch Bomben hat und ob das Spezialfeldattribut auf 0 steht.
+
+In der Building Phase wird als erstes geprüft, ob das Zielfeld des \hyperref[Move]{Moves} ein Loch ist. Falls dem so ist, ist der Zug nicht gültig. Als nächstes wird geschaut ob das Feld bereits besetzt ist und der Spieler keine Overridestones mehr hat. Auch in diesem Fall ist der Zug ungültig. Danach werden die Spezialfeld Attribute überprüft, so dass diese den Netzwerkspezifikationen entsprechen. Ein Abweichen resultiert auch in einem ungültigen Zug. Wenn das Zielfeld ein Expansionstone ist, so kann dieser nun als gültiger Zug betrachtet werden, denn der Spieler hat an dieser Stelle des Programms noch Overridestones, sonst hätte der Algorithmus den Zug bereits als ungültig bewertet. Es muss also nur noch geprüft werden, dass ein Stein umgedreht werden kann in dem Zug. Dafür werden acht MapWalker erstellt, die in alle Richtungen von dem Zielfeld weg laufen. Zuerst machen diese nur einen Schritt und es wird geprüft, ob das Zielfeld an ein besetztes Feld angrenzt, das nicht von dem Ziehenden Spieler besetzt ist. Sollte es kein solches Feld geben, kann kein Stein umgedreht werden und der Zug ist ungültig. Danach laufen die Walker weiter in ihre Richtungen, bis sie auf ein leeres Feld oder auf ein vom ziehenden Spieler besetztes Feld stoßen. Im zweiten Fall, muss nur geprüft werden, dass es nicht das Startfeld ist, da auch im Kreis gegangen werden kann, durch Transitionen. Ist es nicht das Startfeld, so wurde ein gültiger Zug gefunden. Trifft ein Walker auf ein Loch oder ein leeres Feld, so bleibt er stehen, damit er nicht zufällig auf ein besetztes Feld gerät und somit ein Pfad mit einem leeren Feld in der Mitte als gültig erkennt.
+
+Durch die Verwendung der MapWalker werden auch die Transitionen korrekt beachtet.
+
+Die Überprüfung auf Korrektheit der Spezialfeldattribute wurde an dieser Stelle gemacht und nicht am Netzwerkinterface, da vom Server nur gültige Züge übertragen werden sollten und bei der Ermittlung der gültigen Züge, die später wichtig sein wird, diese Felder auch von Bedeutung sein werden und das Netzwerkinterface nichts mit der Ermittlung der möglichen Folgezüge zu tun hat.
