@@ -25,6 +25,8 @@ public class Vector2i {
 
 	/**
 	 * Initialise as (x,y)
+	 * @param x
+	 * @param y
 	 */
 	public Vector2i(int x, int y)
 	{
@@ -33,7 +35,8 @@ public class Vector2i {
 	}
 
 	/**
-	 * Addition of another Vector b. this = this + b
+	 * Addition of another Vector b like this = this + b
+	 * This Method modifies this Object
 	 * 
 	 * @param b
 	 *            Other Vector to be added
@@ -46,6 +49,7 @@ public class Vector2i {
 
 	/**
 	 * Scale Vector by factor
+	 * This Method modifies this Object
 	 * 
 	 * @param factor
 	 *            factor to be scaled by
@@ -61,7 +65,7 @@ public class Vector2i {
 	 * 
 	 * @param b
 	 *            Other Vector to be added
-	 * @return true, if vectors are equal
+	 * @return true, if vectors are equal; false, otherwise
 	 */
 	public boolean equals(Vector2i b)
 	{
@@ -69,6 +73,8 @@ public class Vector2i {
 	}
 
 	/**
+	 * Checks if both entries of the Vector are zero
+	 * 
 	 * @return true, if x and y are 0; false, otherwise
 	 */
 	public boolean isZero()
@@ -90,7 +96,7 @@ public class Vector2i {
 	}
 
 	/**
-	 * Creates a new Vector equal to the scaled Vetor a
+	 * Creates a new Vector equal to the scaled Vector a
 	 * @param a doesn't get changed by function
 	 * @param factor to be scaled by
 	 * @return a new vector
@@ -113,6 +119,11 @@ public class Vector2i {
 	}
 
 	/**
+	 * Maps a direction in the form specified by the assignments to a Vector
+	 * Input can be an int in interval [0,7]
+	 * Output will be a Vector in the direction:
+	 * i.e. Direction 0 (up) will be mapped to (0,-1)
+	 * 
 	 * @param dir
 	 * @return
 	 */
@@ -170,6 +181,15 @@ public class Vector2i {
 		if (y != other.y)
 			return false;
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return "(" + x + "," + y + ")";
 	}
 
 	

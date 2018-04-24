@@ -1,1 +1,39 @@
 \section{Task 2}
+Im folgenden wird jede Klasse die zur Bearbeitung dieser Aufgabe angelegt wurde kurz erläutert. Auf die JUnit Testklassen wird dabei nicht eingegangen, da diese keine funktionale Bedeutung haben.
+\subsection{Pseudo-2D-Array}
+\label{subsec:PseudoArr}
+Ein Pseudo-2D-Array ist keine von uns angelegte Klasse sondern ein Begriff um ein, in einem eindimensionalen Array gespeichertes, zweidimensionales Array zu beschreiben. Dabei wird jede Zeile des Pseudo-2D-Arrays nacheinander in das eindimensionale Array geschrieben. Dies hat gegenüber normalen zweidimensionalen Arrays den Vorteil, dass alle Einträge am Stück im Speicher liegen und nicht eine Referenz auf ein Array von Referenzen gespeichert ist. somit muss nicht doppelt dereferenziert werden und es kann die Performance verbessern, wenn das gesamte Array in den Cache geladen wird und nicht nur eine Zeile davon. Der Zugriff auf ein solches Array ist auch nicht kompliziert: Um auf Position (x,y) zuzugreifen, muss lediglich die der Index im eindimensionalen Array berechnet werden: $Index=x+y*Breite$, wobei $Breite$ die Breite des 2D-Arrays beschreibt. 
+\subsection{Vector2i Klasse}
+\label{subsec:Vector2i}
+Diese Klasse repräsentiert einen zweidimensionalen Vektor mit Integer Werten.
+Diese Vektoren werden benutzt um Positionen und Richtungen auf der Karte zu speichern.
+Mit diesen Vektoren zu arbeiten, anstatt die Richtungsdefinition aus den Regeln zu benutzen, hat den Vorteil, dass sie das programmieren sehr erleichtern. So kann man einen Positionsvektor recht einfach verändern indem ein Richtungsvektor addiert wird, was in wenigen Zeilen Code gemacht werden kann. Würde man die Richtungen in Form eines Enums speichern, wären sehr viele switch-Statements notwendig um Schritte in eine Richtung zu machen, bzw. einen Richtungswechsel nach einer Transition durchzuführen.
+
+Vector2i bietet zwei Konstruktoren um als Nullvektor, sowie als Vektor mit gegebenen Werten initialisiert zu werden.
+Des weiteren gibt es je zwei Funktionen um einen Vektor um einen Faktor zu skalieren und um zwei Vektoren zu addieren. Eine dieser Funktionen verändert jeweils das Objekt auf dem sie aufgerufen wurde und die andere ist jeweils eine statische Methode, die ein neues Vector2i Objekt zurück gibt, auf das diese Änderungen angewandt wurden.
+\subsection{Transition Klasse}
+\label{subsec:Transition}
+In dieser Klasse werden die Transitionen einer Karte gespeichert. Dazu wird ein Endpunkt und eine Ankunftsrichtung, jeweils in Form eines \hyperref[subsec:Vector2i]{Vector2i}, festgehalten. Damit ist eine Transition also gerichtet, obwohl Transitionen laut Spezifikation ungerichtet sind. In unserer Implementation werden deshalb für jede Transition der Karte 2 Transition Objekte erzeugt. Diese Objekte werden an jeweils an ein \hyperref[subsec:Tile]{Tile} 'gehängt'. Da nur über den Ursprung auf eine Transition zugegriffen werden kann, muss dieser nicht mit von dieser Transition gespeichert werden. Eine Transition muss mit allen Attributen initialisiert werden, denn zu der Erzeugung einer Transition stehen diese bereits fest und werden im Verlauf des Spiels nicht mehr verändert.
+\subsection{TileStatus Klasse}
+\label{subsec:TileStatus}
+TileStatus ist ein recht einfaches Enum, das den Zustand eines \hyperref[subsec:Tile]{Tile} codiert. Als Zustand wird hierbei die Belegung sowie die Art dieses Feldes gemeint, also ob es ein Loch oder ein richtiges Feld ist, ob ein Spieler einen Stein dort liegen hat oder es ein Bonusfeld ist. Man könnte diesen Zustand noch weiter aufteilen in verschiedene Enums: Eins, das die Art des Feldes definiert und Eins, das den Spieler festhält, dessen Stein auf diesem Feld liegt, allerdings würde dies nur zu mehr Aufwand führen.
+
+Des weiteren gibt es noch eine Methode, die einen char entsprechend der Regeln in einen TileStatus umwandelt.
+\subsection{Tile Klasse}
+\label{subsec:Tile}
+In der Tile Klasse werden die Felder des Spielfeldes verwaltet. Dazu wird jeweils ein \hyperref[subsec:TileStatus]{TileStatus} und ein 3x3 \hyperref[subsec:PseudoArr]{Pseudo-2D-Array} von Transitionen gespeichert.
+Initialisiert werden kann ein Tile standardmäßig als Loch oder mit einem übergebenem TileStatus. Transitionen können erst nach der Initialisierung hinzugefügt werden, da diese auch in der Map Datei erst nach dem Spielfeld definiert sind.
+
+Transitionen werden in dem Array über eine Richtung, also einen \hyperref[subsec:Vector2i]{Vector2i} indiziert. Dazu werden jedoch die beiden Werte des Vektor um eins inkrementiert, damit keine negativen Indices auftreten. Danach wird der Index bestimmt aus: $v.x+v.y*Breite$. Da es sich um ein 3x3 Array handelt ist die Breite folglich 3.
+Somit gibt es für jede Richtung an in die eine Transition verlaufen kann einen Slot in dem Array. Jedoch gibt es auch einen, der in keine Richtung geht. Dieser wird jedoch nie belegt.
+
+Wird die Methode \textit{addTransition(...)} aufgerufen, wird geprüft, dass keine Transition in der gewünschten Richtung vorliegt. Somit wird verhindert, dass zwei Transitionen in dieselbe Richtung gehen. Von einem Tile kann nicht geprüft werden, dass eine Transition nur in eine Richtung geht, in der ein Loch liegt, da es keine Möglichkeit gibt auf den Nachbarn der Karte zuzugreifen.
+\subsection{Map Klasse}
+\label{subsuec:Map}
+Alle Informationen über die Karte werden in dieser Klasse verwaltet. So werden jeweils die Anzahl der Spieler, die Anzahl der Overrides pro Spieler, die Anzahl der Bomben, die Stärke der Bomben, die Anzahl der Transitionen sowie die Dimensionen der Map gespeichert. Des weiteren gibt es ein \hyperref[subsec:PseudeArr]{Pseudo-2D-Array}, in dem die \hyperref[subsec:Tile]{Tiles} des Spielfeld abgelegt sind. Diese sind jedoch innerhalb der Map Klasse von einer Reihe Löcher umgeben, was das iterieren über die Map vereinfacht: Es muss nicht geprüft werden ob man am Rand der Karte ist, sondern nur ob das nächste Feld ein Loch ist. Somit fasst man zwei Fälle zusammen. Nach außen wwerden die Koordinaten aber so angepasst, als gäbe es diese neuen Tiles nicht.
+
+Eine Map muss mit einem Map-String gemäß Regeln initialisiert werden und kann danach nicht mehr verändert werden. Es kann lediglich lesend auf alle Variablen zugegriffen werden. Man kann auch über Referenzen auf die Tiles der Map zugreifen, sodass diese Ihren Status ändern können.
+\subsection{Eine Map einlesen}
+Eine \hyperref[subsec:Map]{Map} wird per Konstruktor aus dem Map-String erzeugt. Dazu wird ein Standard Java Scanner verwendet, der das einlesen von Zahlen sehr vereinfacht und auch die Fehlertoleranz bei zu vielen Whitespaces erhöht. Jedes Mal, wenn dieser Scanner versucht Daten aus dem String zu lesen, wird dies in einem Try-Block verschachtelt und bei einem Fehlschlag eine IllegalArgumentException mit einer Nachricht, entsprechend des fehlgeschlagenen Segments, geworfen.
+
+Zuerst liest der Scanner die Metadaten aus dem Kopf des Strings und speichert diese in die zugehörigen Variablen. Bei den Dimensionen der Karte wird jeweils eine 2 addiert, um Platz für die Umrandung mit Löchern zu haben. Danach wird ein neues Array für die \hyperref[subsec:Tile]{Tiles} mit passenden Dimensionen erzeugt. Als nächstes werden die einzelnen Felder aus dem String eingelesen und die Löcher am Rand erstellt. Zuletzt werden noch die Transitionen eingelesen. Dazu werden zuerst die Integer aus dem String gelesen und diese danach zu \hyperref[subsec:Vector2i]{Vektoren} für die Positionen und Richtungen konvertiert. Dabei wird beachtet, dass die Ausgangsrichtungen und Eingangsrichtungen inverse sind, also dass man nach oben ein Tile verlässt aber man beim betreten nach unten geht. Auch wird überprüft, dass eine Transition in keinem Loch startet oder endet und dass in die Richtung der Transition kein benutzbares Tile ist. Zuletzt werden den beiden an der Transition beteiligten Tiles die erstellten entgegengesetzten Transitionen hinzugefügt.

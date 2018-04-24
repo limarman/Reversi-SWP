@@ -15,7 +15,7 @@ public class Transition {
 	private Vector2i targetIncomingDir;
 
 	/**
-	 * Simple Constructor initialising everything
+	 * Simple Constructor initializing everything
 	 * 
 	 * @param targetPoint
 	 * @param inputDir

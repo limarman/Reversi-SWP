@@ -24,7 +24,7 @@ class MapTest {
 	@Test
 	void testMapString()
 	{
-		String testString = "2\n3\n4 5\n4 4\n0 1 2 3\n4 5 6 7\n8 - c i\nb x - -\n0 0 0 <-> 2 3 4";
+		String testString = "2\n3\n4 5\n4 4\n0 1 2 3\n4 5 6 7\n8 - c i\nb x - -\n0 0 0 <-> 1 3 4";
 		
 		Map testMap = new Map(testString);
 		
@@ -62,7 +62,7 @@ class MapTest {
 		Vector2i p1    = new Vector2i(0,  0);
 		Vector2i p1In  = new Vector2i(0,  1);
 		Vector2i p1Out = new Vector2i(0, -1);
-		Vector2i p2    = new Vector2i(2,  3);
+		Vector2i p2    = new Vector2i(1,  3);
 		Vector2i p2In  = new Vector2i(0, -1);
 		Vector2i p2Out = new Vector2i(0,  1);
 		

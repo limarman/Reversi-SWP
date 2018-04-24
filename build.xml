@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project name="swpg3" default="compile" basedir=".">
   <description>
     Buildfile for our Software Praktikum Group 3 Project

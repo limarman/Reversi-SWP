@@ -31,6 +31,15 @@ public enum TileStatus {
 		this.value = (byte)value;
 	}
 	/**
+	 * Maps a char to a valid TileStatus according to the Rules:
+	 * '0' -> EMPTY
+	 * '1'-'8' -> PLAYER_1-8
+	 * '-' -> HOLE
+	 * 'c' -> CHOICE
+	 * 'i' -> INVERSION
+	 * 'b' -> BONUS
+	 * 'x' -> EXPANSION
+	 * 
 	 * @param c char to be mapped
 	 * @return TileStatus represented by char or TileStatus.INVALID if c cannot be mapped
 	 */
