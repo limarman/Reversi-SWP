@@ -134,7 +134,7 @@ public class MoveManager {
 		LinkedList<Move> possibleMoves = new LinkedList<>();
 
 		// TODO: implement
-
+		// Sehr dringend
 		return possibleMoves;
 	}
 
