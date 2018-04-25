@@ -133,4 +133,10 @@ public class Tile {
 	{
 		return (status.value >= 1 && status.value <= 8);
 	}
+	
+	public boolean isEmpty() 
+	{
+		return status == TileStatus.EMPTY || status == TileStatus.CHOICE || status == TileStatus.BONUS
+				|| status == TileStatus.INVERSION;
+	}
 }

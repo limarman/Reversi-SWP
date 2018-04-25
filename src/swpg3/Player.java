@@ -33,7 +33,7 @@ public class Player {
 	/**
 	 * @return the overrideStones
 	 */
-	public int getOverrideStones()
+	public int getNumberOfOverrideStones()
 	{
 		return overrideStones;
 	}

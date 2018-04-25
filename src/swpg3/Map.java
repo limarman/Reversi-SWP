@@ -19,6 +19,7 @@ public class Map {
 	private int	transitionCount;
 
 	private HashSet<Vector2i>	startingFields;
+	private HashSet<Vector2i>	positionOfExpansionStones;
 	private Tile[]				grid;
 
 	/**
@@ -30,6 +31,7 @@ public class Map {
 	public Map(String inputString)
 	{
 		startingFields = new HashSet<>();
+		positionOfExpansionStones = new HashSet<>();
 
 		Scanner scan = new Scanner(inputString);
 		this.transitionCount = 0;
@@ -100,6 +102,9 @@ public class Map {
 					} else if (newStatus.value >= 1 && newStatus.value <= 8) // occupied by player
 					{
 						startingFields.add(new Vector2i(x - 1, y - 1));
+					} else if(newStatus == TileStatus.EXPANSION)
+					{
+						positionOfExpansionStones.add(new Vector2i(x - 1 ,y - 1));
 					}
 					// and add it to the grid
 					grid[x + y * height] = new Tile(newStatus);
@@ -251,5 +256,23 @@ public class Map {
 	public Tile getTileAt(Vector2i pos)
 	{
 		return grid[(pos.x + 1) + (pos.y + 1) * height];
+	}
+	
+	/**
+	 * removes an expansion stone which has been overriden
+	 * @param coordinates
+	 */
+	public void removeExpansionStone(Vector2i coordinates) 
+	{
+		positionOfExpansionStones.remove(coordinates);
+	}
+	
+	/**
+	 * 
+	 * @return all remaining expansion stones on the map
+	 */
+	public HashSet<Vector2i> getExpansionStonePositions()
+	{
+		return positionOfExpansionStones;
 	}
 }

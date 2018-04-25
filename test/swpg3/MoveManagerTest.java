@@ -175,11 +175,54 @@ class MoveManagerTest {
 		assertTrue(mm.getPlayer(1).getStonePositions().size() == 1, "not all stone bombs have been registered.");
 		assertTrue(mm.getPlayer(2).getStonePositions().size() == 0, "not all stone bombs have been registered.");
 		assertTrue(mm.getPlayer(3).getStonePositions().size() == 1, "not all stone bombs have been registered.");
-
-
-
-
-
+	}
+	
+	@Test
+	void testGetPossibleMoves()
+	{
+		String mapString = "3\n3\n2 2\n6 6\n000100\n000120\n0c-100\n0031i0\n000200\n0000xx";
+		Map map = null;
+		try{
+			map = new Map(mapString);
+		}
+		catch(Exception e) {
+			fail("map could not be read.");
+		}
+		
+		MoveManager mm = new MoveManager(map);
+		
+		HashSet<Move> possibleMovesTest = mm.getPossibleMoves((byte)3);
+		
+		//asserting that every added move was legal
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(mm.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		assertTrue(possibleMovesTest.size() == 5, "not every possible move was discovered!");
+		
+		possibleMovesTest = mm.getPossibleMoves((byte) 1);
+		
+		//asserting that every added move was legal
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(mm.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		assertTrue(possibleMovesTest.size() == 8, "not every possible move was discovered!");
+		
+		possibleMovesTest = mm.getPossibleMoves((byte) 2);
+		
+		//asserting that every added move was legal
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(mm.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		
+		for(Move m : possibleMovesTest)
+		{
+			System.out.println(m);
+		}
+		
+		assertTrue(possibleMovesTest.size() == 11, "not every possible move was discovered!");
 		
 
 		

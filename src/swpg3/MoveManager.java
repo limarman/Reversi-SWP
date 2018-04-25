@@ -5,7 +5,6 @@ package swpg3;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 /**
  * @author eric
@@ -55,7 +54,7 @@ public class MoveManager {
 			if (movePos.isHole())
 				return false;
 
-			if (movePos.isOccupied() && playerInfo[playerIndex].getOverrideStones() == 0)
+			if (movePos.isOccupied() && playerInfo[playerIndex].getNumberOfOverrideStones() == 0)
 				return false;
 			// Check Move special Field:
 			// Not a special Field but Special attributes?
@@ -126,15 +125,116 @@ public class MoveManager {
 	}
 
 	/**
+	 * Giving all the possible moves the plaer with specified playernumber can make.
 	 * 
-	 * @return Possible Moves
+	 * @param playerNumber
+	 * 
+	 * @return Possible Moves - HashSet of possibleMoves
 	 */
-	public LinkedList<Move> getPossibleMoves()
+	public HashSet<Move> getPossibleMoves(byte playerNumber)
 	{
-		LinkedList<Move> possibleMoves = new LinkedList<>();
-
+		HashSet<Move> possibleMoves = new HashSet<>();
+		MapWalker mw = new MapWalker(map);
+		
+		boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() != 0);
+		
+		//looking from every playerstone and searching the possible moves
+		for(Vector2i pos : playerInfo[playerNumber-1].getStonePositions())
+		{
+			for(int i = 0; i<8; i++) //creating a MapWalker in every direction
+			{
+				//creating MapWalker
+				mw.setPosition(pos.clone());
+				mw.setDirection(Vector2i.mapDirToVector(i));
+				
+				if(!mw.canStep()) 
+				{
+					//adjacent hole
+					continue; //there is no possible move in this direction
+				}
+				mw.step();
+				if(mw.getCurrentTile().isEmpty() || !mw.canStep()
+						|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+				{
+					//adjacent field is empty or already owned or next field is empty 
+					continue; //no enclosing of stones possible
+				}
+				mw.step(); //making sure that direct adjacent fields are not valid moves
+				
+				//iterate till a hole, an empty field or an own stone is found 
+				while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
+						mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+				{
+					if(overridePossible) 
+					{
+						//a new Move is found
+						Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber);
+						possibleMoves.add(move);
+					}
+					mw.step();
+				}
+								
+				if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+				{
+					//stopped on an owned stone
+					
+					//if not the starting stone
+					if(!mw.getPosition().equals(pos)) {
+						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+					}
+				}
+				else if(mw.getCurrentTile().isEmpty())
+				{
+					//stopped on a non-occupied field
+					switch(mw.getCurrentTile().getStatus()) 
+					{
+					case EMPTY:
+						//There is only a regular move possible
+						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+						break;
+					case CHOICE:
+						for(int j = 1; j<=map.getNumberOfPlayers(); j++)
+						{
+							//there are #player possible ways to switch players
+							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
+						}
+						break;
+					case INVERSION:
+						//There is only a regular move possible
+						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+						break;
+					case BONUS:
+						//There is a choice between an extra bomb and an extra override stone
+						possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
+						possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber));
+						break;
+					default:
+						//cannot be the case
+						break;
+					}
+				}else
+				{
+					//no further step possible
+					//field is not empty (and not own stone)
+					if(overridePossible)
+					{
+						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+					}
+				}
+			}
+		}
+		
+		//adding the possibility of placing on an expansion Stone
+		if(overridePossible)
+		{
+			for(Vector2i position : map.getExpansionStonePositions())
+			{
+				possibleMoves.add(new Move(position.clone(), (byte) 0, (byte) playerNumber));
+			}
+		}
+		
+		
 		// TODO: implement
-		// Sehr dringend
 		return possibleMoves;
 	}
 
@@ -212,6 +312,9 @@ public class MoveManager {
 						playerInfo[playerIndex].addBomb();
 					}
 					break;
+				case EXPANSION:
+					//updating the positions of the expansion stones
+					map.removeExpansionStone(move.getCoordinates());
 				default:
 					// do nothing
 					break;

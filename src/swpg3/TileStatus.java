@@ -79,4 +79,14 @@ public enum TileStatus {
 				return TileStatus.INVALID;
 		}
 	}
+	
+	/**
+	 * 
+	 * @param playerNumber
+	 * @return returns the TileState representing a player's stone
+	 */
+	public static TileStatus getStateByPlayerNumber(byte playerNumber)
+	{
+		return mapCharToTileStatus((char)(playerNumber + '0'));
+	}
 }

@@ -65,4 +65,49 @@ public class Move {
 		return playerNumber;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((coordinates == null) ? 0 : coordinates.hashCode());
+		result = prime * result + playerNumber;
+		result = prime * result + specialFieldInfo;
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Move other = (Move) obj;
+		if (coordinates == null) {
+			if (other.coordinates != null)
+				return false;
+		} else if (!coordinates.equals(other.coordinates))
+			return false;
+		if (playerNumber != other.playerNumber)
+			return false;
+		if (specialFieldInfo != other.specialFieldInfo)
+			return false;
+		return true;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Player: " +	playerNumber + " Coords: " + coordinates.toString() +
+				" Special: " + specialFieldInfo;
+	}
+	
+
 }
