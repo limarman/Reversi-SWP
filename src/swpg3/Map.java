@@ -20,7 +20,7 @@ public class Map {
 
 	private HashSet<Vector2i>	startingFields;
 	private HashSet<Vector2i>	positionOfExpansionStones;
-	private Tile[]				grid;
+	public Tile[]				grid; //TODO: changing to private again
 
 	/**
 	 * Creates a Map from String formatted as described in courseRules.pdf

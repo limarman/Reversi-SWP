@@ -134,103 +134,128 @@ public class MoveManager {
 	public HashSet<Move> getPossibleMoves(byte playerNumber)
 	{
 		HashSet<Move> possibleMoves = new HashSet<>();
-		MapWalker mw = new MapWalker(map);
 		
-		boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() != 0);
-		
-		//looking from every playerstone and searching the possible moves
-		for(Vector2i pos : playerInfo[playerNumber-1].getStonePositions())
+		//finding a move in the building phase
+		if(gamePhase == GamePhase.BUILDING_PHASE) 
 		{
-			for(int i = 0; i<8; i++) //creating a MapWalker in every direction
+			MapWalker mw = new MapWalker(map);
+	
+			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() != 0);
+			
+			//looking from every playerstone and searching the possible moves
+			for(Vector2i pos : playerInfo[playerNumber-1].getStonePositions())
 			{
-				//creating MapWalker
-				mw.setPosition(pos.clone());
-				mw.setDirection(Vector2i.mapDirToVector(i));
-				
-				if(!mw.canStep()) 
+				for(int i = 0; i<8; i++) //creating a MapWalker in every direction
 				{
-					//adjacent hole
-					continue; //there is no possible move in this direction
-				}
-				mw.step();
-				if(mw.getCurrentTile().isEmpty() || !mw.canStep()
-						|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
-				{
-					//adjacent field is empty or already owned or next field is empty 
-					continue; //no enclosing of stones possible
-				}
-				mw.step(); //making sure that direct adjacent fields are not valid moves
-				
-				//iterate till a hole, an empty field or an own stone is found 
-				while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
-						mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
-				{
-					if(overridePossible) 
+					//creating MapWalker
+					mw.setPosition(pos.clone());
+					mw.setDirection(Vector2i.mapDirToVector(i));
+					
+					if(!mw.canStep()) 
 					{
-						//a new Move is found
-						Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber);
-						possibleMoves.add(move);
+						//adjacent hole
+						continue; //there is no possible move in this direction
 					}
 					mw.step();
-				}
-								
-				if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
-				{
-					//stopped on an owned stone
+					if(mw.getCurrentTile().isEmpty() || !mw.canStep()
+							|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+					{
+						//adjacent field is empty or already owned or next field is empty 
+						continue; //no enclosing of stones possible
+					}
+					mw.step(); //making sure that direct adjacent fields are not valid moves
 					
-					//if not the starting stone
-					if(!mw.getPosition().equals(pos)) {
-						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+					//iterate till a hole, an empty field or an own stone is found 
+					while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
+							mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+					{
+						if(overridePossible) 
+						{
+							//a new Move is found
+							Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber);
+							possibleMoves.add(move);
+						}
+						mw.step();
+					}
+									
+					if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+					{
+						//stopped on an owned stone
+						
+						//if not the starting stone
+						if(!mw.getPosition().equals(pos)) {
+							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+						}
+					}
+					else if(mw.getCurrentTile().isEmpty())
+					{
+						//stopped on a non-occupied field
+						switch(mw.getCurrentTile().getStatus()) 
+						{
+						case EMPTY:
+							//There is only a regular move possible
+							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+							break;
+						case CHOICE:
+							for(int j = 1; j<=map.getNumberOfPlayers(); j++)
+							{
+								//there are #player possible ways to switch players
+								possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
+							}
+							break;
+						case INVERSION:
+							//There is only a regular move possible
+							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+							break;
+						case BONUS:
+							//There is a choice between an extra bomb and an extra override stone
+							possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
+							possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber));
+							break;
+						default:
+							//cannot be the case
+							break;
+						}
+					}else
+					{
+						//no further step possible
+						//field is not empty (and not own stone)
+						if(overridePossible)
+						{
+							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+						}
 					}
 				}
-				else if(mw.getCurrentTile().isEmpty())
+			}
+			
+			//adding the possibility of placing on an expansion Stone
+			if(overridePossible)
+			{
+				for(Vector2i position : map.getExpansionStonePositions())
 				{
-					//stopped on a non-occupied field
-					switch(mw.getCurrentTile().getStatus()) 
-					{
-					case EMPTY:
-						//There is only a regular move possible
-						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-						break;
-					case CHOICE:
-						for(int j = 1; j<=map.getNumberOfPlayers(); j++)
-						{
-							//there are #player possible ways to switch players
-							possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
-						}
-						break;
-					case INVERSION:
-						//There is only a regular move possible
-						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-						break;
-					case BONUS:
-						//There is a choice between an extra bomb and an extra override stone
-						possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
-						possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber));
-						break;
-					default:
-						//cannot be the case
-						break;
-					}
-				}else
-				{
-					//no further step possible
-					//field is not empty (and not own stone)
-					if(overridePossible)
-					{
-						possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-					}
+					possibleMoves.add(new Move(position.clone(), (byte) 0, (byte) playerNumber));
 				}
 			}
 		}
-		
-		//adding the possibility of placing on an expansion Stone
-		if(overridePossible)
+		else //finding possible moves in bombing phase
 		{
-			for(Vector2i position : map.getExpansionStonePositions())
+			//if player has any bombs
+			if(playerInfo[playerNumber-1].getBombs() > 0)
 			{
-				possibleMoves.add(new Move(position.clone(), (byte) 0, (byte) playerNumber));
+				//iterate over whole map and search for occupied fields
+				for(int i = 0; i<map.getWidth(); i++)
+				{
+					for(int j = 0; j<map.getHeight(); j++)
+					{
+						if(map.getTileAt(i, j).isOccupied())
+						{
+							Vector2i pos = new Vector2i(i,j);
+							possibleMoves.add(new Move(pos, (byte) 0, playerNumber));
+						}
+					}
+				}
 			}
+			//otherwise there are no possible moves
 		}
 		
 		
@@ -238,6 +263,153 @@ public class MoveManager {
 		return possibleMoves;
 	}
 
+	/**
+	 * ALternative Version
+	 * Giving all the possible moves the plaer with specified playernumber can make.
+	 * 
+	 * @param playerNumber
+	 * 
+	 * @return Possible Moves - HashSet of possibleMoves
+	 */
+	public HashSet<Move> getPossibleMoves2(byte playerNumber)
+	{
+		HashSet<Move> possibleMoves = new HashSet<>();
+		
+		//searching for possible moves in building phase
+		if(gamePhase == GamePhase.BUILDING_PHASE)
+		{
+			MapWalker mw = new MapWalker(map);
+			
+			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() != 0);
+			
+			//looking from every playerstone and searching the possible moves
+			for(int h = 0; h<map.getHeight(); h++)
+			{
+				for(int w = 0; w < map.getWidth(); w++) 
+				{
+					if(map.getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+					{
+						Vector2i pos = new Vector2i(w,h);
+						for(int i = 0; i<8; i++) //creating a MapWalker in every direction
+						{
+							//creating MapWalker
+							mw.setPosition(pos.clone());
+							mw.setDirection(Vector2i.mapDirToVector(i));
+							
+							if(!mw.canStep()) 
+							{
+								//adjacent hole
+								continue; //there is no possible move in this direction
+							}
+							mw.step();
+							if(mw.getCurrentTile().isEmpty() || !mw.canStep()
+									|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								//adjacent field is empty or already owned or next field is empty 
+								continue; //no enclosing of stones possible
+							}
+							mw.step(); //making sure that direct adjacent fields are not valid moves
+							
+							//iterate till a hole, an empty field or an own stone is found 
+							while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
+									mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								if(overridePossible) 
+								{
+									//a new Move is found
+									Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber);
+									possibleMoves.add(move);
+								}
+								mw.step();
+							}
+											
+							if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+							{
+								//stopped on an owned stone
+								
+								//if not the starting stone
+								if(!mw.getPosition().equals(pos)) {
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+								}
+							}
+							else if(mw.getCurrentTile().isEmpty())
+							{
+								//stopped on a non-occupied field
+								switch(mw.getCurrentTile().getStatus()) 
+								{
+								case EMPTY:
+									//There is only a regular move possible
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+									break;
+								case CHOICE:
+									for(int j = 1; j<=map.getNumberOfPlayers(); j++)
+									{
+										//there are #player possible ways to switch players
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
+									}
+									break;
+								case INVERSION:
+									//There is only a regular move possible
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+									break;
+								case BONUS:
+									//There is a choice between an extra bomb and an extra override stone
+									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
+									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber));
+									break;
+								default:
+									//cannot be the case
+									break;
+								}
+							}else
+							{
+								//no further step possible
+								//field is not empty (and not own stone)
+								if(overridePossible)
+								{
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			//adding the possibility of placing on an expansion Stone
+			if(overridePossible)
+			{
+				for(Vector2i position : map.getExpansionStonePositions())
+				{
+					possibleMoves.add(new Move(position.clone(), (byte) 0, (byte) playerNumber));
+				}
+			}
+		}
+		else //finding possible moves in bombing phase
+		{
+			//if player has any bombs
+			if(playerInfo[playerNumber-1].getBombs() > 0)
+			{
+				//iterate over whole map and search for occupied fields
+				for(int i = 0; i<map.getWidth(); i++)
+				{
+					for(int j = 0; j<map.getHeight(); j++)
+					{
+						if(map.getTileAt(i, j).isOccupied())
+						{
+							Vector2i pos = new Vector2i(i,j);
+							possibleMoves.add(new Move(pos, (byte) 0, playerNumber));
+						}
+					}
+				}
+			}
+			//otherwise there are no possible moves
+		}
+		
+		
+		// TODO: implement
+		return possibleMoves;
+	}
+	
 	/**
 	 * Expecting the move to be valid
 	 * 
