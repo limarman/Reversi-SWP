@@ -3,8 +3,6 @@
  */
 package swpg3;
 
-import java.util.HashSet;
-
 /**
  * @author eric
  *
@@ -14,8 +12,8 @@ public class Player {
 	private int	bombs;
 	private int	number;
 	private boolean isDisqualified = false;
-	private HashSet<Vector2i> stonePositions;
-	private int numberOfStones;
+	//private HashSet<Vector2i> stonePositions;
+	//private int numberOfStones;
 
 	/**
 	 * @param number
@@ -27,7 +25,7 @@ public class Player {
 		this.number = number;
 		this.overrideStones = overrideStones;
 		this.bombs = bombs;
-		this.stonePositions = new HashSet<Vector2i>();
+		//this.stonePositions = new HashSet<Vector2i>();
 	}
 
 	/**
@@ -112,67 +110,67 @@ public class Player {
 		this.bombs++;
 	}
 	
-	/**
-	 * 
-	 * @param position where stone is deleted/flipped
-	 */
-	public void removeStone(Vector2i position)
-	{
-		if(stonePositions.remove(position))
-			numberOfStones--;
-	}
+//	/**
+//	 * 
+//	 * @param position where stone is deleted/flipped
+//	 */
+//	public void removeStone(Vector2i position)
+//	{
+//		if(stonePositions.remove(position))
+//			numberOfStones--;
+//	}
 	
-	/**
-	 * 
-	 * @param position
-	 * @return whether player has a stone at the given position
-	 */
-	public boolean containsStone(Vector2i position)
-	{
-		return stonePositions.contains(position);
-	}
+//	/**
+//	 * 
+//	 * @param position
+//	 * @return whether player has a stone at the given position
+//	 */
+//	public boolean containsStone(Vector2i position)
+//	{
+//		return stonePositions.contains(position);
+//	}
 	
-	/**
-	 * 
-	 * @param position
-	 */
-	public void addStone(Vector2i position)
-	{
-		if(stonePositions.add(position))
-			numberOfStones++;
-	}
+//	/**
+//	 * 
+//	 * @param position
+//	 */
+//	public void addStone(Vector2i position)
+//	{
+//		if(stonePositions.add(position))
+//			numberOfStones++;
+//	}
 	
-	/**
-	 * 
-	 * @return the stone Positions
-	 */
-	public HashSet<Vector2i> getStonePositions()
-	{
-		return stonePositions;
-	}
+//	/**
+//	 * 
+//	 * @return the stone Positions
+//	 */
+//	public HashSet<Vector2i> getStonePositions()
+//	{
+//		return stonePositions;
+//	}
 	
-	/**
-	 *  Switches the stone coordinates with another player
-	 * @param p
-	 */
-	public void switchStones(Player p) 
-	{
-		HashSet<Vector2i> temp = p.stonePositions;
-		p.stonePositions = this.stonePositions;
-		this.stonePositions = temp;
-		// switch stone numbers too
-		int tempCount = p.numberOfStones;
-		p.numberOfStones = this.numberOfStones;
-		this.numberOfStones = tempCount;
-	}
+//	/**
+//	 *  Switches the stone coordinates with another player
+//	 * @param p
+//	 */
+//	public void switchStones(Player p) 
+//	{
+//		HashSet<Vector2i> temp = p.stonePositions;
+//		p.stonePositions = this.stonePositions;
+//		this.stonePositions = temp;
+//		// switch stone numbers too
+//		int tempCount = p.numberOfStones;
+//		p.numberOfStones = this.numberOfStones;
+//		this.numberOfStones = tempCount;
+//	}
 
-	/**
-	 * @return number of stones currently in the set of this player
-	 */
-	public int getNumberOfStones()
-	{
-		return numberOfStones;
-	}
+//	/**
+//	 * @return number of stones currently in the set of this player
+//	 */
+//	public int getNumberOfStones()
+//	{
+//		return numberOfStones;
+//	}
 	
 	/**
 	 * 
