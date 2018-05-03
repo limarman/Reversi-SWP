@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>70</y>
+      <w>450</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>swpg3.net::Message
+--
+--
++Message(MessageType type, int length, byte[] data): ctor
++getType(): MessageType
++getLength(): int
++getData(): byte[]
++newGroupNumberInitMessage(byte groupNumber): Message
++retrieveMap(): String
++retrievePlayerNumber(): byte
++retrieveTimeLimit(): int
++retrieveDepthLimit(): int
++newMoveReply(Move move): Message
++retrieveAnouncedMove(): Move
++retrieveDisqualifiedPlayer(): byte
++retrieveGameState(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>70</y>
+      <w>360</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>swpg3.net::NetworkManager &lt;Singleton&gt;
+--
+--
++getInstance(): NetworkManager
++initialize(String host, int port): NetworkManager
++isConnected(): boolean
++close(): boolean
++sendMessage(Message m): void
++getNewMessage(): Message
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>570</x>
+      <y>440</y>
+      <w>280</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>swpg3.net::WrongMessageException
+--
+
+--
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>150</y>
+      <w>70</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>340</y>
+      <w>30</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>80</x>
+      <y>280</y>
+      <w>270</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>swpg3.net::MessageType &lt;enum&gt;
+--
+
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>310</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>200</x>
+      <y>220</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
