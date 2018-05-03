@@ -9,6 +9,17 @@
   <target name="compile">
     <javac srcdir="${src}" destdir="${bin}" />
   </target>
+
+  <target name="deploy" depends="compile">
+    <jar destfile="./Phteven.jar">
+      <manifest>
+        <attribute name="Main-Class" value="swpg3.main.Phteven" />
+      </manifest>
+      <fileset dir="${bin}">
+      	<exclude name="**/.gitkeep" />
+  	  </fileset>
+    </jar>
+  </target>
   
   <target name="clean">
     <delete includeemptydirs="true">
@@ -18,6 +29,7 @@
         <exclude name=".gitignore" />
       </fileset>
     </delete>
+  	<delete file="./Phteven.jar" />
   </target>
   
 </project>
