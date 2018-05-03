@@ -5,6 +5,7 @@ package swpg3.main;
 
 import java.io.IOException;
 
+import swpg3.MapManager;
 import swpg3.Move;
 import swpg3.net.Message;
 import swpg3.net.MessageType;
@@ -50,6 +51,7 @@ public class Phteven{
 	private boolean errorLog;
 	private boolean shouldClose;
 	private NetworkManager net;
+	private MapManager mapMan;
 	
 	/**
 	 * Initializes Phteven by connecting to the server and transmitting the group number Message.
@@ -60,6 +62,8 @@ public class Phteven{
 	public void initialize(String hostname, int port, boolean errorLog)
 	{
 		this.errorLog = errorLog;
+		
+		mapMan = MapManager.getInstance();
 		// Connect to server
 		net = NetworkManager.initialize(hostname, port);
 		if(!net.isConnected())
@@ -132,7 +136,7 @@ public class Phteven{
 		{
 			String map = m.retrieveMap();
 			// Initialize Map
-			// TODO ...
+			mapMan.initializeMap(map);
 		}
 		else if(m.getType() == MessageType.PLAYER_NUMBER_ASSIGN) // MessageType 3
 		{
@@ -151,17 +155,19 @@ public class Phteven{
 		{
 			Move move = m.retrieveAnouncedMove();
 			// Apply Move to the map
-			
+			mapMan.applyMove(move);	
 		}
 		else if(m.getType() == MessageType.DISQUALIFICATION) // MessageType 7
 		{
 			byte disqualified = m.retrieveDisqualifiedPlayer();
 			// remove Disqualified player.
-			// if its us: eixt programm
+			mapMan.getCurrentMap().getPlayer(disqualified).disqualify();
+			// if its us: exit programm
 		}
 		else if(m.getType() == MessageType.END_FIRST_PHASE) // MessageType 8
 		{
 			// AI.enterBombingPhase()
+			mapMan.toggleGamePhase();
 		}
 		else if(m.getType() == MessageType.END_SECOND_PHASE) // MessageType 9
 		{

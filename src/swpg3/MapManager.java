@@ -264,4 +264,13 @@ public class MapManager {
 		return currentMap;
 	}
 	
+	/**
+	 * Executes a given move
+	 * @param m - Move to apply to the current Map
+	 */
+	public void applyMove(Move m)
+	{
+		currentMap.applyMove(m);
+	}
+	
 }
