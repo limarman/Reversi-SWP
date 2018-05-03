@@ -100,7 +100,7 @@ public class Message {
 		int timeLimit = 0;
 		for(int i = 0; i < 4; i++)
 		{
-			timeLimit |= data[i];
+			timeLimit |= Byte.toUnsignedInt(data[i]);
 			if(i != 3) {timeLimit <<= 8;}
 		}
 		return timeLimit;
@@ -112,7 +112,7 @@ public class Message {
 		{
 			throw new WrongMessageException();
 		}
-		return (int) data[4];
+		return Byte.toUnsignedInt(data[4]);
 	}
 	//###############################################################
 	//					Message type 5
@@ -145,13 +145,13 @@ public class Message {
 		int x = 0;
 		int y = 0;
 		
-		x |= data[0];
+		x |= Byte.toUnsignedInt(data[0]);
 		x <<= 8;
-		x |= data[1];
+		x |= Byte.toUnsignedInt(data[1]);
 		
-		y |= data[2];
+		y |= Byte.toUnsignedInt(data[2]);
 		y <<= 8;
-		y |= data[3];
+		y |= Byte.toUnsignedInt(data[3]);
 		
 		return new Move(x, y, data[4], data[5]);
 	}
