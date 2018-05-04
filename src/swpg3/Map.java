@@ -766,7 +766,7 @@ public class Map {
 	 */
 	public Tile getTileAt(int x, int y)
 	{
-		return grid[(x + 1) + (y + 1) * (MapManager.getInstance().getHeight()+2)];
+		return grid[(x + 1) + (y + 1) * (MapManager.getInstance().getWidth()+2)];
 	}
 
 	/**
@@ -778,6 +778,20 @@ public class Map {
 	 */
 	public Tile getTileAt(Vector2i pos)
 	{
-		return grid[(pos.x + 1) + (pos.y + 1) * (MapManager.getInstance().getHeight()+2)];
+		return grid[(pos.x + 1) + (pos.y + 1) * (MapManager.getInstance().getWidth()+2)];
+	}
+	
+	public void print()
+	{
+		MapManager mm = MapManager.getInstance();
+		
+		for(int y = 0; y <mm.getHeight()+2; y++)
+		{
+			for(int x = 0; x < mm.getWidth()+2; x++)
+			{
+				System.out.print(grid[(x) + (y*(mm.getWidth()+2))].getStatus().rep + " ");
+			}
+			System.out.println("");
+		}
 	}
 }

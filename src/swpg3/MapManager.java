@@ -87,11 +87,14 @@ public class MapManager {
 			int rowInd = 0;
 			for (int x = 0; x < width; x++)
 			{
+				//System.out.print("" + x + "," + y + ":");
 				if (x == 0 || x == width - 1 || y == 0 || y == height - 1) // It's part of the border?
 				{
-					grid[x + y * height] = new Tile(TileStatus.HOLE); // Fill with holes
+					//System.out.println("Border -> Hole");
+					grid[x + y * width] = new Tile(TileStatus.HOLE); // Fill with holes
 				} else
 				{
+					//System.out.print("no Border\n");
 					char curTile;
 					// Read in the current type of field
 					try
@@ -107,7 +110,7 @@ public class MapManager {
 					} catch (Exception e)
 					{
 						scan.close();
-						throw new IllegalArgumentException("Mapdata Col Error: (" + y + "," + x + ")" + row);
+						throw new IllegalArgumentException("Mapdata Col Error: (" + x + "," + y + ")" + row);
 					}
 
 					// map the char from String to a Status
@@ -115,12 +118,13 @@ public class MapManager {
 					if (newStatus == TileStatus.INVALID)
 					{
 						scan.close();
-						throw new IllegalArgumentException("Invalid Tiletype Error (" + y + "," + x + ")");
+						throw new IllegalArgumentException("Invalid Tiletype Error (" + x + "," + y + ")");
 					} 
 					// and add it to the grid
-					grid[x + y * height] = new Tile(newStatus);
+					grid[x + y * width] = new Tile(newStatus);
 				}
 			}
+			//System.out.println("");
 		}
 		
 		// initializing players

@@ -9,26 +9,28 @@ package swpg3;
  * @author eric
  */
 public enum TileStatus {
-	HOLE(0), 
-	PLAYER_1(1), 
-	PLAYER_2(2), 
-	PLAYER_3(3),
-	PLAYER_4(4), 
-	PLAYER_5(5), 
-	PLAYER_6(6), 
-	PLAYER_7(7), 
-	PLAYER_8(8),
-	EMPTY(9), 
-	CHOICE(10), 
-	INVERSION(11), 
-	BONUS(12), 
-	EXPANSION(13),
-	INVALID(-1);
+	HOLE(0, '-'), 
+	PLAYER_1(1, '1'), 
+	PLAYER_2(2, '2'), 
+	PLAYER_3(3, '3'),
+	PLAYER_4(4, '4'), 
+	PLAYER_5(5, '5'), 
+	PLAYER_6(6, '6'), 
+	PLAYER_7(7, '7'), 
+	PLAYER_8(8, '8'),
+	EMPTY(9, '0'), 
+	CHOICE(10, 'c'), 
+	INVERSION(11, 'i'), 
+	BONUS(12, 'b'), 
+	EXPANSION(13, 'x'),
+	INVALID(-1, '?');
 	
 	public final byte value;
-	TileStatus(int value)
+	public final char rep;
+	TileStatus(int value, char rep)
 	{
 		this.value = (byte)value;
+		this.rep = rep;
 	}
 	/**
 	 * Maps a char to a valid TileStatus according to the Rules:

@@ -4,6 +4,7 @@
 package swpg3.main;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import swpg3.MapManager;
 import swpg3.Move;
@@ -149,6 +150,17 @@ public class Phteven{
 			int timeLimit = m.retrieveTimeLimit();
 			int depthLimit = m.retrieveDepthLimit();
 			// Request Move from AI
+			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
+			for (Move move : moves)
+			{
+				try
+				{
+					net.sendMessage(Message.newMoveReply(move));
+				} catch (IOException e)
+				{
+				}
+				break;
+			}
 			
 		}
 		else if(m.getType() == MessageType.MOVE_ANNOUNCE) // MessageType 6
@@ -162,6 +174,7 @@ public class Phteven{
 			byte disqualified = m.retrieveDisqualifiedPlayer();
 			// remove Disqualified player.
 			mapMan.getCurrentMap().getPlayer(disqualified).disqualify();
+			System.out.println("Disqualified: " + disqualified);
 			// if its us: exit programm
 		}
 		else if(m.getType() == MessageType.END_FIRST_PHASE) // MessageType 8

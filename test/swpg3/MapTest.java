@@ -5,7 +5,10 @@ package swpg3;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,19 +29,19 @@ class MapTest {
 	@Test
 	void testMapString()
 	{
-		String testString = "2\n3\n4 5\n4 4\n0 1 2 3\n4 5 6 7\n8 - c i\nb x - -\n0 0 0 <-> 1 3 4";
+		String testString = "2\n3\n4 5\n3 4\n0 1 2 3\n4 5 6 7\n8 - c i\n" + "0 0 0 <-> 2 2 4";
 		
 		MapManager mm = MapManager.getInstance();
 		mm.initializeMap(testString);
 		
 		Map testMap = mm.getCurrentMap();
-		
+		testMap.print();
 		assertEquals(2, mm.getNumberOfPlayers(), "Missmatch in playercount");
 		assertEquals(3, mm.getNumberOfOverrides(), "Missmatch in Overridestodes");
 		assertEquals(4, mm.getNumberOfBombs(), "Missmatch in bomb number");
 		assertEquals(5, mm.getBombStrength(), "Missmatch in Bomb strength");
 		assertEquals(4, mm.getWidth(), "Dimension missmatch width");
-		assertEquals(4, mm.getHeight(), "Dimension missmatch height");
+		assertEquals(3, mm.getHeight(), "Dimension missmatch height");
 		
 		// Test Tiles:
 		assertEquals(TileStatus.EMPTY, testMap.getTileAt(0, 0).getStatus(), "Tile Missmatch (0,0) EMPTY");
@@ -56,10 +59,10 @@ class MapTest {
 		assertEquals(TileStatus.CHOICE, testMap.getTileAt(2, 2).getStatus(), "Tile Missmatch (2,2) CHOICE");
 		assertEquals(TileStatus.INVERSION, testMap.getTileAt(3, 2).getStatus(), "Tile Missmatch (3,2) INVERSION");
 		
-		assertEquals(TileStatus.BONUS, testMap.getTileAt(0, 3).getStatus(), "Tile Missmatch (0,3) BONUS");
-		assertEquals(TileStatus.EXPANSION, testMap.getTileAt(1, 3).getStatus(), "Tile Missmatch (1,3) EXPANSION");
-		assertEquals(TileStatus.HOLE, testMap.getTileAt(2, 3).getStatus(), "Tile Missmatch (2,3) HOLE");
-		assertEquals(TileStatus.HOLE, testMap.getTileAt(3, 3).getStatus(), "Tile Missmatch (3,3) HOLE");
+		//assertEquals(TileStatus.BONUS, testMap.getTileAt(0, 3).getStatus(), "Tile Missmatch (0,3) BONUS");
+		//assertEquals(TileStatus.EXPANSION, testMap.getTileAt(1, 3).getStatus(), "Tile Missmatch (1,3) EXPANSION");
+		//assertEquals(TileStatus.HOLE, testMap.getTileAt(2, 3).getStatus(), "Tile Missmatch (2,3) HOLE");
+		//assertEquals(TileStatus.HOLE, testMap.getTileAt(3, 3).getStatus(), "Tile Missmatch (3,3) HOLE");
 		
 		// Test Transitions:
 		assertEquals(1, mm.getTransitionCount(), "TransitionCount missmatch");
@@ -67,7 +70,7 @@ class MapTest {
 		Vector2i p1    = new Vector2i(0,  0);
 		Vector2i p1In  = new Vector2i(0,  1);
 		Vector2i p1Out = new Vector2i(0, -1);
-		Vector2i p2    = new Vector2i(1,  3);
+		Vector2i p2    = new Vector2i(2,  2);
 		Vector2i p2In  = new Vector2i(0, -1);
 		Vector2i p2Out = new Vector2i(0,  1);
 		
@@ -91,7 +94,7 @@ class MapTest {
 	{
 		String mapString = "3\n3\n2 3\n6 6\n000100\n000120\n0c-100\n0031i0\n000230\n000000\n3 0 0 <-> 3 5 4";
 		MapManager mm = MapManager.getInstance();
-		mm.initializeMap(mapString);
+		//mm.initializeMap(mapString);
 		
 		try{
 			mm.initializeMap(mapString);
@@ -101,7 +104,7 @@ class MapTest {
 		}
 		
 		Map map = mm.getCurrentMap();
-		
+		map.print();
 		assertEquals(TileStatus.PLAYER_2, map.getTileAt(4,1).getStatus(), "map was not read correctly.");
 		assertEquals(TileStatus.EMPTY, map.getTileAt(1,4).getStatus(),  "map was not read correctly.");
 				
@@ -132,6 +135,8 @@ class MapTest {
 		
 		MapManager mm = MapManager.getInstance();
 		
+		
+		
 		try{
 			mm.initializeMap(mapString);
 		}
@@ -140,6 +145,7 @@ class MapTest {
 		}
 		
 		Map map = mm.getCurrentMap();
+		map.print();
 		
 		assertEquals(TileStatus.PLAYER_2, map.getTileAt(4,1).getStatus(), "map was not read correctly.");
 		assertEquals(TileStatus.EMPTY, map.getTileAt(1,4).getStatus(),  "map was not read correctly.");
@@ -273,6 +279,36 @@ class MapTest {
 		}
 		
 		assertTrue(possibleMovesTest.size() == 9, "a possible move was not discovered!");
+	}
+	
+	@Test
+	void MapFromFileTest()
+	{
+		try
+		{
+			FileInputStream fs = new FileInputStream("maps/Map1Test.txt");
+			Scanner scan = new Scanner(fs);
+			String mapString = "";
+			while(scan.hasNextLine())
+			{
+				mapString += scan.nextLine() + "\n";
+			}
+			
+			System.out.println(mapString);
+			
+			MapManager mm = MapManager.getInstance();
+			mm.initializeMap(mapString);
+			
+			
+			mm.getCurrentMap().print();
+			
+			assertEquals(TileStatus.EMPTY, mm.getCurrentMap().getTileAt(19, 0).getStatus());
+			assertEquals(TileStatus.BONUS, mm.getCurrentMap().getTileAt(19, 1).getStatus());
+			
+		} catch (FileNotFoundException e)
+		{
+			fail("FileError!");
+		}
 	}
 
 }
