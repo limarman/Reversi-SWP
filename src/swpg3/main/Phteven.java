@@ -49,7 +49,6 @@ public class Phteven{
 	//###############################################################
 	private byte groupNumber = 3;
 	private byte playerNumber;
-	private boolean errorLog;
 	private boolean shouldClose;
 	private NetworkManager net;
 	private MapManager mapMan;
@@ -62,14 +61,12 @@ public class Phteven{
 	 */
 	public void initialize(String hostname, int port, boolean errorLog)
 	{
-		this.errorLog = errorLog;
-		
 		mapMan = MapManager.getInstance();
 		// Connect to server
 		net = NetworkManager.initialize(hostname, port);
 		if(!net.isConnected())
 		{
-			if(errorLog) {System.out.println("ERROR: Could connect to server!");}
+			Logger.log(LogLevel.ERROR, "Could not connect to server!)");
 			System.exit(1);
 		}
 		
@@ -79,7 +76,7 @@ public class Phteven{
 			net.sendMessage(Message.newGroupNumberInitMessage(groupNumber));
 		} catch (IOException e)
 		{
-			if(errorLog) {System.out.println("ERROR: Could not send Message (1)!");}
+			Logger.log(LogLevel.ERROR, "Could not send Message (1)!");
 			cleanUp();
 			System.exit(1);
 		}
@@ -102,7 +99,7 @@ public class Phteven{
 				message = net.getNewMessage();
 			} catch (IOException e)
 			{
-				if(errorLog) {System.out.println("ERROR: Could not read message!");}
+				Logger.log(LogLevel.ERROR, "Could not read message!");
 				shouldClose = true;
 				break;
 			}
@@ -112,7 +109,7 @@ public class Phteven{
 				handleMessage(message);
 			} catch (WrongMessageException e)
 			{
-				if(errorLog) {System.out.println("ERROR: Can't handle the Message");} // should never occur
+				Logger.log(LogLevel.ERROR, "Can't handle the Message"); // should never occur
 			}
 			
 		}
@@ -123,7 +120,7 @@ public class Phteven{
 	 */
 	public void cleanUp()
 	{
-		if(!net.close()) {System.out.println("ERROR_ Could not clean up properly!");}
+		if(!net.close()) {Logger.log(LogLevel.WARNING, "Could not clean up properly!");}
 	}
 		
 	/**
@@ -172,10 +169,18 @@ public class Phteven{
 		else if(m.getType() == MessageType.DISQUALIFICATION) // MessageType 7
 		{
 			byte disqualified = m.retrieveDisqualifiedPlayer();
+			Logger.log(LogLevel.INFO, "Player disqualified: " + disqualified);
+			
 			// remove Disqualified player.
 			mapMan.getCurrentMap().getPlayer(disqualified).disqualify();
-			System.out.println("Disqualified: " + disqualified);
+			
+			
 			// if its us: exit programm
+			if(playerNumber == disqualified)
+			{
+				Logger.log(LogLevel.WARNING, "We were disqualified");
+				shouldClose = true;
+			}
 		}
 		else if(m.getType() == MessageType.END_FIRST_PHASE) // MessageType 8
 		{
@@ -207,10 +212,11 @@ public class Phteven{
 	 */
 	public static void main(String[] args)
 	{
+		Logger.init(LogLevel.DETAIL);
 		//Check cmdArgs:
 		if(args.length != 2)
 		{
-			System.out.println("ERROR: Call with hostname and port as parameters");
+			Logger.log(LogLevel.ERROR, "Call with hostname and port as parameters");
 			System.exit(0);
 		}
 		int port = -1;
@@ -219,7 +225,7 @@ public class Phteven{
 			port = Integer.parseInt(args[1]);
 		}catch(Exception e)
 		{
-			System.out.println("ERROR: port must be a number");
+			Logger.log(LogLevel.ERROR, "port must be a number");
 			System.exit(1);
 		}
 		
