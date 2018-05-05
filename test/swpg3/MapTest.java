@@ -304,9 +304,12 @@ class MapTest {
 			
 			assertEquals(TileStatus.EMPTY, mm.getCurrentMap().getTileAt(19, 0).getStatus());
 			assertEquals(TileStatus.BONUS, mm.getCurrentMap().getTileAt(19, 1).getStatus());
+
+			scan.close();
 			
 		} catch (FileNotFoundException e)
 		{
+			
 			fail("FileError!");
 		}
 	}
