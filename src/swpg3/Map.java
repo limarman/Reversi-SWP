@@ -18,8 +18,9 @@ public class Map {
 //	private int	width;
 //	private int	transitionCount;
 
-	private Tile[]				grid;
-	private Player[] 			playerInfo;
+	private Tile[]	grid;
+	private Player[] playerInfo;
+	private byte nextPlayerTurn;
 
 	
 	/**
@@ -31,14 +32,11 @@ public class Map {
 	 * 			Array of players
 	 *            
 	 */
-	public Map(Tile[] field, Player[] playerInfo)
+	public Map(Tile[] field, Player[] playerInfo, byte nextPlayerTurn)
 	{
 		this.grid = field;
-		if(grid[10] == null)
-		{
-			System.out.println("Tile is null");
-		}
 		this.playerInfo = playerInfo;
+		this.nextPlayerTurn = nextPlayerTurn;
 	}
 	
 	/**
@@ -396,6 +394,9 @@ public class Map {
 			playerInfo[playerIndex].useBomb();
 			bombField(mm.getBombStrength(), move.getCoordinates().clone());
 		}
+		
+		//managing the turn
+		nextPlayerTurn = (byte) (move.getPlayerNumber() % mm.getNumberOfPlayers() + 1);		
 	}
 	
 	/**
@@ -779,6 +780,16 @@ public class Map {
 	public Tile getTileAt(Vector2i pos)
 	{
 		return grid[(pos.x + 1) + (pos.y + 1) * (MapManager.getInstance().getWidth()+2)];
+	}
+	
+	public byte getNextPlayerTurn() {
+		return nextPlayerTurn;
+	}
+	
+	@Override
+	public Map clone()
+	{
+		return new Map(grid, playerInfo, nextPlayerTurn);
 	}
 	
 	public void print()

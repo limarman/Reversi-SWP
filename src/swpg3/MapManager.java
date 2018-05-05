@@ -134,7 +134,7 @@ public class MapManager {
 			players[i] = new Player(i + 1, getNumberOfOverrides(), getNumberOfBombs());
 		}
 		
-		currentMap = new Map(grid, players);
+		currentMap = new Map(grid, players, (byte)1);
 		
 		// read in Transitions
 		while (scan.hasNextLine() && scan.hasNextInt())
@@ -265,7 +265,7 @@ public class MapManager {
 	 * @return the actualMap
 	 */
 	public Map getCurrentMap() {
-		return currentMap;
+		return currentMap.clone();
 	}
 	
 	/**
