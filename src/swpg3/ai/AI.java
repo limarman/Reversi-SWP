@@ -1,8 +1,11 @@
 package swpg3.ai;
 
+import java.util.HashSet;
+
 import swpg3.GamePhase;
 import swpg3.Map;
 import swpg3.MapManager;
+import swpg3.MapWalker;
 import swpg3.Move;
 import swpg3.Player;
 import swpg3.Tile;
@@ -13,14 +16,14 @@ import swpg3.main.Phteven;
 public class AI {
 	
 	
-	static AI instance = null;
+	private static AI instance = null;
 	
 	//##################################################
 	// Parameters for evaluation-function
 	//##################################################
 	
 	//StoneCount parameter
-	private double STONE_COUNT_BONUS = 10;
+	private double STONE_COUNT_BONUS = 8;
 	
 	private double SC_SV;
 	private double SC_TV;
@@ -65,6 +68,15 @@ public class AI {
 	// Static map-properties
 	//##################################################
 	int PLAYABLE_SQUARES;
+	private HashSet<Vector2i> solidSquares;
+	
+	//currently unused -> should weakSquares become normal squares when the solid square is taken?
+	@SuppressWarnings("unused")
+	private HashSet<Vector2i> weakSquares;
+	@SuppressWarnings("unused")
+	private HashSet<Vector2i> weakSquaresBonus;
+	@SuppressWarnings("unused")
+	private HashSet<Vector2i> weakSquaresChoice;
 	
 	
 	
@@ -96,6 +108,7 @@ public class AI {
 		
 		if(MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
+			int solidSquareCount = 0;
 			int occupiedSquares = 0;
 			int freePossibleMoves = 0;
 			int stoneCount = 0;
@@ -110,11 +123,20 @@ public class AI {
 					
 					if(t.isOccupied())
 					{
+						//count the occupied squares
 						occupiedSquares++;
 						if(t.getStatus() == Player.mapPlayerNumberToTileStatus(playerNumber))
 						{
+							//count own stones
 							stoneCount++;
-							//TODO: check whether on weak or solid tile etc.
+							
+							if(solidSquares.contains(new Vector2i(w,h)))
+							{
+								//count solid Squares
+								solidSquareCount++;
+							}
+							//TODO: check whether on weak tile etc.
+							
 						}
 					}
 					else if(t.isEmpty())
@@ -159,13 +181,13 @@ public class AI {
 			}
 			
 			
+			//sum up the evaluations
 			evaluation += evaluateMobility(freePossibleMoves, turns, occupiedSquares/((double)PLAYABLE_SQUARES));
 			evaluation += evaluateStoneCount(occupiedSquares/((double)stoneCount),
 					occupiedSquares/((double)PLAYABLE_SQUARES));
 			evaluation += evaluateOverrideCount(map.getPlayer(playerNumber).getNumberOfOverrideStones());
-
-			//TODO: positional factors
-			//Look at the positional factors
+			evaluation += evaluatePositionalFactors(solidSquareCount, 0, 0, 0,
+					occupiedSquares/((double)PLAYABLE_SQUARES));
 		}
 		else //Bombing Phase
 		{
@@ -272,15 +294,40 @@ public class AI {
 	//##################################################
 	private void analyseMap()
 	{
+		solidSquares = new HashSet<>();
 		int playableSquares = 0;
 		Map map = MapManager.getInstance().getCurrentMap();
 		for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
 		{
 			for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
 			{
-				if(!map.getTileAt(w, h).isHole())
+				Vector2i pos = new Vector2i(w,h);
+				Tile t = map.getTileAt(w,h);
+				if(!t.isHole())
 				{
 					playableSquares++;
+					
+					//is it a solid square?
+					//looking whether all 4 directions are blocked
+					boolean directionsBlocked[] = new boolean[4];
+					MapWalker tester = new MapWalker(map);
+					tester.setPosition(pos);
+					for(int i = 0; i<8; i++)
+					{
+						tester.setDirection(Vector2i.mapDirToVector(i));
+						
+						//direction is blocked!
+						if(!tester.canStep())
+						{
+							directionsBlocked[i % 4] = true;
+						}
+					}
+					
+					//all directions are blocked -> solidSquare
+					if(directionsBlocked[0] && directionsBlocked[1] && directionsBlocked[2] && directionsBlocked[3])
+					{
+						solidSquares.add(pos.clone());
+					}
 				}
 			}
 		}
@@ -377,10 +424,10 @@ public class AI {
 		return evaluation;
 	}
 	
-	private double evaluateBombingPhase()
-	{
-		return PLAYABLE_SQUARES;
-	}
+//	private double evaluateBombingPhase()
+//	{
+//		return PLAYABLE_SQUARES;
+//	}
 	
 	private void setParameters()
 	{
@@ -421,6 +468,11 @@ public class AI {
 	public int getPlayableSquares()
 	{
 		return PLAYABLE_SQUARES;
+	}
+	
+	public HashSet<Vector2i> getSolidSquares()
+	{
+		return solidSquares;
 	}
 }
 
