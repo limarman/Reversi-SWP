@@ -1,4 +1,5 @@
 \section{Task 2}
+\includegraphics[scale=0.5]{AIClassdiagram.pdf}
 Unsere Bewertungsfunktion behandelt verschiedene Aspekte des Spieles. Diese wären:
 \begin{enumerate}
 \item[-] Stabile Felder
@@ -24,3 +25,8 @@ Die Funktionen für den erwartenden Wert sind grundsätzlich dazu da, dass sich 
 \end{center}
 Die Funktionen für die Anzahl der Overridesteine und stabilen Felder ist zunächst konstant 0 gelassen, aufgrund mangelnder Erfahrung und Einschätzbarkeit. Die Funktion für die eigene Feldkontrolle nimmt einen ähnlichen Verlauf wie die Wichtigkeitsfunktion.\\
 Mit der hohen Parametrisierung erhoffen wir uns eine hohe und systematische Anpassbarkeit der Bewertungsfunktion. Mit steigender Spielerfahrung sollten sich gute heuristische Werte einpendeln.
+\newline
+
+\noindent
+Nun haben wir auch die Methode anlayseMap, die schaut auf der ganzen Map schaut, ob es stabile Felder gibt und diese im HashSet solidSquares speichert. Die Methode iteriert über die ganze Map und schaut bei Feldern, die keine Löcher sind, ob diese stabil sind, indem man schaut ob alle 4 Richtungen blockiert sind. Ausserdem wird beim iterieren über der Map alle bespielbaren Felder mit dem Counter playableSquares gezählt.
+
