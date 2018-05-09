@@ -227,6 +227,7 @@ class MapTest {
 	void testGetPossibleMoves()
 	{
 		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n000100\r\n000120\r\n0c-100\n0031i0\n000200\n0000xx";
+		
 		MapManager mm = MapManager.getInstance();
 		
 		try{
@@ -242,11 +243,11 @@ class MapTest {
 		
 		HashSet<Move> possibleMovesTest = map.getPossibleMoves((byte)3);
 		
+//		possibleMovesTest.forEach(System.out::println);
+		
 		//asserting that every added move was legal
-		for(Move m : possibleMovesTest)
-		{
-			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
-		}
+		possibleMovesTest.forEach(e -> assertTrue(map.isMoveValid(e),"invalid move was added as possible move!"));
+	
 		assertTrue(possibleMovesTest.size() == 5, "not every possible move was discovered!");
 		
 		possibleMovesTest = map.getPossibleMoves((byte) 1);
@@ -280,6 +281,70 @@ class MapTest {
 		
 		assertTrue(possibleMovesTest.size() == 9, "a possible move was not discovered!");
 	}
+//	
+//	@Test
+//	void testGetPossibleMoves2()
+//	{
+//		String mapString = "3\r\n0\r\n2 2\r\n6 6\r\n000100\r\n000120\r\n0c-100\n0031i0\n000200\n0000xx";
+//		
+//		MapManager mm = MapManager.getInstance();
+//		
+//		try{
+//			mm.initializeMap(mapString);;
+//		}
+//		catch(Exception e) {
+//			fail("map could not be read.");
+//		}
+//		
+//		Map map = mm.getCurrentMap();
+//		
+//		//testing the building phase
+//		
+//		HashSet<Move> possibleMovesTest = map.getPossibleMoves((byte)3);
+//		
+////		for(Move m : possibleMovesTest)
+////		{
+////			System.out.println(m);
+////		}
+////		
+//		//asserting that every added move was legal
+//		for(Move m : possibleMovesTest)
+//		{
+//			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+//		}
+//		//assertTrue(possibleMovesTest.size() == 5, "not every possible move was discovered!");
+//		
+//		possibleMovesTest = map.getPossibleMoves((byte) 1);
+//		
+//		//asserting that every added move was legal
+//		for(Move m : possibleMovesTest)
+//		{
+//			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+//		}
+//		//assertTrue(possibleMovesTest.size() == 8, "not every possible move was discovered!");
+//		
+//		possibleMovesTest = map.getPossibleMoves((byte) 2);
+//		
+//		//asserting that every added move was legal
+//		for(Move m : possibleMovesTest)
+//		{
+//			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+//		}
+//		
+//		//assertTrue(possibleMovesTest.size() == 11, "not every possible move was discovered!");
+//		
+//		//testing the bombing phase
+//		mm.toggleGamePhase();
+//		
+//		possibleMovesTest = map.getPossibleMoves((byte) 1);
+//		
+//		for(Move m : possibleMovesTest)
+//		{
+//			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+//		}
+//		
+//		//assertTrue(possibleMovesTest.size() == 9, "a possible move was not discovered!");
+//	}
 	
 	@Test
 	void MapFromFileTest()

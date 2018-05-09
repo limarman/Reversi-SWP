@@ -90,6 +90,10 @@ public class Player {
 	 */
 	public void useOverrideStone()
 	{
+		if(overrideStones <= 0)
+		{
+			throw new IllegalStateException("out of override stones.");
+		}
 		this.overrideStones--;
 	}
 	

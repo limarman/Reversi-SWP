@@ -3,6 +3,9 @@ package swpg3;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import swpg3.main.LogLevel;
+import swpg3.main.Logger;
+
 /**
  * A class to store Map information
  * 
@@ -145,7 +148,7 @@ public class Map {
 		{
 			MapWalker mw = new MapWalker(this);
 			
-			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() != 0);
+			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() > 0);
 			
 			//looking from every playerstone and searching the possible moves
 			for(int h = 0; h<mm.getHeight(); h++)
@@ -193,7 +196,7 @@ public class Map {
 								//stopped on an owned stone
 								
 								//if not the starting stone
-								if(!mw.getPosition().equals(pos)) {
+								if(!mw.getPosition().equals(pos) && overridePossible) {
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
 								}
 							}
@@ -288,7 +291,9 @@ public class Map {
 			if (t.isOccupied())
 			{
 				playerInfo[playerIndex].useOverrideStone();
+				Logger.log(LogLevel.INFO, "Use override stone");
 			}
+			Logger.log(LogLevel.INFO,""+ playerInfo[playerIndex].getNumberOfOverrideStones());
 
 			// flip set stone
 			// actualizing the map

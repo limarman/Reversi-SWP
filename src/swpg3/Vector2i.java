@@ -13,6 +13,10 @@ package swpg3;
 public class Vector2i {
 	public int	x;
 	public int	y;
+	
+	static Vector2i UP() {
+		return new Vector2i(0, -1);
+	}
 
 	/**
 	 * Initialise as (0,0)
