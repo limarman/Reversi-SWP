@@ -135,17 +135,22 @@ public class Phteven{
 			String map = m.retrieveMap();
 			// Initialize Map
 			mapMan.initializeMap(map);
+			Logger.log(LogLevel.INFO, "Recieved Map.");
+			Logger.logMap(LogLevel.DETAIL, mapMan.getCurrentMap());
 		}
 		else if(m.getType() == MessageType.PLAYER_NUMBER_ASSIGN) // MessageType 3
 		{
 			// Assign playernumber:
 			playerNumber = m.retrievePlayerNumber();
+			Logger.log(LogLevel.INFO, "We have been assigned Number: " + playerNumber);
 		}
 		else if(m.getType() == MessageType.MOVE_REQUEST) // MessageType 4
 		{
 			// Retrieve limits
 			int timeLimit = m.retrieveTimeLimit();
 			int depthLimit = m.retrieveDepthLimit();
+			
+			Logger.log(LogLevel.INFO, "Recieved Moverequest: (" + timeLimit + ", " + depthLimit + ")");
 			// Request Move from AI
 			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
 			for (Move move : moves)
@@ -153,6 +158,7 @@ public class Phteven{
 				try
 				{
 					net.sendMessage(Message.newMoveReply(move));
+					Logger.log(LogLevel.INFO, "Replied with Move: " + move);
 				} catch (IOException e)
 				{
 				}
@@ -163,8 +169,11 @@ public class Phteven{
 		else if(m.getType() == MessageType.MOVE_ANNOUNCE) // MessageType 6
 		{
 			Move move = m.retrieveAnouncedMove();
+			Logger.log(LogLevel.INFO, "Recieved Move: " + move);
 			// Apply Move to the map
-			mapMan.applyMove(move);	
+			mapMan.applyMove(move);
+			Logger.log(LogLevel.DETAIL, "Applied Move:");
+			Logger.logMap(LogLevel.DETAIL, mapMan.getCurrentMap());
 		}
 		else if(m.getType() == MessageType.DISQUALIFICATION) // MessageType 7
 		{
@@ -178,7 +187,7 @@ public class Phteven{
 			// if its us: exit programm
 			if(playerNumber == disqualified)
 			{
-				Logger.log(LogLevel.WARNING, "We were disqualified");
+				Logger.log(LogLevel.WARNING, "We were disqualified!");
 				shouldClose = true;
 			}
 		}
@@ -186,16 +195,19 @@ public class Phteven{
 		{
 			// AI.enterBombingPhase()
 			mapMan.toggleGamePhase();
+			Logger.log(LogLevel.INFO, "First Phase has ended!");
 		}
 		else if(m.getType() == MessageType.END_SECOND_PHASE) // MessageType 9
 		{
 			// Exit Program
 			shouldClose = true;
+			Logger.log(LogLevel.INFO, "Game has ended!");
 		}
 		else if(m.getType() == MessageType.CURRENT_GAME_STATE) // MessageType 10
 		{
 			//String state = m.retrieveGameState();
 			// ignore or update Map:
+			Logger.log(LogLevel.INFO, "Recieved new game state!");
 		}
 		else
 		{

@@ -15,7 +15,7 @@ public enum LogLevel {
 	DETAIL (4, "DETAIL"),
 	DEBUG  (5, "DEBUG ");
 	
-	
+	public static final String Whitespace = "      ";
 	public final int level;
 	public final String msg;
 	

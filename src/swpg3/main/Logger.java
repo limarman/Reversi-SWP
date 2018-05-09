@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+import swpg3.Map;
+import swpg3.MapManager;
+
 /**
  * @author eric
  *
@@ -96,6 +99,40 @@ public class Logger {
 		{
 			out.print("[ " + level.msg + " ]: " );
 			out.println(message);
+		}
+	}
+	
+	public static void logMap(LogLevel level, Map map)
+	{
+		if(active && level.level <= maxLevel.level)
+		{
+			int height = MapManager.getInstance().getHeight();
+			int width = MapManager.getInstance().getWidth();
+			
+			out.print("[ " + level.msg + " ]:    " );
+			for(int i = 0; i < width; i++)
+			{
+				out.printf("%2d", i);
+			}
+			out.println();
+			out.print("[ " + LogLevel.Whitespace + " ]:   /");
+			for(int i = 0; i < width; i++)
+			{
+				out.print("--");
+			}
+			out.println();
+			
+			for(int y = 0; y < height; y++)
+			{
+				out.print("[ " + LogLevel.Whitespace + " ]: ");
+				out.format("%2d|", y);
+				for(int x = 0; x < width; x++)
+				{
+					out.print(" " + map.getTileAt(x, y).getStatus().rep);
+				}
+				out.println();
+			}
+			
 		}
 	}
 }
