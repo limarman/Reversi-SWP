@@ -3,6 +3,9 @@
  */
 package swpg3;
 
+import swpg3.main.LogLevel;
+import swpg3.main.Logger;
+
 /**
  * A class to walk over a Map in a specified direction.
  * This class will automatically follow Transitions and adjust its walking direction
@@ -95,12 +98,15 @@ public class MapWalker {
 	public boolean step()
 	{
 		if (!canStep() || movementStopped)
+		{
 			return false;
+		}
 		Tile nextTile = map.getTileAt(Vector2i.sum(position, direction));
 		Tile thisTile = map.getTileAt(position);
 		if (!nextTile.isHole())
 		{
-			this.position.add(this.direction);
+			//this.position.add(this.direction); //Yeah, this was a bug. Why? We do not know
+			this.position = Vector2i.sum(position, direction);
 			return true;
 		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) //TODO: check the condition?
 		{

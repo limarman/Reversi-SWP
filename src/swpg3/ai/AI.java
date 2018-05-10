@@ -282,11 +282,26 @@ public class AI {
 	// Method for Returning the Best Move
 	//##################################################
 	
-	public Move getBestMove()
+	public Move getBestMove(byte playerNumber)
 	{
-		Move move = null;
+		Move currentBest = null;
+		double currentBestEval = Double.MIN_VALUE;
+		Map map = MapManager.getInstance().getCurrentMap();
 		
-		return move;
+		HashSet<Move> possibleMoves = map.getPossibleMoves(playerNumber);
+		
+		for (Move move : possibleMoves) {
+			Map appliedMove = map.clone();
+			appliedMove.applyMove(move);
+			double evaluation = evaluatePosition(appliedMove, playerNumber);
+			
+			if(evaluation > currentBestEval)
+			{
+				currentBestEval = evaluation;
+				currentBest = move;
+			}
+		}
+		return currentBest;
 	}
 	
 	//##################################################

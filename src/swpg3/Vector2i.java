@@ -14,7 +14,7 @@ public class Vector2i {
 	public int	x;
 	public int	y;
 	
-	static Vector2i UP() {
+	public static Vector2i UP() {
 		return new Vector2i(0, -1);
 	}
 

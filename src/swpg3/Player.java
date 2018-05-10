@@ -27,6 +27,20 @@ public class Player {
 		this.bombs = bombs;
 		//this.stonePositions = new HashSet<Vector2i>();
 	}
+	
+	/**
+	 * @param number
+	 * @param overrideStones
+	 * @param bombs
+	 */
+	public Player(int number, int overrideStones, int bombs, boolean disqualified)
+	{
+		this.number = number;
+		this.overrideStones = overrideStones;
+		this.bombs = bombs;
+		this.isDisqualified = disqualified;
+		//this.stonePositions = new HashSet<Vector2i>();
+	}
 
 	/**
 	 * @return the overrideStones
@@ -204,5 +218,11 @@ public class Player {
 			default:
 				return TileStatus.INVALID;
 		}
+	}
+	
+	@Override
+	public Player clone()
+	{
+		return new Player(this.number, this.overrideStones, this.bombs, this.isDisqualified);
 	}
 }

@@ -29,6 +29,16 @@ public class Tile {
 			arbitraryTransitions[i] = null;
 		}
 	}
+	
+	/**
+	 * private constructor - for clone method
+	 * @param status
+	 */
+	private Tile(TileStatus status, Transition[] arbitraryTransitions) 
+	{
+		this.status = status;
+		this.arbitraryTransitions = arbitraryTransitions;
+	}
 
 	/**
 	 * Initializes Tile with status and no Transitions
@@ -138,5 +148,10 @@ public class Tile {
 	{
 		return status == TileStatus.EMPTY || status == TileStatus.CHOICE || status == TileStatus.BONUS
 				|| status == TileStatus.INVERSION;
+	}
+	
+	@Override
+	public Tile clone() {
+		return new Tile(status, arbitraryTransitions);
 	}
 }

@@ -163,6 +163,7 @@ public class Map {
 							//creating MapWalker
 							mw.setPosition(pos.clone());
 							mw.setDirection(Vector2i.mapDirToVector(i));
+							//Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
 							
 							if(!mw.canStep()) 
 							{
@@ -170,6 +171,7 @@ public class Map {
 								continue; //there is no possible move in this direction
 							}
 							mw.step();
+//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
 							if(mw.getCurrentTile().isEmpty() || !mw.canStep()
 									|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
@@ -177,6 +179,7 @@ public class Map {
 								continue; //no enclosing of stones possible
 							}
 							mw.step(); //making sure that direct adjacent fields are not valid moves
+							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
 							
 							//iterate till a hole, an empty field or an own stone is found 
 							while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
@@ -189,6 +192,7 @@ public class Map {
 									possibleMoves.add(move);
 								}
 								mw.step();
+//								Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
 							}
 											
 							if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
@@ -281,6 +285,7 @@ public class Map {
 	{
 		MapManager mm = MapManager.getInstance();
 		int playerIndex = move.getPlayerNumber() - 1;
+		
 		if (mm.getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
 
@@ -291,10 +296,8 @@ public class Map {
 			if (t.isOccupied())
 			{
 				playerInfo[playerIndex].useOverrideStone();
-				Logger.log(LogLevel.INFO, "Use override stone");
 			}
-			Logger.log(LogLevel.INFO,""+ playerInfo[playerIndex].getNumberOfOverrideStones());
-
+			
 			// flip set stone
 			// actualizing the map
 			getTileAt(move.getCoordinates()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())); 
@@ -305,13 +308,14 @@ public class Map {
 			{
 				MapWalker mw = new MapWalker(this, move.getCoordinates().clone(), Vector2i.mapDirToVector(i));
 				mw.step();
-
 				// walk until hole, a non-occupied square or an own stone
 				while (mw.getCurrentTile().isOccupied() && mw.canStep() && mw.getCurrentTile().getStatus() != Player
 						.mapPlayerNumberToTileStatus(move.getPlayerNumber()))
 				{
+//					Logger.log(LogLevel.DETAIL,"2.2." + debug + ". " + getTileAt(3, 0).getTransitionTo(Vector2i.UP()).getTargetPoint());
 					mw.step();
 				}
+
 				if (mw.getCurrentTile().getStatus() == Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())
 						&& !(mw.getPosition().equals(move.getCoordinates())))
 				{
@@ -327,6 +331,7 @@ public class Map {
 					}
 				}
 			}
+
 
 			// handle special fields
 			switch (beforeStatus)
@@ -791,10 +796,24 @@ public class Map {
 		return nextPlayerTurn;
 	}
 	
+	//TODO: METHOD IS NOT WORKING
 	@Override
 	public Map clone()
 	{
-		return new Map(grid, playerInfo, nextPlayerTurn);
+		Player[] playerInfoClone = new Player[playerInfo.length];
+		Tile[] gridClone = new Tile[grid.length];
+		
+		for(int i = 0; i<playerInfo.length; i++) 
+		{
+			playerInfoClone[i] = playerInfo[i].clone();
+		}
+		
+		for(int i = 0; i<grid.length; i++) 
+		{
+			gridClone[i] = grid[i].clone();
+		}
+		
+		return new Map(gridClone, playerInfoClone, nextPlayerTurn);
 	}
 	
 	public void print()

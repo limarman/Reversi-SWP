@@ -11,8 +11,8 @@ package swpg3;
  *
  */
 public class Transition {
-	private Vector2i targetPoint;
-	private Vector2i targetIncomingDir;
+	private final Vector2i targetPoint;
+	private final Vector2i targetIncomingDir;
 
 	/**
 	 * Simple Constructor initializing everything
@@ -41,6 +41,12 @@ public class Transition {
 	public Vector2i getTargetIncomingDir()
 	{
 		return targetIncomingDir;
+	}
+	
+	@Override
+	public Transition clone()
+	{
+		return new Transition(targetPoint, targetIncomingDir);
 	}
 
 }

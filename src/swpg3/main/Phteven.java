@@ -8,6 +8,8 @@ import java.util.HashSet;
 
 import swpg3.MapManager;
 import swpg3.Move;
+import swpg3.Vector2i;
+import swpg3.ai.AI;
 import swpg3.net.Message;
 import swpg3.net.MessageType;
 import swpg3.net.NetworkManager;
@@ -52,6 +54,7 @@ public class Phteven{
 	private boolean shouldClose;
 	private NetworkManager net;
 	private MapManager mapMan;
+	private AI ai;
 	
 	/**
 	 * Initializes Phteven by connecting to the server and transmitting the group number Message.
@@ -62,6 +65,7 @@ public class Phteven{
 	public void initialize(String hostname, int port, boolean errorLog)
 	{
 		mapMan = MapManager.getInstance();
+		ai = AI.getInstance();
 		// Connect to server
 		net = NetworkManager.initialize(hostname, port);
 		if(!net.isConnected())
@@ -135,7 +139,8 @@ public class Phteven{
 			String map = m.retrieveMap();
 			// Initialize Map
 			mapMan.initializeMap(map);
-			Logger.log(LogLevel.INFO, "Recieved Map.");
+			ai.initialize();
+			Logger.log(LogLevel.INFO, "Received Map.");
 			Logger.logMap(LogLevel.DETAIL, mapMan.getCurrentMap());
 		}
 		else if(m.getType() == MessageType.PLAYER_NUMBER_ASSIGN) // MessageType 3
@@ -150,26 +155,26 @@ public class Phteven{
 			int timeLimit = m.retrieveTimeLimit();
 			int depthLimit = m.retrieveDepthLimit();
 			
-			Logger.log(LogLevel.INFO, "Recieved Moverequest: (" + timeLimit + ", " + depthLimit + ")");
+			Logger.log(LogLevel.INFO, "Received Moverequest: (" + timeLimit + ", " + depthLimit + ")");
+						
+						
 			// Request Move from AI
-			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
-			for (Move move : moves)
+			Move bestMove = AI.getInstance().getBestMove(playerNumber);
+			
+//			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
+			try
 			{
-				try
-				{
-					net.sendMessage(Message.newMoveReply(move));
-					Logger.log(LogLevel.INFO, "Replied with Move: " + move);
-				} catch (IOException e)
-				{
-				}
-				break;
+				net.sendMessage(Message.newMoveReply(bestMove));
+				Logger.log(LogLevel.INFO, "Replied with Move: " + bestMove);
+			} catch (IOException e)
+			{
 			}
 			
 		}
 		else if(m.getType() == MessageType.MOVE_ANNOUNCE) // MessageType 6
 		{
 			Move move = m.retrieveAnouncedMove();
-			Logger.log(LogLevel.INFO, "Recieved Move: " + move);
+			Logger.log(LogLevel.INFO, "Received Move: " + move);
 			// Apply Move to the map
 			mapMan.applyMove(move);
 			Logger.log(LogLevel.DETAIL, "Applied Move:");
@@ -207,7 +212,7 @@ public class Phteven{
 		{
 			//String state = m.retrieveGameState();
 			// ignore or update Map:
-			Logger.log(LogLevel.INFO, "Recieved new game state!");
+			Logger.log(LogLevel.INFO, "Received new game state!");
 		}
 		else
 		{
