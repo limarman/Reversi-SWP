@@ -38,8 +38,8 @@ public class MapWalker {
 	public MapWalker(Map map, Vector2i position, Vector2i direction)
 	{
 		this.map = map;
-		this.position = position;
-		this.direction = direction;
+		this.position = position.clone();
+		this.direction = direction.clone();
 		movementStopped = false;
 	}
 
@@ -48,7 +48,7 @@ public class MapWalker {
 	 */
 	public Vector2i getPosition()
 	{
-		return position;
+		return position.clone();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class MapWalker {
 	 */
 	public void setPosition(Vector2i position)
 	{
-		this.position = position;
+		this.position = position.clone();
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class MapWalker {
 	 */
 	public Vector2i getDirection()
 	{
-		return direction;
+		return direction.clone();
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class MapWalker {
 	 */
 	public void setDirection(Vector2i direction)
 	{
-		this.direction = direction;
+		this.direction = direction.clone();
 	}
 
 	/**
@@ -105,8 +105,7 @@ public class MapWalker {
 		Tile thisTile = map.getTileAt(position);
 		if (!nextTile.isHole())
 		{
-			//this.position.add(this.direction); //Yeah, this was a bug. Why? We do not know
-			this.position = Vector2i.sum(position, direction);
+			this.position.add(this.direction); //Yeah, this was a bug. Why? We do not know
 			return true;
 		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) //TODO: check the condition?
 		{

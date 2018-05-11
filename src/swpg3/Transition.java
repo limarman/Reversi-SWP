@@ -23,8 +23,8 @@ public class Transition {
 	 */
 	public Transition(Vector2i targetPoint, Vector2i targetIncomingDir)
 	{
-		this.targetPoint = targetPoint;
-		this.targetIncomingDir = targetIncomingDir;
+		this.targetPoint = targetPoint.clone();
+		this.targetIncomingDir = targetIncomingDir.clone();
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Transition {
 	 */
 	public Vector2i getTargetPoint()
 	{
-		return targetPoint;
+		return targetPoint.clone();
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class Transition {
 	 */
 	public Vector2i getTargetIncomingDir()
 	{
-		return targetIncomingDir;
+		return targetIncomingDir.clone();
 	}
 	
 	@Override
