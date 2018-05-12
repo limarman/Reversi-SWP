@@ -4,11 +4,9 @@
 package swpg3.main;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import swpg3.MapManager;
 import swpg3.Move;
-import swpg3.Vector2i;
 import swpg3.ai.AI;
 import swpg3.net.Message;
 import swpg3.net.MessageType;

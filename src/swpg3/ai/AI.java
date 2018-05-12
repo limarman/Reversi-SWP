@@ -11,7 +11,8 @@ import swpg3.Player;
 import swpg3.Tile;
 import swpg3.TileStatus;
 import swpg3.Vector2i;
-import swpg3.main.Phteven;
+import swpg3.main.LogLevel;
+import swpg3.main.Logger;
 
 public class AI {
 	
@@ -21,6 +22,9 @@ public class AI {
 	//##################################################
 	// Parameters for evaluation-function
 	//##################################################
+	
+	//whether the expection-function should be used
+	private boolean USE_EXPECTIONFUNC = false;
 	
 	//StoneCount parameter
 	private double STONE_COUNT_BONUS = 8;
@@ -192,86 +196,50 @@ public class AI {
 		else //Bombing Phase
 		{
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-			int [] stonecount = new int[MapManager.getInstance().getNumberOfPlayers()-1];
+			int [] stoneCount = new int[MapManager.getInstance().getNumberOfPlayers()];
 			
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
 			{
 				for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
 				{
-					if(map.getTileAt(w, h).getStatus() != TileStatus.HOLE)
+					if(map.getTileAt(w, h).isOccupiedbyPlayer())
 					{
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_1)
-						{
-							stonecount [0]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_2)
-						{
-							stonecount[1]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_3)
-						{
-							stonecount[2]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_4)
-						{
-							stonecount[3]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_5)
-						{
-							stonecount[4]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_6)
-						{
-							stonecount[5]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_7)
-						{
-							stonecount[6]++;
-						}
-						if(map.getTileAt(w, h).getStatus() == TileStatus.PLAYER_8)
-						{
-							stonecount[7]++;
-						}
+						byte player = map.getTileAt(w, h).getStatus().value;
+						stoneCount[player-1]++;
 					}
 				}	
 			}
 			
-			//finding the index of the player with the most stones, second most and of the player
-			int max = 0;
-			int secmax = 0;
-			int player = Phteven.getPlayerNumber() - 1;
-			for (int i = 0; i < stonecount.length; i++)
+			int playerStoneCount = stoneCount[playerNumber-1];
+			int stonesTillFirst = 0;
+			int stonesTillPred = Integer.MAX_VALUE;
+			
+			//iterating over the array adding stones to bomb
+			for(int i = 0; i<stoneCount.length; i++) 
 			{
-			     if (stonecount[i] >= max)
-			     {
-			    	secmax = max;
-			    	max = i;
-			     }else if(stonecount[i] > secmax)
-			     {
-			    	secmax = i;
-			     }
+				//stones needed to bomb
+				if(stoneCount[i] > playerStoneCount) 
+				{
+					stonesTillFirst += (stoneCount[i] - playerStoneCount);
+				}
+				//if not comparing with own stones
+				//and if difference is smaller than found earlier
+				// -> actualize the distance to predecessor
+				else if(i != playerNumber-1 && stonesTillPred > playerStoneCount - stoneCount[i])
+				{
+					stonesTillPred = playerStoneCount - stoneCount[i];
+				}
 			}
 			
-			if(player == max && !(stonecount[max] == stonecount[secmax])) 
+			if(stonesTillFirst == 0) //you are the (divided) first place
 			{
-				return stonecount[max] - stonecount[secmax];
-			}else if(stonecount[player] == max && stonecount[max] == stonecount[secmax])	//when player shares first place with other players we return -1
-			{
-				return -1;
+				evaluation = stonesTillPred;
 			}else 
 			{
-				//count the number of stones needed for first place
-				int sumtoFirst = 0;
-				for(int n = 0; n < stonecount.length; n++)
-				{
-					if(stonecount[player] < stonecount[n])
-					{
-						sumtoFirst += stonecount[n];
-					}
-				}
-				return -sumtoFirst;
+				evaluation = -stonesTillFirst;
 			}
+			
 			
 		}
 		return evaluation;
@@ -285,21 +253,29 @@ public class AI {
 	public Move getBestMove(byte playerNumber)
 	{
 		Move currentBest = null;
-		double currentBestEval = Double.MIN_VALUE;
+		double currentBestEval = Double.NEGATIVE_INFINITY;
 		Map map = MapManager.getInstance().getCurrentMap();
 		
 		HashSet<Move> possibleMoves = map.getPossibleMoves(playerNumber);
+		
+		if(possibleMoves.isEmpty())
+		{
+			Logger.log(LogLevel.INFO, "There is no possible move");
+		}
 		
 		for (Move move : possibleMoves) {
 			Map appliedMove = map.clone();
 			appliedMove.applyMove(move);
 			double evaluation = evaluatePosition(appliedMove, playerNumber);
-			
 			if(evaluation > currentBestEval)
 			{
 				currentBestEval = evaluation;
 				currentBest = move;
 			}
+		}
+		if(currentBest == null) 
+		{
+			Logger.log(LogLevel.ERROR, "No move was found!");
 		}
 		return currentBest;
 	}
@@ -354,21 +330,29 @@ public class AI {
 	{
 		double evaluation = 0;
 		
-		//calculating the bonus
-		if(totalFieldControl < M_MRP)
+		
+		if(USE_EXPECTIONFUNC)
 		{
-			double expectedValue = calcLinearInterpolation(0, M_MRP, M_SV, M_MV, totalFieldControl);
-			evaluation = MOBILITY_BONUS * (mobility - expectedValue);
+			//calculating the bonus
+			if(totalFieldControl < M_MRP)
+			{
+				double expectedValue = calcLinearInterpolation(0, M_MRP, M_SV, M_MV, totalFieldControl);
+				evaluation = MOBILITY_BONUS * (mobility - expectedValue);
+			}
+			else if(totalFieldControl >= M_MRP && totalFieldControl < M_MLP)
+			{
+				double expectedValue = M_MV;
+				evaluation = MOBILITY_BONUS * (mobility - expectedValue);
+			}
+			else //totalFieldControl >= M_MLP
+			{
+				double expectedValue = calcLinearInterpolation(M_MLP, 1, M_MV, M_EV, totalFieldControl);
+				evaluation = MOBILITY_BONUS * (mobility - expectedValue);
+			}
 		}
-		else if(totalFieldControl >= M_MRP && totalFieldControl < M_MLP)
+		else 
 		{
-			double expectedValue = M_MV;
-			evaluation = MOBILITY_BONUS * (mobility - expectedValue);
-		}
-		else //totalFieldControl >= M_MLP
-		{
-			double expectedValue = calcLinearInterpolation(M_MLP, 1, M_MV, M_EV, totalFieldControl);
-			evaluation = MOBILITY_BONUS * (mobility - expectedValue);
+			evaluation = MOBILITY_BONUS * mobility;
 		}
 		
 		//resizing according to importance func
@@ -383,15 +367,23 @@ public class AI {
 		double evaluation = 0;
 		
 		//calculating the bonus
-		if(totalFieldControl < SC_TP)
+		if(USE_EXPECTIONFUNC) 
 		{
-			double expectedValue = calcLinearInterpolation(0, SC_TP, SC_SV, SC_TV, totalFieldControl);
-			evaluation = 100 * STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
+		
+			if(totalFieldControl < SC_TP)
+			{
+				double expectedValue = calcLinearInterpolation(0, SC_TP, SC_SV, SC_TV, totalFieldControl);
+				evaluation = 100 * STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
+			}
+			else
+			{
+				double expectedValue = calcLinearInterpolation(SC_TP, 1, SC_TV, SC_EV, totalFieldControl);
+				evaluation = 100 * STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
+			}
 		}
-		else
+		else 
 		{
-			double expectedValue = calcLinearInterpolation(SC_TP, 1, SC_TV, SC_EV, totalFieldControl);
-			evaluation = 100 * STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
+			evaluation = 100 * STONE_COUNT_BONUS * controlOfOccupied;
 		}
 		
 		//resizing according to importance func
@@ -488,6 +480,11 @@ public class AI {
 	public HashSet<Vector2i> getSolidSquares()
 	{
 		return solidSquares;
+	}
+	
+	public boolean isUsingExpectFunc() 
+	{
+		return USE_EXPECTIONFUNC;
 	}
 }
 

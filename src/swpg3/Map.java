@@ -261,7 +261,7 @@ public class Map {
 				{
 					for(int j = 0; j<mm.getHeight(); j++)
 					{
-						if(getTileAt(i, j).isOccupied())
+						if(!getTileAt(i, j).isHole())
 						{
 							Vector2i pos = new Vector2i(i,j);
 							possibleMoves.add(new Move(pos, (byte) 0, playerNumber));
@@ -796,7 +796,6 @@ public class Map {
 		return nextPlayerTurn;
 	}
 	
-	//TODO: METHOD IS NOT WORKING
 	@Override
 	public Map clone()
 	{
