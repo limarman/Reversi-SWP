@@ -24,4 +24,16 @@ public enum LogLevel {
 		this.level = level;
 		this.msg = msg;
 	}
+	
+	public static LogLevel fromInt(int i)
+	{
+		for(LogLevel ll : LogLevel.values())
+		{
+			if(ll.level == i)
+			{
+				return ll;
+			}
+		}
+		return INFO;
+	}
 }

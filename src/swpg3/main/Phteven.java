@@ -65,10 +65,11 @@ public class Phteven{
 		mapMan = MapManager.getInstance();
 		ai = AI.getInstance();
 		// Connect to server
+		Logger.log(LogLevel.DETAIL, "Connecting to server: " + hostname + ":" + port);
 		net = NetworkManager.initialize(hostname, port);
 		if(!net.isConnected())
 		{
-			Logger.log(LogLevel.ERROR, "Could not connect to server!)");
+			Logger.log(LogLevel.ERROR, "Could not connect to server!");
 			System.exit(1);
 		}
 		
@@ -227,28 +228,35 @@ public class Phteven{
 	 */
 	public static void main(String[] args)
 	{
-		Logger.init(LogLevel.DETAIL);
-		//Check cmdArgs:
-		if(args.length != 2)
-		{
-			Logger.log(LogLevel.ERROR, "Call with hostname and port as parameters");
-			System.exit(0);
-		}
-		int port = -1;
+		// Parse in args:
+		CliParser parser = new CliParser();
 		
-		try {
-			port = Integer.parseInt(args[1]);
-		}catch(Exception e)
+		// options:
+		CliOption serverOpt = 
+				new CliOption('s', "server", true, CliOptionType.STRINGPARAM, "localhost", "Serveraddress to connect to");
+		CliOption portOpt = 
+				new CliOption('p', "port", true, CliOptionType.INTPARAM, "12345", "Serverport to connect to");
+		CliOption loglevelOpt =
+				new CliOption('l', "loglevel", false, CliOptionType.INTPARAM, "3", "Loglevel: 0-None to 5-Debug");
+		
+		parser.addOption(serverOpt);
+		parser.addOption(portOpt);
+		parser.addOption(loglevelOpt);
+		
+		//actual parsing:
+		if(!parser.parse(args))
 		{
-			Logger.log(LogLevel.ERROR, "port must be a number");
 			System.exit(1);
 		}
 		
+		// Initialize the Logger:
+		Logger.init(LogLevel.fromInt(loglevelOpt.getInt()));
 		
+		Logger.log(LogLevel.DEBUG, "Logger initialized in DEBUG Mode. Prepare for a Wall of Text :P");
 		// In piece may he rest
 		Phteven hooking = Phteven.getInstance();
 		
-		hooking.initialize(args[0], port, true);
+		hooking.initialize(serverOpt.getString(), portOpt.getInt(), true);
 		
 		// main Event Loop:
 		hooking.mainLoop();

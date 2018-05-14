@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<project name="swpg3" default="compile" basedir=".">
+<project name="swpg3" default="deploy" basedir=".">
   <description>
     Buildfile for our Software Praktikum Group 3 Project
   </description>
   <property name="src" location="src" />
   <property name="bin" location="bin" />
   
-  <target name="compile">
+  <target name="compile" depends="clean">
     <javac srcdir="${src}" destdir="${bin}" />
   </target>
 
