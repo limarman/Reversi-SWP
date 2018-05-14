@@ -288,7 +288,6 @@ public class Map {
 		
 		if (mm.getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
-
 			// if tile is occupied
 			Tile t = getTileAt(move.getCoordinates());
 			TileStatus beforeStatus = t.getStatus();
