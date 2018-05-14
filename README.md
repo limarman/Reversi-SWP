@@ -25,6 +25,7 @@ This is a list of all commandline arguments:
 | --------- | -------------- | ------ | ------------ | ------------- | -----------                               |
 | `-s`      | `--server`   | STRING | yes          |               | The server address you want to connect to |
 | `-p`      | `--port`     | INT    | yes          |               | The serverport you want to connect to     |
+| `-h`      | `--help`     | FLAG   | no           |               | Prints a hopefully helping text |
 | `-l`      | `--loglevel` | INT    | no           | 3             | The maximum LogLevel that should be printed. 0:NONE 1:ERROR 2:WARNING 3:INFO 4:DETAIL 5:DEBUG |
     
 Arguments with either a STRING or INT option require an additional option after them.
