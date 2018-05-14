@@ -2,8 +2,6 @@ package swpg3;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashSet;
-
 import org.junit.jupiter.api.Test;
 
 class MapWalkerTest {

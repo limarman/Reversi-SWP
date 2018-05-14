@@ -3,8 +3,6 @@
  */
 package swpg3;
 
-import swpg3.main.LogLevel;
-import swpg3.main.Logger;
 
 /**
  * A class to walk over a Map in a specified direction.
