@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>14</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>378</x>
+      <y>224</y>
+      <w>462</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>swpg3.ai::AI
+--
+--
++getBestMove(byte playerNumber): Move
+-setParameters(): void
++getPlayableSquares(): int
++getSolidSquares(): HashSet&lt;Vector2i&gt;
++isUsingExpectFunc(): boolean
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>350</x>
+      <y>952</y>
+      <w>966</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>swpg3.ai::Calculator
+--
+--
+-Calculator(): ctor
++getInstance(): Calculator
++minimax(Evaluator eval, byte playerNumber, int depth, Map map): double
+-minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map): double
+-maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map): double
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>126</x>
+      <y>686</y>
+      <w>742</w>
+      <h>196</h>
+    </coordinates>
+    <panel_attributes>swpg3.ai::EgocentricEvaluator
+--
+--
++evaluatePosition(Map map, byte playerNumber): double
+-evaluateMobility(int mobility, int turns, double totalFieldControl): double
+-evaluateStoneCount(double controlOfOccupied, double totalFieldControl): double
+-evaluateOverrideCount(int numberOfOverrides): double
+-evaluatePositionalFactors(): double
+-calcLinearInterpolation(): double</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>126</x>
+      <y>420</y>
+      <w>742</w>
+      <h>196</h>
+    </coordinates>
+    <panel_attributes>swpg3.ai::RelativeEvaluator
+--
+--
++evaluatePosition(Map map, byte playerNumber): double
+-evaluateMobility(int mobility, int turns, double totalFieldControl): double
+-evaluateStoneCount(double controlOfOccupied, double totalFieldControl): double
+-evaluateOverrideCount(int numberOfOverrides): double
+-evaluatePositionalFactors(): double
+-calcLinearInterpolation(): double</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>224</y>
+      <w>252</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>swpg3.ai::Analyser
+--
+--
++getInstance(): Analyser
++analyseMap(): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>966</x>
+      <y>224</y>
+      <w>518</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+swpg3.ai::Evaluator
+--
+--
+~evaluatePosition(Map map, byte playerNumber): double
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>238</x>
+      <y>294</y>
+      <w>168</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>854</x>
+      <y>308</y>
+      <w>168</w>
+      <h>238</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;100.0;150.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>854</x>
+      <y>308</y>
+      <w>280</w>
+      <h>560</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;380.0;180.0;380.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>826</x>
+      <y>294</y>
+      <w>168</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
