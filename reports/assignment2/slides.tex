@@ -13,6 +13,8 @@
 \setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 }
 
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \usepackage{hyperref}
@@ -55,6 +57,53 @@ RWTH Aachen \\ % Your institution for the title page
 
 \end{frame}
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------
+
+\begin{frame}
+\frametitle{AI - Bewertungsfunktion}
+
+\textbf{Bewertungskategorien:}
+\begin{enumerate}
+\item[•] Anzahl eigener Steine
+\item[•] "kostenlose" Mobilität
+\item[•] Anzahl stabiler Steine
+\item[•] Anzahl der Override Steine
+\end{enumerate}
+
+\pause
+\hfill\break
+
+\textbf{Ablauf der Evaluation:}
+\begin{enumerate}
+\item[1.] Analyse des Attributes
+\item[2.] Auswertung mit Erwartungswertfunktion
+\item[3.] Skalierung mit Wichtigkeitsfunktion
+\end{enumerate}
+
+
+\end{frame}
+
+%--------------------------------------------------
+
+\begin{frame}
+\frametitle{Bsp. Erwartungswertfunktion - Mobilität}
+\centering
+\includegraphics[width = 0.7\textwidth]{ExpectedValueGraphEdited.pdf}
+\end{frame}
+
+%--------------------------------------------------
+
+\begin{frame}
+\frametitle{Bsp. Wichtigkeitsfunktion - Anzahl eigener Steine}
+\centering
+\includegraphics[width = 0.7\textwidth]{ImportanceFunctionGraph.pdf}
+\end{frame}
+
+%--------------------------------------------------
+%--------------------------------------------------
+%--------------------------------------------------
+
+
+
 
 \end{document} 
