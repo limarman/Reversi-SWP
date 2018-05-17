@@ -15,7 +15,13 @@ public class Move {
 	private Vector2i	coordinates;
 	private byte		specialFieldInfo;
 	private byte		playerNumber;
-
+	
+	
+	/**
+	 * Creating an empty move to clone from another move later
+	 */
+	public Move() {}
+	
 	/**
 	 * @param coordinates
 	 * @param specialFieldInfo
@@ -107,6 +113,13 @@ public class Move {
 	{
 		return "Player: " +	playerNumber + " Coords: " + coordinates.toString() +
 				" Special: " + specialFieldInfo;
+	}
+	
+	public void copyFrom(Move m) 
+	{
+		this.coordinates = m.coordinates;
+		this.playerNumber = m.playerNumber;
+		this.specialFieldInfo = m.specialFieldInfo;
 	}
 	
 

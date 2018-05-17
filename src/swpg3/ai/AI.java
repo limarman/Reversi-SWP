@@ -2,7 +2,6 @@ package swpg3.ai;
 
 import java.util.HashSet;
 
-import swpg3.Map;
 import swpg3.MapManager;
 import swpg3.Move;
 import swpg3.Vector2i;
@@ -106,34 +105,36 @@ public class AI {
 	// Method for Returning the Best Move
 	//##################################################
 	
-	public Move getBestMove(byte playerNumber)
+	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
-		Move currentBest = null;
-		double currentBestEval = Double.NEGATIVE_INFINITY;
-		Map map = MapManager.getInstance().getCurrentMap();
-		
-		HashSet<Move> possibleMoves = map.getPossibleMoves(playerNumber);
-		
-		if(possibleMoves.isEmpty())
-		{
-			Logger.log(LogLevel.INFO, "There is no possible move");
-		}
-		
-		for (Move move : possibleMoves) {
-			Map appliedMove = map.clone();
-			appliedMove.applyMove(move);
-			double evaluation = eva.evaluatePosition(appliedMove, playerNumber);
-			if(evaluation > currentBestEval)
-			{
-				currentBestEval = evaluation;
-				currentBest = move;
-			}
-		}
-		if(currentBest == null) 
-		{
-			Logger.log(LogLevel.ERROR, "No move was found!");
-		}
-		return currentBest;
+		Move bestMove = new Move();
+//		double currentBestEval = Double.NEGATIVE_INFINITY;
+//		Map map = MapManager.getInstance().getCurrentMap();
+//		
+//		HashSet<Move> possibleMoves = map.getPossibleMoves(playerNumber);
+//		
+//		if(possibleMoves.isEmpty())
+//		{
+//			Logger.log(LogLevel.INFO, "There is no possible move");
+//		}
+//		
+//		for (Move move : possibleMoves) {
+//			Map appliedMove = map.clone();
+//			appliedMove.applyMove(move);
+//			double evaluation = eva.evaluatePosition(appliedMove, playerNumber);
+//			if(evaluation > currentBestEval)
+//			{
+//				currentBestEval = evaluation;
+//				currentBest = move;
+//			}
+//		}
+//		if(currentBest == null) 
+//		{
+//			Logger.log(LogLevel.ERROR, "No move was found!");
+//		}
+		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, bestMove);
+		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
+		return bestMove;
 	}
 	
 	private void setParameters()
@@ -146,7 +147,7 @@ public class AI {
 			return;
 		}
 		
-		int movesToEnd = 3;
+		int movesToEnd = 5;
 		double turnPoint = (PLAYABLE_SQUARES - (numberOfPlayers * movesToEnd))/((double)PLAYABLE_SQUARES);
 		
 		//setting the turningPoints

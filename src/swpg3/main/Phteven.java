@@ -158,8 +158,12 @@ public class Phteven{
 						
 						
 			// Request Move from AI
-			Move bestMove = AI.getInstance().getBestMove(playerNumber);
+			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
 			
+			if(bestMove == null) 
+			{
+				Logger.log(LogLevel.ERROR, "Best returned move is null!");
+			}
 //			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
 			try
 			{

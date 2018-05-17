@@ -3,9 +3,6 @@ package swpg3;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import swpg3.main.LogLevel;
-import swpg3.main.Logger;
-
 /**
  * A class to store Map information
  * 
@@ -179,7 +176,7 @@ public class Map {
 								continue; //no enclosing of stones possible
 							}
 							mw.step(); //making sure that direct adjacent fields are not valid moves
-							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
+//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
 							
 							//iterate till a hole, an empty field or an own stone is found 
 							while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
