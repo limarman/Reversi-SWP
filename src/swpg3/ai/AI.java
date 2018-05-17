@@ -18,11 +18,9 @@ public class AI {
 	// Parameters for evaluation-function
 	//##################################################
 	
-	//whether the expection-function should be used
-	protected static boolean USE_EXPECTIONFUNC = false;
 	
 	//StoneCount parameter
-	protected static double STONE_COUNT_BONUS = 8;
+	protected static double STONE_COUNT_BONUS = 5;
 	
 	protected static double SC_SV;
 	protected static double SC_TV;
@@ -36,7 +34,7 @@ public class AI {
 	protected static double SC_TP_I;
 	
 	//Mobility parameter
-	protected static double MOBILITY_BONUS = 10;
+	protected static double MOBILITY_BONUS = 30;
 	
 	protected static double M_SV;
 	protected static double M_MV;
@@ -48,11 +46,11 @@ public class AI {
 	protected static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	protected static double OVERRIDE_BONUS = 20;
+	protected static double OVERRIDE_BONUS = 50;
 	protected static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
-	protected static double SOLID_SQUARE_BONUS = 10;
+	protected static double SOLID_SQUARE_BONUS = 50;
 	protected static double WEAK_SQUARE_BONUS = -5;
 	protected static double BONUS_WEAK_SQUARE_BONUS = -3;
 	protected static double CHOICE_WEAK_SQUARE_BONUS = -5;
@@ -64,7 +62,7 @@ public class AI {
 	protected static double PP_TP_I;
 	
 	//tools
-	private Analyser ana;
+	private Analyser anna;
 	private Calculator calc;
 	private Evaluator eva;
 	
@@ -97,10 +95,10 @@ public class AI {
 	
 	public void initialize()
 	{
-		ana = Analyser.getInstance();
+		anna = Analyser.getInstance();
 		calc = Calculator.getInstance();
-		eva = new EgocentricEvaluator();
-		ana.analyseMap();
+		eva = new RelativeEvaluator();
+		anna.analyseMap();
 		setParameters();
 	}
 	
@@ -178,10 +176,6 @@ public class AI {
 	{
 		return solidSquares;
 	}
-	
-	public boolean isUsingExpectFunc() 
-	{
-		return USE_EXPECTIONFUNC;
-	}
+
 }
 

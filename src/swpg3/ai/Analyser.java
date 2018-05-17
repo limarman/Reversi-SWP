@@ -59,14 +59,14 @@ public class Analyser {
 					}
 					
 					//all directions are blocked -> solidSquare
-						if(directionsBlocked[0] && directionsBlocked[1] && directionsBlocked[2] && directionsBlocked[3])
-						{
-							AI.solidSquares.add(pos.clone());
-						}
+					if(directionsBlocked[0] && directionsBlocked[1] && directionsBlocked[2] && directionsBlocked[3])
+					{
+						AI.solidSquares.add(pos.clone());
 					}
 				}
 			}
-			
-			AI.PLAYABLE_SQUARES = playableSquares;
 		}
+			
+		AI.PLAYABLE_SQUARES = playableSquares;
+	}
 }

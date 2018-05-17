@@ -11,6 +11,10 @@ import swpg3.Vector2i;
 
 public class EgocentricEvaluator implements Evaluator {
 
+	//whether the expection-function should be used
+	private boolean useExpectFunc = true;
+	
+	
 	//##################################################
 	// Evaluation Function
 	//##################################################
@@ -165,7 +169,7 @@ public class EgocentricEvaluator implements Evaluator {
 		double evaluation = 0;
 		
 		
-		if(AI.USE_EXPECTIONFUNC)
+		if(useExpectFunc)
 		{
 			//calculating the bonus
 			if(totalFieldControl < AI.M_MRP)
@@ -201,7 +205,7 @@ public class EgocentricEvaluator implements Evaluator {
 		double evaluation = 0;
 		
 		//calculating the bonus
-		if(AI.USE_EXPECTIONFUNC) 
+		if(useExpectFunc) 
 		{
 		
 			if(totalFieldControl < AI.SC_TP)

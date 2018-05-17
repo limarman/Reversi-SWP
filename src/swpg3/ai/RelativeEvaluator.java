@@ -12,100 +12,55 @@ import swpg3.Vector2i;
 public class RelativeEvaluator implements Evaluator{
 
 	
+	private final int FIRST_PRIZE = 100;
+	private final int SECOND_PRIZE = 50;
+	private final int THIRD_PRIZE = 30;
+	
 	//##################################################
 	// Evaluation Function
 	//##################################################
 
 	public double evaluatePosition(Map map, byte playerNumber)
 	{
-		double evaluation = 0;
+		double evaluation;
 		
 		if(MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
+			double[] evaluations = new double[MapManager.getInstance().getNumberOfPlayers()];
+
+			//finding out all attributes
+			//first dimension for the players
+			//second dimension are the attributes:
+			// 0 - solid stone count
+			// 1 - free mobility
+			// 2 - stone count
+			// 3 - turns to wait
+			int[][] attributesPerPlayer = getPlayerAttributes(map);		
 			
-			int solidSquareCount = 0;
-			int occupiedSquares = 0;
-			int freePossibleMoves = 0;
-			int stoneCount = 0;
-			int turns = 0;
-			
-			//iterating over the map, analyzing
-			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
+			//finding out how many occupied squares
+			int occupiedSquares  = 0;
+			for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
 			{
-				for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
-				{
-					Tile t = map.getTileAt(w, h);
-					
-					if(t.isOccupied())
-					{
-						//count the occupied squares
-						occupiedSquares++;
-						if(t.getStatus() == Player.mapPlayerNumberToTileStatus(playerNumber))
-						{
-							//count own stones
-							stoneCount++;
-							
-							if(AI.solidSquares.contains(new Vector2i(w,h)))
-							{
-								//count solid Squares
-								solidSquareCount++;
-							}
-							//TODO: check whether on weak tile etc.
-							
-						}
-					}
-					else if(t.isEmpty())
-					{
-						//check whether move is possible
-						if(t.getStatus() == TileStatus.BONUS) 
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), Move.ADD_OVERRIDESTONE, playerNumber)))
-							{
-								freePossibleMoves++;
-							}
-						}
-						else if(t.getStatus() == TileStatus.CHOICE)
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), playerNumber, playerNumber)))
-							{
-								freePossibleMoves++;
-							}
-						}
-						else //no special field info needed
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, playerNumber)))
-							{
-								freePossibleMoves++;
-							}
-						}
-						
-					}//otherwise it was a hole
-				}
+				occupiedSquares += attributesPerPlayer[i][2];
 			}
 			
-			//finding out how many turns till own turn
-			int nextToMove = map.getNextPlayerTurn();
-			
-			while(nextToMove != playerNumber)
+			//summing up the evaluations for every player
+			for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
 			{
-				if(!map.getPlayer(nextToMove).isDisqualified())
-				{
-					turns++;
-				}
-				nextToMove = nextToMove % MapManager.getInstance().getNumberOfPlayers() + 1;
+				evaluations[i] = 0;
+				evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3], occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+				evaluations[i] += evaluateStoneCount(occupiedSquares/((double)attributesPerPlayer[i][2]),occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
+				evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0], 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 			}
 			
+			double[] probs =  calculateProbalities(playerNumber, evaluations);
 			
-			//sum up the evaluations
-			evaluation += evaluateMobility(freePossibleMoves, turns, occupiedSquares/((double)AI.PLAYABLE_SQUARES));
-			evaluation += evaluateStoneCount(occupiedSquares/((double)stoneCount),
-					occupiedSquares/((double)AI.PLAYABLE_SQUARES));
-			evaluation += evaluateOverrideCount(map.getPlayer(playerNumber).getNumberOfOverrideStones());
-			evaluation += evaluatePositionalFactors(solidSquareCount, 0, 0, 0,
-					occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+			//expected prize - according to probabilites
+			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
 		}
 		else //Bombing Phase
-		{
+		{			
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
 			int [] stoneCount = new int[MapManager.getInstance().getNumberOfPlayers()];
 			
@@ -161,34 +116,201 @@ public class RelativeEvaluator implements Evaluator{
 	// Helping Methods
 	// ----------------------------------------------------
 	
+	/**
+	 * Calculating the probabilities for the player with given playerNumber for the first, second and third place
+	 * @param playerNumber the perspective the value is made
+	 * @param evaluations evaluations for all the players
+	 * @return array of probabilities. a[0] = P(1). a[1] = P(2). a[2] = P(3).
+	 */
+	private double[] calculateProbalities(byte playerNumber, double[] evaluations) {
+		
+		//probabilities saved to not calculate all over again (dynamic programming)
+		//TODO: saving the calculated probs for the second place
+		double[] firstPlaceProbs = new double[evaluations.length];
+//		double[] secondPlaceProbs = new double[evaluations.length];
+		
+		//probabilities for second and third place
+		double thirdPlaceProb = 0, secondPlaceProb = 0;
+		
+		double evaluation_sum = 0;
+		for (double eval : evaluations) {
+			evaluation_sum += eval;
+		}
+		
+		//calculating the probabilities for the first place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			firstPlaceProbs[i] = evaluations[i] / evaluation_sum;
+		}
+		
+		//calculating the probability for the second place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			if(i==playerNumber-1) 
+			{
+				//same player cannot be first and second
+				continue;
+			}
+			
+			secondPlaceProb += firstPlaceProbs[i] * (evaluations[playerNumber-1] / (evaluation_sum - evaluations[i]));
+		}
+		
+//		//calculating probability for the second place
+//		for(int i = 0; i<evaluations.length; i++) 
+//		{
+//			for(int j = 0; j<evaluations.length; j++) 
+//			{
+//				//same player cannot be first and second
+//				if(i==j) 
+//				{
+//					continue;
+//				}
+//				
+//				secondPlaceProbs[i] += firstPlaceProbs[j] * (evaluations[i] / (evaluation_sum - evaluations[j]));
+//			}
+//		}
+		
+		//calculating probability for the third place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			//player cannot be first and third place
+			if(i == playerNumber-1) 
+			{
+				continue;
+			}
+			for(int j = 0; j<evaluations.length; j++) 
+			{
+				//playerNumber cannot be third and second. First and second cannot be the same.
+				if(playerNumber-1 == j || i == j) 
+				{
+					continue;
+				}
+				
+				thirdPlaceProb += firstPlaceProbs[i] * (evaluations[j] / (evaluation_sum - evaluations[i])) * 
+						(evaluations[playerNumber-1] / (evaluation_sum - evaluations[i] - evaluations[j]));
+			}
+		}
+
+		double[] probalities = {firstPlaceProbs[playerNumber-1], secondPlaceProb, thirdPlaceProb};
+		
+		return probalities;
+	}
+
+
+	/**
+	 * Iterates over the map analyzing and returns a 2-dimensional Array with one line for every Player and the column for every attribute
+	 * These are:
+	 * 0 - solid stone count
+	 * 1 - free possible move count
+	 * 2 - stone count
+	 * 3 - turns to wait till own turn (=-1, if player is disqualified)
+	 * @param map
+	 * @return attributes for every player
+	 */
+	private int[][] getPlayerAttributes(Map map)
+	{
+				
+		//attributes for all players
+		int[][] attributesPerPlayer = new int[MapManager.getInstance().getNumberOfPlayers()][4];
+		//first dimension is for the playerNumber
+		//the second for the corresponding attributes
+		// 0 - solidSquareCount
+		// 1 - freePossibleMoves
+		// 2 - stoneCount
+		// 3 - turnsToWait
+		int SOLID_STONES = 0, FREE_POS_MOVES = 1, STONE_COUNT = 2, TURNS_TO_WAIT = 3;
+
+		//iterating over the map, analyzing
+		for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
+		{
+			for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
+			{
+				Tile t = map.getTileAt(w, h);
+				
+				if(t.isOccupiedbyPlayer())
+				{
+					//find out whose stone
+					int playerNumber = t.getStatus().value;
+					
+					//increment stonecount
+					attributesPerPlayer[playerNumber-1][STONE_COUNT]++;
+					
+					if(AI.solidSquares.contains(new Vector2i(w,h))) 
+					{
+						//increment solid stone count
+						attributesPerPlayer[playerNumber-1][SOLID_STONES]++;
+					}
+				}
+				else if(t.isEmpty())
+				{
+					for(byte i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++) 
+					{
+						//check whether move is possible
+						if(t.getStatus() == TileStatus.BONUS) 
+						{
+							if(map.isMoveValid(new Move(new Vector2i(w, h), Move.ADD_OVERRIDESTONE, i)))
+							{
+								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+							}
+						}
+						else if(t.getStatus() == TileStatus.CHOICE)
+						{
+							if(map.isMoveValid(new Move(new Vector2i(w, h), i, i)))
+							{
+								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+							}
+						}
+						else //no special field info needed
+						{
+							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
+							{
+								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+							}
+						}
+					}
+					
+				}//otherwise it was a hole/expansion-stone
+			}
+		}
+		
+		//finding out how many turns till own turn
+		int nextToMove = map.getNextPlayerTurn();
+		
+		int turns = 0;
+		
+		for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
+		{
+			Player nextPlayer = map.getPlayer(nextToMove);
+			if(nextPlayer.isDisqualified()) 
+			{
+				attributesPerPlayer[nextToMove-1][TURNS_TO_WAIT] = -1;
+			}
+			else //player not disqualified
+			{
+				attributesPerPlayer[nextToMove-1][TURNS_TO_WAIT] = turns;
+				turns++;
+			}
+			nextToMove = nextToMove % MapManager.getInstance().getNumberOfPlayers() + 1;
+		}
+		
+		return attributesPerPlayer;
+
+	}
+	
+	/**
+	 * 
+	 * @param mobility
+	 * @param turns
+	 * @param totalFieldControl
+	 * @return scaled mobility evaluation according to parameters in AI class
+	 */
 	private double evaluateMobility(int mobility, int turns, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
+		 
+		evaluation = AI.MOBILITY_BONUS * mobility;
 		
-		if(AI.USE_EXPECTIONFUNC)
-		{
-			//calculating the bonus
-			if(totalFieldControl < AI.M_MRP)
-			{
-				double expectedValue = calcLinearInterpolation(0, AI.M_MRP, AI.M_SV, AI.M_MV, totalFieldControl);
-				evaluation = AI.MOBILITY_BONUS * (mobility - expectedValue);
-			}
-			else if(totalFieldControl >= AI.M_MRP && totalFieldControl < AI.M_MLP)
-			{
-				double expectedValue = AI.M_MV;
-				evaluation = AI.MOBILITY_BONUS * (mobility - expectedValue);
-			}
-			else //totalFieldControl >= M_MLP
-			{
-				double expectedValue = calcLinearInterpolation(AI.M_MLP, 1, AI.M_MV, AI.M_EV, totalFieldControl);
-				evaluation = AI.MOBILITY_BONUS * (mobility - expectedValue);
-			}
-		}
-		else 
-		{
-			evaluation = AI.MOBILITY_BONUS * mobility;
-		}
 		
 		//resizing according to importance func
 		double factor = Math.pow(AI.M_ILF, turns);
@@ -197,29 +319,19 @@ public class RelativeEvaluator implements Evaluator{
 		return evaluation;
 	}
 	
+	/**
+	 * 
+	 * @param controlOfOccupied
+	 * @param totalFieldControl
+	 * @return scaled stone count evaluation according to parameters in AI class
+	 */
 	private double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
 		//calculating the bonus
-		if(AI.USE_EXPECTIONFUNC) 
-		{
+		evaluation = 100 * AI.STONE_COUNT_BONUS * controlOfOccupied;
 		
-			if(totalFieldControl < AI.SC_TP)
-			{
-				double expectedValue = calcLinearInterpolation(0, AI.SC_TP, AI.SC_SV, AI.SC_TV, totalFieldControl);
-				evaluation = 100 * AI.STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
-			}
-			else
-			{
-				double expectedValue = calcLinearInterpolation(AI.SC_TP, 1, AI.SC_TV, AI.SC_EV, totalFieldControl);
-				evaluation = 100 * AI.STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
-			}
-		}
-		else 
-		{
-			evaluation = 100 * AI.STONE_COUNT_BONUS * controlOfOccupied;
-		}
 		
 		//resizing according to importance func
 		if(totalFieldControl < AI.SC_TP_I)
@@ -236,11 +348,25 @@ public class RelativeEvaluator implements Evaluator{
 		return evaluation;
 	}
 	
+	/**
+	 * 
+	 * @param numberOfOverrides
+	 * @return scaled ovveride stone count evaluation according to parameters in AI class
+	 */
 	private double evaluateOverrideCount(int numberOfOverrides)
 	{
 		return numberOfOverrides * AI.OVERRIDE_BONUS * AI.OVERRIDE_IMPORTANCE;
 	}
 	
+	/**
+	 * 
+	 * @param solidSquares
+	 * @param weakSquares
+	 * @param bonusWeakSquares
+	 * @param choiceWeakSquares
+	 * @param totalFieldControl
+	 * @return scaled positional evaluation according to parameters in AI class
+	 */
 	private double evaluatePositionalFactors(int solidSquares, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
 			, double totalFieldControl)
 	{
@@ -266,6 +392,15 @@ public class RelativeEvaluator implements Evaluator{
 		return evaluation;
 	}
 			
+	/**
+	 * Lagrange interpolation between the linear function through point (start, startVal) and (end, endVal) in point x
+	 * @param start
+	 * @param end
+	 * @param startVal
+	 * @param endVal
+	 * @param x
+	 * @return the linear interpolation from x in the line through (start,startVal) and (end,endVal)
+	 */
 	private double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
 	{
 		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
