@@ -62,11 +62,15 @@ public class Phteven{
 	 */
 	public void initialize(String hostname, int port, boolean errorLog)
 	{
+		
+		Logger.log(LogLevel.INFO, "Initializing: " + VersionMaster.getVersionString());
+		
 		mapMan = MapManager.getInstance();
 		ai = AI.getInstance();
 		// Connect to server
 		Logger.log(LogLevel.DETAIL, "Connecting to server: " + hostname + ":" + port);
 		net = NetworkManager.initialize(hostname, port);
+		Logger.log(LogLevel.INFO, "Connected to server: " + hostname + ":" + port);
 		if(!net.isConnected())
 		{
 			Logger.log(LogLevel.ERROR, "Could not connect to server!");
