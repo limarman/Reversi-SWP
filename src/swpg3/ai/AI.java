@@ -95,7 +95,7 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-		calc = Calculator.getInstance();
+		calc = new PruningParanoidCalculator();
 		eva = new RelativeEvaluator();
 		anna.analyseMap();
 		setParameters();

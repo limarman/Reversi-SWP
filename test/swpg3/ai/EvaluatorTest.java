@@ -165,9 +165,42 @@ class EvaluatorTest {
 //		System.out.println(round(player2_probs[2],3));
 //		System.out.println(round(player3_probs[2],3));
 //		System.out.println(round(player4_probs[2],3));
-		
-
 	}
+		
+	@Test
+	void testEvaluateMobility() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		Evaluator eva = new RelativeEvaluator();
+		
+		//test the (private) calculateProbs Method (with reflections)
+		Method mob = RelativeEvaluator.class.getDeclaredMethod("evaluateMobility", int.class, int.class);
+		mob.setAccessible(true);
+		
+		AI.MOBILITY_BONUS = 30;
+		AI.M_ILF = 0.9;
+		
+		assertEquals(262.44d, round((double)mob.invoke(eva, 12, 3),2), "Mobility Evaluation calculated wrongly!");
+	}
+	
+	@Test
+	void testStoneCountEvaluation() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		Evaluator eva = new RelativeEvaluator();
+		
+		//test the (private) calculateProbs Method (with reflections)
+		Method mob = RelativeEvaluator.class.getDeclaredMethod("evaluateStoneCount", double.class, double.class);
+		mob.setAccessible(true);
+		
+		AI.STONE_COUNT_BONUS = 5;
+		AI.SC_TP_I = 0.9;
+		AI.SC_SV_I = 0.2;
+		AI.SC_TV_I = 0.4;
+		AI.SC_EV_I = 1;
+		
+		assertEquals(46.67d, round((double)mob.invoke(eva, 0.3, 0.5),2), "Stone Count Evaluation calculated wrongly! (Pre Turningpoint)");
+		assertEquals(105d, round((double)mob.invoke(eva, 0.3, 0.95),2), "Mobility Evaluation calculated wrongly! (Post Turningpoint)");
+	}
+
 	
 	private double round(double value, int places) {
 	    if (places < 0) throw new IllegalArgumentException();

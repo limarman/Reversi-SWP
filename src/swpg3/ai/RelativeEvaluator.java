@@ -44,12 +44,30 @@ public class RelativeEvaluator implements Evaluator{
 				occupiedSquares += attributesPerPlayer[i][2];
 			}
 			
+//			//debugging
+//			double[] player_evaluations = new double[4];
+//			player_evaluations[0] = evaluateMobility(attributesPerPlayer[playerNumber-1][1], attributesPerPlayer[playerNumber-1][3],
+//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); //mobility
+//			player_evaluations[1] = evaluateStoneCount(occupiedSquares/((double)attributesPerPlayer[playerNumber-1][2]),
+//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); // stone count
+//			player_evaluations[2] = evaluateOverrideCount(map.getPlayer(playerNumber).getNumberOfOverrideStones());
+//								// override stone count
+//			player_evaluations[3] = evaluatePositionalFactors(attributesPerPlayer[playerNumber-1][0], 0, 0, 0,
+//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); //positional factors
+//			
+//			Logger.log(LogLevel.INFO, "Mobility Evaluation: " + Math.round(player_evaluations[0]));
+//			Logger.log(LogLevel.INFO, "Stone Count Evaluation: " + Math.round(player_evaluations[1]));
+//			Logger.log(LogLevel.INFO, "Override Stone Count Evaluation: " + Math.round(player_evaluations[2]));
+//			Logger.log(LogLevel.INFO, "Solid Stone Count Evaluation: " + Math.round(player_evaluations[3]) + "\n");
+
+
 			//summing up the evaluations for every player
 			for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
 			{
 				evaluations[i] = 0;
-				evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3], occupiedSquares/((double)AI.PLAYABLE_SQUARES));
-				evaluations[i] += evaluateStoneCount(occupiedSquares/((double)attributesPerPlayer[i][2]),occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+				evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]);
+				evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
+						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
 				evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0], 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 			}
@@ -154,21 +172,6 @@ public class RelativeEvaluator implements Evaluator{
 			
 			secondPlaceProb += firstPlaceProbs[i] * (evaluations[playerNumber-1] / (evaluation_sum - evaluations[i]));
 		}
-		
-//		//calculating probability for the second place
-//		for(int i = 0; i<evaluations.length; i++) 
-//		{
-//			for(int j = 0; j<evaluations.length; j++) 
-//			{
-//				//same player cannot be first and second
-//				if(i==j) 
-//				{
-//					continue;
-//				}
-//				
-//				secondPlaceProbs[i] += firstPlaceProbs[j] * (evaluations[i] / (evaluation_sum - evaluations[j]));
-//			}
-//		}
 		
 		//calculating probability for the third place
 		for(int i = 0; i<evaluations.length; i++) 
@@ -301,10 +304,9 @@ public class RelativeEvaluator implements Evaluator{
 	 * 
 	 * @param mobility
 	 * @param turns
-	 * @param totalFieldControl
 	 * @return scaled mobility evaluation according to parameters in AI class
 	 */
-	private double evaluateMobility(int mobility, int turns, double totalFieldControl)
+	private double evaluateMobility(int mobility, int turns)
 	{
 		double evaluation = 0;
 		
@@ -321,8 +323,8 @@ public class RelativeEvaluator implements Evaluator{
 	
 	/**
 	 * 
-	 * @param controlOfOccupied
-	 * @param totalFieldControl
+	 * @param controlOfOccupied - percentage of own controlled stones (within all controlled stones)
+	 * @param totalFieldControl - total percentage of field control
 	 * @return scaled stone count evaluation according to parameters in AI class
 	 */
 	private double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)

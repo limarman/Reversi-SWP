@@ -42,7 +42,7 @@ class AITest {
 		
 		//Map map = mm.getCurrentMap();
 		AI.getInstance().initialize();
-		Move m = AI.getInstance().getBestMove((byte)1);
+		Move m = AI.getInstance().getBestMove((byte)1, 1, 0);
 		
 		assertNotEquals(null, m);
 	}
