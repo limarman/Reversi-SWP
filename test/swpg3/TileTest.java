@@ -50,7 +50,7 @@ class TileTest {
 		
 		// Test retrieving transition
 		Transition trans = toTest.getTransitionTo(dir1);
-		assertTrue(trans != null && trans.getTargetPoint() == target, "Not correct Transition");
+		assertTrue(trans != null && trans.getTargetPoint().equals(target), "Not correct Transition");
 
 		try
 		{

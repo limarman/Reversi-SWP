@@ -3,6 +3,7 @@
  */
 package swpg3;
 
+
 /**
  * A class to walk over a Map in a specified direction.
  * This class will automatically follow Transitions and adjust its walking direction
@@ -35,8 +36,8 @@ public class MapWalker {
 	public MapWalker(Map map, Vector2i position, Vector2i direction)
 	{
 		this.map = map;
-		this.position = position;
-		this.direction = direction;
+		this.position = position.clone();
+		this.direction = direction.clone();
 		movementStopped = false;
 	}
 
@@ -45,7 +46,7 @@ public class MapWalker {
 	 */
 	public Vector2i getPosition()
 	{
-		return position;
+		return position.clone();
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class MapWalker {
 	 */
 	public void setPosition(Vector2i position)
 	{
-		this.position = position;
+		this.position = position.clone();
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class MapWalker {
 	 */
 	public Vector2i getDirection()
 	{
-		return direction;
+		return direction.clone();
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class MapWalker {
 	 */
 	public void setDirection(Vector2i direction)
 	{
-		this.direction = direction;
+		this.direction = direction.clone();
 	}
 
 	/**
@@ -95,12 +96,14 @@ public class MapWalker {
 	public boolean step()
 	{
 		if (!canStep() || movementStopped)
+		{
 			return false;
+		}
 		Tile nextTile = map.getTileAt(Vector2i.sum(position, direction));
 		Tile thisTile = map.getTileAt(position);
 		if (!nextTile.isHole())
 		{
-			this.position.add(this.direction);
+			this.position.add(this.direction); //Yeah, this was a bug. Why? We do not know
 			return true;
 		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) //TODO: check the condition?
 		{

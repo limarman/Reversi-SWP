@@ -3,19 +3,15 @@
  */
 package swpg3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashSet;
-import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
-
-import swpg3.Map;
-import swpg3.Tile;
-import swpg3.TileStatus;
-import swpg3.Vector2i;
 
 /**
  * @author eric
@@ -226,7 +222,14 @@ class MapTest {
 	@Test
 	void testGetPossibleMoves()
 	{
-		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n000100\r\n000120\r\n0c-100\n0031i0\n000200\n0000xx";
+		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n"
+				+ "000100\r\n"
+				+ "000120\r\n"
+				+ "0c-100\r\n"
+				+ "0031i0\r\n"
+				+ "000200\r\n"
+				+ "0000xx";
+		
 		MapManager mm = MapManager.getInstance();
 		
 		try{
@@ -242,11 +245,11 @@ class MapTest {
 		
 		HashSet<Move> possibleMovesTest = map.getPossibleMoves((byte)3);
 		
+//		possibleMovesTest.forEach(System.out::println);
+		
 		//asserting that every added move was legal
-		for(Move m : possibleMovesTest)
-		{
-			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
-		}
+		possibleMovesTest.forEach(e -> assertTrue(map.isMoveValid(e),"invalid move was added as possible move!"));
+	
 		assertTrue(possibleMovesTest.size() == 5, "not every possible move was discovered!");
 		
 		possibleMovesTest = map.getPossibleMoves((byte) 1);
@@ -278,40 +281,89 @@ class MapTest {
 			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
 		}
 		
-		assertTrue(possibleMovesTest.size() == 9, "a possible move was not discovered!");
+		assertTrue(possibleMovesTest.size() == 35, "a possible move was not discovered!");
 	}
 	
 	@Test
-	void MapFromFileTest()
+	void getPossibleMovesTest2()
 	{
-		try
-		{
-			FileInputStream fs = new FileInputStream("maps/Map1Test.txt");
-			Scanner scan = new Scanner(fs);
-			String mapString = "";
-			while(scan.hasNextLine())
-			{
-				mapString += scan.nextLine() + "\n";
-			}
-			
-			System.out.println(mapString);
-			
-			MapManager mm = MapManager.getInstance();
-			mm.initializeMap(mapString);
-			
-			
-			mm.getCurrentMap().print();
-			
-			assertEquals(TileStatus.EMPTY, mm.getCurrentMap().getTileAt(19, 0).getStatus());
-			assertEquals(TileStatus.BONUS, mm.getCurrentMap().getTileAt(19, 1).getStatus());
-
-			scan.close();
-			
-		} catch (FileNotFoundException e)
-		{
-			
-			fail("FileError!");
+		String mapString = "2\r\n"
+				+ "0\r\n"
+				+ "0 2\r\n"
+				+ "6 6\r\n"
+				+ "2 2 1 0 0 0\r\n"
+				+ "0 - 2 1 - 0\r\n"
+				+ "0 0 1 1 1 0\r\n"
+				+ "0 0 2 1 0 0\r\n"
+				+ "0 - 0 1 0 0\r\n"
+				+ "0 0 1 1 0 0\r\n"
+				+ "0 0 0 <-> 0 5 4\r\n" 
+				+ "1 0 0 <-> 1 5 4\r\n" 
+				+ "2 0 0 <-> 2 5 4\r\n" 
+				+ "3 0 0 <-> 3 5 4\r\n" 
+				+ "4 0 0 <-> 4 5 4\r\n"
+				+ "5 0 0 <-> 5 5 4";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);;
 		}
+		catch(Exception e) {
+			fail("map could not be read.");
+		}
+		
+		Map map = mm.getCurrentMap();
+				
+		Vector2i pos = new Vector2i(3,0);
+		
+		assertEquals(new Vector2i(3,5), map.getTileAt(pos).getTransitionTo(Vector2i.UP()).getTargetPoint(), "Transition was overridden!");
+		
+//		MapWalker mw = new MapWalker(map);
+//		mw.setPosition(new Vector2i(3,0));
+//		mw.setDirection(Vector2i.UP());
+//		
+//		for(int i = 0; i<3; i++)
+//		{
+//			mw.step();
+//		}
+		
+		map.applyMove(new Move(pos, (byte) 0, (byte) 2));
+		
+		assertEquals(new Vector2i(3,5), map.getTileAt(pos).getTransitionTo(Vector2i.UP()).getTargetPoint(), "Transition was overridden!");
 	}
+	
+//	@Test
+//	void MapFromFileTest()
+//	{
+//		try
+//		{
+//			FileInputStream fs = new FileInputStream("maps/Map1Test.txt");
+//			Scanner scan = new Scanner(fs);
+//			String mapString = "";
+//			while(scan.hasNextLine())
+//			{
+//				mapString += scan.nextLine() + "\n";
+//			}
+//			
+//			System.out.println(mapString);
+//			
+//			MapManager mm = MapManager.getInstance();
+//			mm.initializeMap(mapString);
+//			
+//			
+//			mm.getCurrentMap().print();
+//			
+//			assertEquals(TileStatus.EMPTY, mm.getCurrentMap().getTileAt(19, 0).getStatus());
+//			assertEquals(TileStatus.BONUS, mm.getCurrentMap().getTileAt(19, 1).getStatus());
+//
+//			scan.close();
+//			
+//		} catch (FileNotFoundException e)
+//		{
+//			
+//			fail("FileError!");
+//		}
+//	}
 
 }
