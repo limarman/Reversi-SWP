@@ -95,7 +95,7 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-		calc = new PruningParanoidCalculator();
+		calc = new NatSortPruningParanoidCalculator();
 		eva = new RelativeEvaluator();
 		anna.analyseMap();
 		setParameters();
@@ -132,8 +132,11 @@ public class AI {
 //		{
 //			Logger.log(LogLevel.ERROR, "No move was found!");
 //		}
+		double SystimeBefore = System.currentTimeMillis();
 		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, bestMove);
+		double SystimeAfter = System.currentTimeMillis();
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
+		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
 		return bestMove;
 	}
 	

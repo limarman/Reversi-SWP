@@ -6,6 +6,12 @@ import swpg3.Move;
 import swpg3.main.LogLevel;
 import swpg3.main.Logger;
 
+/**
+ * Simple Calculator 
+ * using Minimax algorithm and following the paranoid search
+ * @author Ramil
+ *
+ */
 public class ParanoidCalculator implements Calculator{
 
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 

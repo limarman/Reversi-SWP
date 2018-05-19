@@ -1,5 +1,8 @@
 package swpg3.ai;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import swpg3.Map;
 import swpg3.MapManager;
 import swpg3.Move;
@@ -7,11 +10,12 @@ import swpg3.main.LogLevel;
 import swpg3.main.Logger;
 
 /**
- * A Calculator using Alpha Beta algorithm and following the paranoid search
+ * Calculator, which is like PruningParanoidCalculator but uses a natural order of Moves
+ * to be (hopefully) able to prune more unnecessary subtrees.
  * @author Ramil
  *
  */
-public class PruningParanoidCalculator implements Calculator{
+public class NatSortPruningParanoidCalculator implements Calculator{
 	
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 
 	{
@@ -37,9 +41,11 @@ public class PruningParanoidCalculator implements Calculator{
 			Logger.log(LogLevel.WARNING, "Received minimax search with depth 0.");
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
+		
+		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
 
 		//Should not be called - Player should have possible moves
-		if(map.getPossibleMoves(maxPlayerNumber).isEmpty()) 
+		if(possibleMoves.isEmpty()) 
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -47,8 +53,13 @@ public class PruningParanoidCalculator implements Calculator{
 		}
 		
 		double maxValue = Double.NEGATIVE_INFINITY;
-		for(Move move : map.getPossibleMoves(maxPlayerNumber)) 
+		
+		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
+		Arrays.sort(possibleMovesOrdered);
+		
+		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{
+			Move move = possibleMovesOrdered[i];
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -76,8 +87,10 @@ public class PruningParanoidCalculator implements Calculator{
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		
 		//Player has no moves or is disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
+		if(possibleMoves.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//player cannot change anything in the evaluation
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -94,8 +107,12 @@ public class PruningParanoidCalculator implements Calculator{
 		}
 		
 		double minValue = beta;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
+		Arrays.sort(possibleMovesOrdered);
+		
+		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{
+			Move move = possibleMovesOrdered[i];
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -133,16 +150,22 @@ public class PruningParanoidCalculator implements Calculator{
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty()) 
+		if(possibleMoves.isEmpty()) 
 		{
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
 		}
 		
 		double maxValue = alpha;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
+		Arrays.sort(possibleMovesOrdered);
+		
+		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{
+			Move move = possibleMovesOrdered[i];
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -166,3 +189,4 @@ public class PruningParanoidCalculator implements Calculator{
 
 
 }
+

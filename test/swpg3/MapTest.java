@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
@@ -244,7 +245,7 @@ class MapTest {
 		//testing the building phase
 		
 		HashSet<Move> possibleMovesTest = map.getPossibleMoves((byte)3);
-		
+				
 //		possibleMovesTest.forEach(System.out::println);
 		
 		//asserting that every added move was legal
@@ -275,6 +276,78 @@ class MapTest {
 		mm.toggleGamePhase();
 		
 		possibleMovesTest = map.getPossibleMoves((byte) 1);
+		
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		
+		assertTrue(possibleMovesTest.size() == 35, "a possible move was not discovered!");
+	}
+	
+	@Test
+	void testGetPossibleMovesOrdered()
+	{
+		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n"
+				+ "000100\r\n"
+				+ "000120\r\n"
+				+ "0c-100\r\n"
+				+ "0031i0\r\n"
+				+ "000200\r\n"
+				+ "0000xx";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);;
+		}
+		catch(Exception e) {
+			fail("map could not be read.");
+		}
+		
+		Map map = mm.getCurrentMap();
+		
+		//testing the building phase
+		
+		HashSet<Move> possibleMovesTest = map.getPossibleMovesOrderable((byte)3);
+				
+//		possibleMovesTest.forEach(System.out::println);
+		
+		//asserting that every added move was legal
+		possibleMovesTest.forEach(e -> assertTrue(map.isMoveValid(e),"invalid move was added as possible move!"));
+	
+		assertTrue(possibleMovesTest.size() == 5, "not every possible move was discovered!");
+		
+		Move[] sorted = possibleMovesTest.toArray(new Move[0]);
+		Arrays.sort(sorted);
+		for(int i = 0; i<sorted.length; i++) 
+		{
+			System.out.println(sorted[i] + "Type: " + sorted[i].getMoveType());
+		}
+		
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
+		
+		//asserting that every added move was legal
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		assertTrue(possibleMovesTest.size() == 8, "not every possible move was discovered!");
+		
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 2);
+		
+		//asserting that every added move was legal
+		for(Move m : possibleMovesTest)
+		{
+			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
+		}
+		
+		assertTrue(possibleMovesTest.size() == 11, "not every possible move was discovered!");
+		
+		//testing the bombing phase
+		mm.toggleGamePhase();
+		
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
 		
 		for(Move m : possibleMovesTest)
 		{
