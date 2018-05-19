@@ -7,14 +7,15 @@ package swpg3;
  * @author eric
  *
  */
-public class Move {
+public class Move implements Comparable<Move>{
 
 	public static final byte	ADD_BOMBSTONE		= 20;	// Now compliant with network specification
 	public static final byte	ADD_OVERRIDESTONE	= 21;
 
-	private Vector2i	coordinates;
-	private byte		specialFieldInfo;
-	private byte		playerNumber;
+	private Vector2i coordinates;
+	private byte specialFieldInfo;
+	private byte playerNumber;
+	private MoveType type; //used to make a natural ordering of moves
 	
 	
 	/**
@@ -32,6 +33,15 @@ public class Move {
 		this.coordinates = coordinates;
 		this.specialFieldInfo = specialFieldInfo;
 		this.playerNumber = playerNumber;
+		this.type = MoveType.NORMAL_BUILDING;
+	}
+	
+	public Move(Vector2i coordinates, byte specialFieldInfo, byte playerNumber, MoveType type) 
+	{
+		this.coordinates = coordinates;
+		this.specialFieldInfo = specialFieldInfo;
+		this.playerNumber = playerNumber;
+		this.type = type;
 	}
 
 	/**
@@ -120,6 +130,21 @@ public class Move {
 		this.coordinates = m.coordinates;
 		this.playerNumber = m.playerNumber;
 		this.specialFieldInfo = m.specialFieldInfo;
+	}
+
+	@Override
+	public int compareTo(Move m) {
+
+		return type.moveValue - m.type.moveValue;
+	}
+	
+	/**
+	 * 
+	 * @return Type of move
+	 */
+	public MoveType getMoveType() 
+	{
+		return type;
 	}
 	
 
