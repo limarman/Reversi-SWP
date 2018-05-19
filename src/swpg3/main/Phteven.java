@@ -23,6 +23,8 @@ public class Phteven{
 	//					Singleton stuff
 	//###############################################################
 	private static Phteven instance = null;
+//	private static double totalTime = 0;
+//	private static int movesAsked = 0;
 	
 	private Phteven()
 	{
@@ -158,11 +160,16 @@ public class Phteven{
 			int timeLimit = m.retrieveTimeLimit();
 			int depthLimit = m.retrieveDepthLimit();
 			
-			Logger.log(LogLevel.INFO, "Received Moverequest: (" + timeLimit + ", " + depthLimit + ")");
-						
-						
+//			Logger.log(LogLevel.DETAIL, "Current Midtime: " + totalTime / movesAsked);
+//			Logger.log(LogLevel.INFO, "Received Moverequest: (" + timeLimit + ", " + depthLimit + ")");
+//						
+//			movesAsked++;
+//			double beforeTime = System.currentTimeMillis();
+			
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
+			
+//			totalTime += (System.currentTimeMillis() - beforeTime) / 1000;
 			
 			if(bestMove == null) 
 			{

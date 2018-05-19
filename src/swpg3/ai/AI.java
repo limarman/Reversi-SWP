@@ -49,7 +49,7 @@ public class AI {
 	protected static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
-	protected static double SOLID_SQUARE_BONUS = 50;
+	protected static double SOLID_SQUARE_BONUS = 10;
 	protected static double WEAK_SQUARE_BONUS = -5;
 	protected static double BONUS_WEAK_SQUARE_BONUS = -3;
 	protected static double CHOICE_WEAK_SQUARE_BONUS = -5;
@@ -95,7 +95,7 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-		calc = new NatSortPruningParanoidCalculator();
+		calc = new ParanoidCalculator();
 		eva = new RelativeEvaluator();
 		anna.analyseMap();
 		setParameters();
@@ -133,7 +133,7 @@ public class AI {
 //			Logger.log(LogLevel.ERROR, "No move was found!");
 //		}
 		double SystimeBefore = System.currentTimeMillis();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, bestMove);
+		double evaluation = calc.calculateBestMove(eva, playerNumber, 1, bestMove); //TODO: Change depth later
 		double SystimeAfter = System.currentTimeMillis();
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
