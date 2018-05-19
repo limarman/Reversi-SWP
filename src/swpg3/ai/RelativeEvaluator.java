@@ -69,7 +69,10 @@ public class RelativeEvaluator implements Evaluator{
 				evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
-				evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0], 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+				if(AI.solidSquares.size() != 0) 
+				{
+					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.solidSquares.size()), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+				}
 			}
 			
 			double[] probs =  calculateProbalities(playerNumber, evaluations);
@@ -80,7 +83,7 @@ public class RelativeEvaluator implements Evaluator{
 		else //Bombing Phase
 		{			
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-			int [] stoneCount = new int[MapManager.getInstance().getNumberOfPlayers()];
+			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
 			
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
@@ -95,34 +98,19 @@ public class RelativeEvaluator implements Evaluator{
 				}	
 			}
 			
-			int playerStoneCount = stoneCount[playerNumber-1];
-			int stonesTillFirst = 0;
-			int stonesTillPred = Integer.MAX_VALUE;
-			
-			//iterating over the array adding stones to bomb
+			//making sure, that everyone senses a chance for a better place
 			for(int i = 0; i<stoneCount.length; i++) 
 			{
-				//stones needed to bomb
-				if(stoneCount[i] > playerStoneCount) 
+				if(stoneCount[i] == 0) 
 				{
-					stonesTillFirst += (stoneCount[i] - playerStoneCount);
-				}
-				//if not comparing with own stones
-				//and if difference is smaller than found earlier
-				// -> actualize the distance to predecessor
-				else if(i != playerNumber-1 && stonesTillPred > playerStoneCount - stoneCount[i])
-				{
-					stonesTillPred = playerStoneCount - stoneCount[i];
+					stoneCount[i] = 0.1;
 				}
 			}
 			
-			if(stonesTillFirst == 0) //you are the (divided) first place
-			{
-				evaluation = stonesTillPred;
-			}else 
-			{
-				evaluation = -stonesTillFirst;
-			}
+			double[] probs = calculateProbalities(playerNumber, stoneCount);
+			
+			//expected prize - according to probabilites
+			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
 			
 			
 		}
@@ -193,6 +181,8 @@ public class RelativeEvaluator implements Evaluator{
 						(evaluations[playerNumber-1] / (evaluation_sum - evaluations[i] - evaluations[j]));
 			}
 		}
+		
+		//TODO: It might be the case, that function fails because divided by 0
 
 		double[] probalities = {firstPlaceProbs[playerNumber-1], secondPlaceProb, thirdPlaceProb};
 		
@@ -362,19 +352,19 @@ public class RelativeEvaluator implements Evaluator{
 	
 	/**
 	 * 
-	 * @param solidSquares
+	 * @param solidSquaresRatio - ratio between owned solid squares and total solid squares
 	 * @param weakSquares
 	 * @param bonusWeakSquares
 	 * @param choiceWeakSquares
 	 * @param totalFieldControl
 	 * @return scaled positional evaluation according to parameters in AI class
 	 */
-	private double evaluatePositionalFactors(int solidSquares, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
+	private double evaluatePositionalFactors(double solidSquareRatio, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
 			, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
-		evaluation += AI.SOLID_SQUARE_BONUS * solidSquares;
+		evaluation += AI.SOLID_SQUARE_BONUS * solidSquareRatio * 100;
 		evaluation += AI.WEAK_SQUARE_BONUS * weakSquares;
 		evaluation += AI.BONUS_WEAK_SQUARE_BONUS * bonusWeakSquares;
 		evaluation += AI.CHOICE_WEAK_SQUARE_BONUS * choiceWeakSquares;
