@@ -75,7 +75,7 @@ public class RelativeEvaluator implements Evaluator{
 				}
 			}
 			
-			double[] probs =  calculateProbalities(playerNumber, evaluations);
+			double[] probs =  calculateProbabilities(playerNumber, evaluations);
 			
 			//expected prize - according to probabilites
 			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
@@ -98,16 +98,8 @@ public class RelativeEvaluator implements Evaluator{
 				}	
 			}
 			
-			//making sure, that everyone senses a chance for a better place
-			for(int i = 0; i<stoneCount.length; i++) 
-			{
-				if(stoneCount[i] == 0) 
-				{
-					stoneCount[i] = 0.1;
-				}
-			}
 			
-			double[] probs = calculateProbalities(playerNumber, stoneCount);
+			double[] probs = calculateProbabilities(playerNumber, stoneCount);
 			
 			//expected prize - according to probabilites
 			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
@@ -128,7 +120,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param evaluations evaluations for all the players
 	 * @return array of probabilities. a[0] = P(1). a[1] = P(2). a[2] = P(3).
 	 */
-	private double[] calculateProbalities(byte playerNumber, double[] evaluations) {
+	private double[] calculateProbabilities(byte playerNumber, double[] evaluations) {
 		
 		//probabilities saved to not calculate all over again (dynamic programming)
 		//TODO: saving the calculated probs for the second place
@@ -137,6 +129,15 @@ public class RelativeEvaluator implements Evaluator{
 		
 		//probabilities for second and third place
 		double thirdPlaceProb = 0, secondPlaceProb = 0;
+		
+		//making sure, that there will be no divisions by zero
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			if(evaluations[i] == 0) 
+			{
+				evaluations[i] = 0.01;
+			}
+		}
 		
 		double evaluation_sum = 0;
 		for (double eval : evaluations) {
