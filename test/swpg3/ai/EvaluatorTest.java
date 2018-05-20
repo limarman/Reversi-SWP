@@ -136,7 +136,7 @@ class EvaluatorTest {
 		
 		
 		//test the (private) calculateProbs Method (with reflections)
-		Method probs = RelativeEvaluator.class.getDeclaredMethod("calculateProbalities", byte.class, double[].class);
+		Method probs = RelativeEvaluator.class.getDeclaredMethod("calculateProbabilities", byte.class, double[].class);
 		probs.setAccessible(true);
 		
 		double[] evals = {1000, 500, 2000, 1500};
