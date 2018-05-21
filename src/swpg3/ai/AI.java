@@ -33,7 +33,7 @@ public class AI {
 	protected static double SC_TP_I;
 	
 	//Mobility parameter
-	protected static double MOBILITY_BONUS = 30;
+	protected static double MOBILITY_BONUS = 20;
 	
 	protected static double M_SV;
 	protected static double M_MV;
@@ -45,7 +45,7 @@ public class AI {
 	protected static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	protected static double OVERRIDE_BONUS = 150;
+	protected static double OVERRIDE_BONUS = 180;
 	protected static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters

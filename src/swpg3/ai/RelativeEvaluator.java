@@ -12,9 +12,9 @@ import swpg3.Vector2i;
 public class RelativeEvaluator implements Evaluator{
 
 	
-	private final int FIRST_PRIZE = 100;
-	private final int SECOND_PRIZE = 50;
-	private final int THIRD_PRIZE = 30;
+	protected final int FIRST_PRIZE = 100;
+	protected final int SECOND_PRIZE = 50;
+	protected final int THIRD_PRIZE = 30;
 	
 	//##################################################
 	// Evaluation Function
@@ -43,22 +43,6 @@ public class RelativeEvaluator implements Evaluator{
 			{
 				occupiedSquares += attributesPerPlayer[i][2];
 			}
-			
-//			//debugging
-//			double[] player_evaluations = new double[4];
-//			player_evaluations[0] = evaluateMobility(attributesPerPlayer[playerNumber-1][1], attributesPerPlayer[playerNumber-1][3],
-//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); //mobility
-//			player_evaluations[1] = evaluateStoneCount(occupiedSquares/((double)attributesPerPlayer[playerNumber-1][2]),
-//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); // stone count
-//			player_evaluations[2] = evaluateOverrideCount(map.getPlayer(playerNumber).getNumberOfOverrideStones());
-//								// override stone count
-//			player_evaluations[3] = evaluatePositionalFactors(attributesPerPlayer[playerNumber-1][0], 0, 0, 0,
-//					occupiedSquares/((double)AI.PLAYABLE_SQUARES)); //positional factors
-//			
-//			Logger.log(LogLevel.INFO, "Mobility Evaluation: " + Math.round(player_evaluations[0]));
-//			Logger.log(LogLevel.INFO, "Stone Count Evaluation: " + Math.round(player_evaluations[1]));
-//			Logger.log(LogLevel.INFO, "Override Stone Count Evaluation: " + Math.round(player_evaluations[2]));
-//			Logger.log(LogLevel.INFO, "Solid Stone Count Evaluation: " + Math.round(player_evaluations[3]) + "\n");
 
 
 			//summing up the evaluations for every player
@@ -120,7 +104,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param evaluations evaluations for all the players
 	 * @return array of probabilities. a[0] = P(1). a[1] = P(2). a[2] = P(3).
 	 */
-	private double[] calculateProbabilities(byte playerNumber, double[] evaluations) {
+	protected double[] calculateProbabilities(byte playerNumber, double[] evaluations) {
 		
 		//probabilities saved to not calculate all over again (dynamic programming)
 		//TODO: saving the calculated probs for the second place
@@ -297,7 +281,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param turns
 	 * @return scaled mobility evaluation according to parameters in AI class
 	 */
-	private double evaluateMobility(int mobility, int turns)
+	protected double evaluateMobility(int mobility, int turns)
 	{
 		double evaluation = 0;
 		
@@ -318,7 +302,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param totalFieldControl - total percentage of field control
 	 * @return scaled stone count evaluation according to parameters in AI class
 	 */
-	private double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)
+	protected double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
@@ -346,7 +330,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param numberOfOverrides
 	 * @return scaled ovveride stone count evaluation according to parameters in AI class
 	 */
-	private double evaluateOverrideCount(int numberOfOverrides)
+	protected double evaluateOverrideCount(int numberOfOverrides)
 	{
 		return numberOfOverrides * AI.OVERRIDE_BONUS * AI.OVERRIDE_IMPORTANCE;
 	}
@@ -360,7 +344,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param totalFieldControl
 	 * @return scaled positional evaluation according to parameters in AI class
 	 */
-	private double evaluatePositionalFactors(double solidSquareRatio, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
+	protected double evaluatePositionalFactors(double solidSquareRatio, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
 			, double totalFieldControl)
 	{
 		double evaluation = 0;
@@ -394,7 +378,7 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param x
 	 * @return the linear interpolation from x in the line through (start,startVal) and (end,endVal)
 	 */
-	private double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
+	protected double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
 	{
 		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
 	}
