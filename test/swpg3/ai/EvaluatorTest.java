@@ -232,8 +232,8 @@ class EvaluatorTest {
 		inverse.setAccessible(true);
 		
 		assertEquals(0, inverse.invoke(eva, 0, 0), "inverse player does not equal inital player");
-		assertEquals(1, inverse.invoke(eva, 0, 4), "player wrongly inversed.");
-		assertEquals(2, inverse.invoke(eva, 0, 5), "player wrongly inversed.");
+		assertEquals(2, inverse.invoke(eva, 0, 4), "player wrongly inversed.");
+		assertEquals(1, inverse.invoke(eva, 0, 5), "player wrongly inversed.");
 		
 	}
 	

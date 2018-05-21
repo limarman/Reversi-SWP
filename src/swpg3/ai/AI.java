@@ -96,7 +96,7 @@ public class AI {
 	{
 		anna = Analyser.getInstance();
 		calc = new ParanoidCalculator();
-		eva = new RelativeEvaluator();
+		eva = new InversionaryEvaluator();
 		anna.analyseMap();
 		setParameters();
 	}

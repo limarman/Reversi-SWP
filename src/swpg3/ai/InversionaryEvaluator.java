@@ -28,7 +28,7 @@ public class InversionaryEvaluator  extends RelativeEvaluator implements Evaluat
 	private double INV_EV_I = 0.9;
 	private double INV_TP_I = 0.6;
 	
-	//TODO: very ugly to have this as an global variable - rewrite getAttributes function..
+	//TODO: very ugly to have this as a global variable - rewrite getAttributes function..
 	//Damn you Java for no pass by reference!
 	private int numberOfInversionStones = 0;
 	
@@ -286,7 +286,11 @@ public class InversionaryEvaluator  extends RelativeEvaluator implements Evaluat
 		//calculating inverse player
 		for(;numberOfInversionStones > 0; numberOfInversionStones--)
 		{
-			playerIndex = (byte) ((playerIndex % MapManager.getInstance().getNumberOfPlayers()) + 1);
+			playerIndex--;
+			if(playerIndex==0) 
+			{
+				playerIndex = MapManager.getInstance().getNumberOfPlayers();
+			}
 		}
 		
 		return playerIndex-1; //conversion back to index
