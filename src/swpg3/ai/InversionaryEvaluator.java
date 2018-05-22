@@ -15,7 +15,7 @@ import swpg3.Vector2i;
  * @author Ramil
  *
  */
-public class InversionaryEvaluator  extends RelativeEvaluator implements Evaluator{
+public class InversionaryEvaluator extends RelativeEvaluator implements Evaluator{
 	
 	//parameters for InversionStone analysis
 	// INV - Inversion Stone
@@ -92,7 +92,9 @@ public class InversionaryEvaluator  extends RelativeEvaluator implements Evaluat
 			{
 				evaluations[i] = inversePlayerImpFactor * inversable_evaluations[inversePlayerIndexes[i]] +
 						(1-inversePlayerImpFactor) * inversable_evaluations[i];
-				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
+				if(evaluations[i] != 0) { //otherwise there will be no chance to play the override Stones
+					evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
+				}
 			}
 						
 			
