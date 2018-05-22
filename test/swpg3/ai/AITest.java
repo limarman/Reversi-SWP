@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-import swpg3.MapManager;
-import swpg3.Move;
+import swpg3.game.map.MapManager;
+import swpg3.game.move.Move;
 
 class AITest {
 

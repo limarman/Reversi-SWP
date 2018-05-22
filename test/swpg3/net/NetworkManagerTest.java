@@ -15,7 +15,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import swpg3.Move;
+import swpg3.game.move.Move;
 
 /**
  * @author eric

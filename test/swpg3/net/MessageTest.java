@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import swpg3.Move;
+import swpg3.game.move.Move;
 
 /**
  * @author eric
@@ -101,7 +101,7 @@ class MessageTest {
 	}
 
 	/**
-	 * Test method for {@link swpg3.net.Message#newMoveReply(swpg3.Move)}.
+	 * Test method for {@link swpg3.net.Message#newMoveReply(swpg3.game.move.Move)}.
 	 */
 	@Test
 	void testNewMoveReply()

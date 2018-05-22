@@ -5,7 +5,7 @@ package swpg3.net;
 
 import java.nio.charset.StandardCharsets;
 
-import swpg3.Move;
+import swpg3.game.move.Move;
 
 /**
  * Class that contains a Network Message

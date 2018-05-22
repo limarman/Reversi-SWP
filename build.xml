@@ -7,13 +7,13 @@
   <property name="bin" location="bin" />
   
   <target name="compile" depends="clean">
-    <javac srcdir="${src}" destdir="${bin}" />
+    <javac includeantruntime="false" srcdir="${src}" destdir="${bin}" />
   </target>
 
   <target name="deploy" depends="compile">
     <jar destfile="./Phteven.jar">
       <manifest>
-        <attribute name="Main-Class" value="swpg3.main.Phteven" />
+        <attribute name="Main-Class" value="swpg3.Phteven" />
       </manifest>
       <fileset dir="${bin}">
       	<exclude name="**/.gitkeep" />

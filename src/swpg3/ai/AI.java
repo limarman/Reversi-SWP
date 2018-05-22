@@ -2,11 +2,15 @@ package swpg3.ai;
 
 import java.util.HashSet;
 
-import swpg3.MapManager;
-import swpg3.Move;
-import swpg3.Vector2i;
-import swpg3.main.LogLevel;
-import swpg3.main.Logger;
+import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.ParanoidCalculator;
+import swpg3.ai.evaluator.Evaluator;
+import swpg3.ai.evaluator.InversionaryEvaluator;
+import swpg3.game.Vector2i;
+import swpg3.game.map.MapManager;
+import swpg3.game.move.Move;
+import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.Logger;
 
 public class AI {
 	
@@ -19,46 +23,46 @@ public class AI {
 	
 	
 	//StoneCount parameter
-	protected static double STONE_COUNT_BONUS = 5;
+	public static double STONE_COUNT_BONUS = 5;
 	
-	protected static double SC_SV;
-	protected static double SC_TV;
-	protected static double SC_EV;
-	protected static double SC_TP;
+	public static double SC_SV;
+	public static double SC_TV;
+	public static double SC_EV;
+	public static double SC_TP;
 	
 	//StoneCount parameter for importance function
-	protected static double SC_SV_I = 0.2;
-	protected static double SC_TV_I = 0.4;
-	protected static double SC_EV_I = 1;
-	protected static double SC_TP_I;
+	public static double SC_SV_I = 0.2;
+	public static double SC_TV_I = 0.4;
+	public static double SC_EV_I = 1;
+	public static double SC_TP_I;
 	
 	//Mobility parameter
-	protected static double MOBILITY_BONUS = 20;
+	public static double MOBILITY_BONUS = 20;
 	
-	protected static double M_SV;
-	protected static double M_MV;
-	protected static double M_EV;
-	protected static double M_MRP;
-	protected static double M_MLP;
+	public static double M_SV;
+	public static double M_MV;
+	public static double M_EV;
+	public static double M_MRP;
+	public static double M_MLP;
 	
 	//Mobility importance
-	protected static double M_ILF = 0.7;
+	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	protected static double OVERRIDE_BONUS = 180;
-	protected static double OVERRIDE_IMPORTANCE = 1;
+	public static double OVERRIDE_BONUS = 180;
+	public static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
-	protected static double SOLID_SQUARE_BONUS = 10;
-	protected static double WEAK_SQUARE_BONUS = -5;
-	protected static double BONUS_WEAK_SQUARE_BONUS = -3;
-	protected static double CHOICE_WEAK_SQUARE_BONUS = -5;
+	public static double SOLID_SQUARE_BONUS = 10;
+	public static double WEAK_SQUARE_BONUS = -5;
+	public static double BONUS_WEAK_SQUARE_BONUS = -3;
+	public static double CHOICE_WEAK_SQUARE_BONUS = -5;
 	
 	//StoneCount parameter for importance function
-	protected static double PP_SV_I = 1;
-	protected static double PP_TV_I = 0.7;
-	protected static double PP_EV_I = 0;
-	protected static double PP_TP_I;
+	public static double PP_SV_I = 1;
+	public static double PP_TV_I = 0.7;
+	public static double PP_EV_I = 0;
+	public static double PP_TP_I;
 	
 	//tools
 	private Analyser anna;
@@ -68,8 +72,8 @@ public class AI {
 	//##################################################
 	// Static map-properties
 	//##################################################
-	protected static int PLAYABLE_SQUARES;
-	protected static HashSet<Vector2i> solidSquares;
+	public static int PLAYABLE_SQUARES;
+	public static HashSet<Vector2i> solidSquares;
 	
 	//currently unused -> should weakSquares become normal squares when the solid square is taken?
 	@SuppressWarnings("unused")

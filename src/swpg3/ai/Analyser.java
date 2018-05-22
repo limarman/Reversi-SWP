@@ -2,11 +2,11 @@ package swpg3.ai;
 
 import java.util.HashSet;
 
-import swpg3.Map;
-import swpg3.MapManager;
-import swpg3.MapWalker;
-import swpg3.Tile;
-import swpg3.Vector2i;
+import swpg3.game.Vector2i;
+import swpg3.game.map.Map;
+import swpg3.game.map.MapManager;
+import swpg3.game.map.MapWalker;
+import swpg3.game.map.Tile;
 
 public class Analyser {
 	
