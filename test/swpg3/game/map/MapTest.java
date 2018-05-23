@@ -399,51 +399,44 @@ class MapTest {
 		
 		assertEquals(new Vector2i(3,5), map.getTileAt(pos).getTransitionTo(Vector2i.UP()).getTargetPoint(), "Transition was overridden!");
 		
-//		MapWalker mw = new MapWalker(map);
-//		mw.setPosition(new Vector2i(3,0));
-//		mw.setDirection(Vector2i.UP());
-//		
-//		for(int i = 0; i<3; i++)
-//		{
-//			mw.step();
-//		}
-		
 		map.applyMove(new Move(pos, (byte) 0, (byte) 2));
 		
 		assertEquals(new Vector2i(3,5), map.getTileAt(pos).getTransitionTo(Vector2i.UP()).getTargetPoint(), "Transition was overridden!");
 	}
 	
-//	@Test
-//	void MapFromFileTest()
-//	{
-//		try
-//		{
-//			FileInputStream fs = new FileInputStream("maps/Map1Test.txt");
-//			Scanner scan = new Scanner(fs);
-//			String mapString = "";
-//			while(scan.hasNextLine())
-//			{
-//				mapString += scan.nextLine() + "\n";
-//			}
-//			
-//			System.out.println(mapString);
-//			
-//			MapManager mm = MapManager.getInstance();
-//			mm.initializeMap(mapString);
-//			
-//			
-//			mm.getCurrentMap().print();
-//			
-//			assertEquals(TileStatus.EMPTY, mm.getCurrentMap().getTileAt(19, 0).getStatus());
-//			assertEquals(TileStatus.BONUS, mm.getCurrentMap().getTileAt(19, 1).getStatus());
-//
-//			scan.close();
-//			
-//		} catch (FileNotFoundException e)
-//		{
-//			
-//			fail("FileError!");
-//		}
-//	}
+	@Test
+	void StoneFlipBugTest()
+	{
+		String mapString = "2\n"
+				+ "0\n"
+				+ "0 1\n"
+				+ "5 5\n"
+				+ "0 0 2 0 0\n"
+				+ "0 0 2 0 0\n"
+				+ "1 2 2 2 2\n"
+				+ "0 1 2 2 0\n"
+				+ "2 0 0 0 0\n"
+				+ "2 0 0 <-> 4 2 2\n"
+				+ "0 4 5 <-> 4 2 1";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);
+		}
+		catch(Exception e) {
+			System.out.println(e.toString());
+			fail("map could not be read.");
+		}
+		Map map = mm.getCurrentMap();
+		
+		Move move = new Move(2, 4, (byte)0, (byte)1);
+		assertTrue(map.isMoveValid(move), "Move not considered Valid");
+		
+		map.applyMove(move);
+		assertEquals(TileStatus.PLAYER_1, map.getTileAt(0, 4).getStatus(), "(0,4)");
+		assertEquals(TileStatus.PLAYER_1, map.getTileAt(1, 2).getStatus(), "(1,2)");
+		assertEquals(TileStatus.PLAYER_1, map.getTileAt(2, 3).getStatus(), "(2,3)");
+	}
 
 }
