@@ -2,6 +2,8 @@ package swpg3.game.map;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
@@ -460,6 +462,9 @@ public class Map {
 			getTileAt(move.getCoordinates()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())); 
 //			flipStone(move.getCoordinates().clone(), move.getPlayerNumber());
 
+			//temporary saving the tiles to flip - direct flipping brings bugs
+			List<Tile> tilesToFlip = new LinkedList<>();
+			
 			// create Walker in every direction
 			for (int i = 0; i < 8; i++)
 			{
@@ -482,13 +487,17 @@ public class Map {
 					mw.step();
 					while (!(mw.getPosition().equals(move.getCoordinates())))
 					{
-						 // actualizing the map
-						getTileAt(mw.getPosition()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
+						 // saving which stones have to be flipped
+						tilesToFlip.add(getTileAt(mw.getPosition()));
 						mw.step();
 					}
 				}
 			}
-
+			
+			// actualizing the map
+			for(Tile tile : tilesToFlip) {
+				tile.setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
+			}
 
 			// handle special fields
 			switch (beforeStatus)
