@@ -313,6 +313,7 @@ public class Map {
 	 * 
 	 * @return Possible Moves - HashSet of possibleMoves
 	 */
+	@Deprecated
 	public HashSet<Move> getPossibleMoves(byte playerNumber)
 	{
 		MapManager mm = MapManager.getInstance();

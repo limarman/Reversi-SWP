@@ -49,7 +49,7 @@ public class ParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-		HashSet<Move> posMoves = map.getPossibleMoves(maxPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
 		//Should not be called - Player should have possible moves
 		if(posMoves.isEmpty()) 
 		{
@@ -102,7 +102,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		//Player has no moves or is disqualified
-		HashSet<Move> posMoves = map.getPossibleMoves(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
 		if(posMoves.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//player cannot change anything in the evaluation
@@ -169,7 +169,7 @@ public class ParanoidCalculator implements Calculator{
 			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
-		HashSet<Move> posMoves = map.getPossibleMoves(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
 		if(posMoves.isEmpty()) 
 		{

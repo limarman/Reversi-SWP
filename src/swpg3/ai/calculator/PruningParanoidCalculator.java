@@ -1,5 +1,9 @@
 package swpg3.ai.calculator;
 
+import java.util.HashSet;
+
+import swpg3.ai.calculator.movesorter.BogoSorter;
+import swpg3.ai.calculator.movesorter.MoveSorter;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
@@ -15,6 +19,26 @@ import swpg3.main.perfLogging.PerfLogger;
  *
  */
 public class PruningParanoidCalculator implements Calculator{
+	
+	private MoveSorter sorter;
+	
+	/**
+	 * standard constructor, initializes the alpha beta pruning without move sorting.
+	 * using MoveSorter - BogoSorter
+	 */
+	public PruningParanoidCalculator() 
+	{
+		sorter = new BogoSorter();
+	}
+	
+	/**
+	 * Constructor initializing the Alpha-Beta-Pruning with given MoveSorting strategy
+	 * @param sorter - MoveSorter to use
+	 */
+	public PruningParanoidCalculator(MoveSorter sorter) 
+	{
+		this.sorter = sorter;
+	}
 	
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 
 	{
@@ -32,7 +56,7 @@ public class PruningParanoidCalculator implements Calculator{
 	 * @return
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, Map map, Move bestMove) 
-	{
+	{	
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
@@ -46,13 +70,18 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		
 		//Should not be called - Player should have possible moves
-		if(map.getPossibleMoves(maxPlayerNumber).isEmpty()) 
+		if(possibleMovesOrderable.isEmpty()) 
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		}
+		
+		//sorting the moves with the provided MoveSorter
+		Move[] sortedMoves = sorter.initialMoveSort(eval, possibleMovesOrderable, map, maxPlayerNumber);
 		
 		if(GlobalSettings.log_performance)
 		{
@@ -62,17 +91,17 @@ public class PruningParanoidCalculator implements Calculator{
 		
 		
 		double maxValue = Double.NEGATIVE_INFINITY;
-		for(Move move : map.getPossibleMoves(maxPlayerNumber)) 
+		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			nextMap.applyMove(move);
+			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, maxValue, Double.POSITIVE_INFINITY);
 
 			if(value > maxValue) //updating the evaluation 
 			{
-				bestMove.copyFrom(move);
+				bestMove.copyFrom(sortedMoves[i]);
 				maxValue = value;
 				//no pruning needed - as Positive_Infinity is never reached
 			}
@@ -100,8 +129,11 @@ public class PruningParanoidCalculator implements Calculator{
 			
 		}
 		
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		
+		
 		//Player has no moves or is disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
+		if(possibleMovesOrderable.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//player cannot change anything in the evaluation
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -117,17 +149,19 @@ public class PruningParanoidCalculator implements Calculator{
 			} 
 		}
 		
+		double minValue = beta;
+		Move[] sortedMoves = sorter.moveSort(eval, possibleMovesOrderable, map, currentPlayerNumber);
+		
 		if(GlobalSettings.log_performance)
 		{
 			PerfLogger.getInst().stopInner();
 			PerfLogger.getInst().startNode();
 		}
 		
-		double minValue = beta;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			nextMap.applyMove(move);
+			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			double value;
 			
@@ -169,16 +203,19 @@ public class PruningParanoidCalculator implements Calculator{
 			}
 			
 			return evalErg;
-			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty()) 
+		if(possibleMovesOrderable.isEmpty()) 
 		{
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
 		}
 		
+		double maxValue = alpha;
+		Move[] sortedMoves = sorter.moveSort(eval, possibleMovesOrderable, map, currentPlayerNumber);
 		
 		if(GlobalSettings.log_performance)
 		{
@@ -186,11 +223,10 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-		double maxValue = alpha;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			nextMap.applyMove(move);
+			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, maxValue, beta);

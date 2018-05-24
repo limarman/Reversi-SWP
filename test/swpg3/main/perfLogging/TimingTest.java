@@ -21,8 +21,8 @@ class TimingTest {
 	@Test
 	void getBestMoveTimingtest()
 	{
-		boolean doTest = false;
-		int numberOfRuns = 1000;
+		boolean doTest = true;
+		int numberOfRuns = 1;
 		
 		if(!doTest)
 		{
@@ -77,7 +77,7 @@ class TimingTest {
 				log.reset();
 				
 				log.startTotal();
-				ai.getBestMove((byte)1, 4, 10000);
+				ai.getBestMove((byte)1, 4, 1000);
 				log.stopTotal();
 				
 				log.compute();
