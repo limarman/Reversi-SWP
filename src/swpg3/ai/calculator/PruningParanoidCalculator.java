@@ -4,8 +4,10 @@ import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
+import swpg3.main.GlobalSettings;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
+import swpg3.main.perfLogging.PerfLogger;
 
 /**
  * A Calculator using Alpha Beta algorithm and following the paranoid search
@@ -38,7 +40,12 @@ public class PruningParanoidCalculator implements Calculator{
 			Logger.log(LogLevel.WARNING, "Received minimax search with depth 0.");
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
-
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().startNode();
+		}
+		
 		//Should not be called - Player should have possible moves
 		if(map.getPossibleMoves(maxPlayerNumber).isEmpty()) 
 		{
@@ -46,6 +53,13 @@ public class PruningParanoidCalculator implements Calculator{
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		}
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
+		
 		
 		double maxValue = Double.NEGATIVE_INFINITY;
 		for(Move move : map.getPossibleMoves(maxPlayerNumber)) 
@@ -74,7 +88,16 @@ public class PruningParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			
 		}
 		
 		//Player has no moves or is disqualified
@@ -92,6 +115,12 @@ public class PruningParanoidCalculator implements Calculator{
 			{
 				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
 			} 
+		}
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
 		}
 		
 		double minValue = beta;
@@ -131,7 +160,16 @@ public class PruningParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
@@ -139,6 +177,13 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
+		}
+		
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
 		}
 		
 		double maxValue = alpha;

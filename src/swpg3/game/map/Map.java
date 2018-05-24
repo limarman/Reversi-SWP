@@ -18,27 +18,26 @@ import swpg3.game.move.MoveType;
  *
  */
 public class Map {
-//	private int	numberOfPlayers;
-//	private int	numberOfOverrides;
-//	private int	numberOfBombs;
-//	private int	bombStrength;
-//	private int	height;
-//	private int	width;
-//	private int	transitionCount;
+	// private int numberOfPlayers;
+	// private int numberOfOverrides;
+	// private int numberOfBombs;
+	// private int bombStrength;
+	// private int height;
+	// private int width;
+	// private int transitionCount;
 
-	private Tile[]	grid;
-	private Player[] playerInfo;
-	private byte nextPlayerTurn;
+	private Tile[]		grid;
+	private Player[]	playerInfo;
+	private byte		nextPlayerTurn;
 
-	
 	/**
 	 * Creates a Map from fieldArray and playerInfo
 	 * 
 	 * @param field
-	 * 			grid of the playing Files
+	 *            grid of the playing Files
 	 * @param playerInfo
-	 * 			Array of players
-	 *            
+	 *            Array of players
+	 * 
 	 */
 	public Map(Tile[] field, Player[] playerInfo, byte nextPlayerTurn)
 	{
@@ -46,7 +45,7 @@ public class Map {
 		this.playerInfo = playerInfo;
 		this.nextPlayerTurn = nextPlayerTurn;
 	}
-	
+
 	/**
 	 * Tests if a given move is valid for current gamestate
 	 * 
@@ -60,7 +59,8 @@ public class Map {
 		int playerIndex = move.getPlayerNumber() - 1; // Array starts at 0, Player numbers with 1
 		if (MapManager.getInstance().getGamePhase() == GamePhase.BOMBING_PHASE)
 		{
-			return (!movePos.isHole()) && (playerInfo[playerIndex].getBombs() > 0) && (move.getSpecialFieldInfo() == (byte)0);
+			return (!movePos.isHole()) && (playerInfo[playerIndex].getBombs() > 0)
+					&& (move.getSpecialFieldInfo() == (byte) 0);
 		} else // BUILD_PHASE
 		{
 			if (movePos.isHole())
@@ -78,8 +78,8 @@ public class Map {
 					&& move.getSpecialFieldInfo() != Move.ADD_OVERRIDESTONE))
 				return false;
 			// Choice field but not a valid playernumber?
-			if (movePos.getStatus() == TileStatus.CHOICE
-					&& !(move.getSpecialFieldInfo() >= 1 && move.getSpecialFieldInfo() <= MapManager.getInstance().getNumberOfPlayers()))
+			if (movePos.getStatus() == TileStatus.CHOICE && !(move.getSpecialFieldInfo() >= 1
+					&& move.getSpecialFieldInfo() <= MapManager.getInstance().getNumberOfPlayers()))
 				return false;
 
 			if (movePos.getStatus() == TileStatus.EXPANSION)
@@ -135,7 +135,177 @@ public class Map {
 			return enclosedPath;
 		}
 	}
-	
+
+	public boolean[] isMoveValidAllPlayers(int x, int y)
+	{
+		int noPlayers = MapManager.getInstance().getNumberOfPlayers();
+		boolean[] valids = new boolean[noPlayers];
+		boolean[] set = new boolean[noPlayers];
+
+		Vector2i moveVec = new Vector2i(x, y);
+
+		for (int i = 0; i < noPlayers; i++)
+		{
+			set[i] = false;
+		}
+
+		Tile movePos = getTileAt(x, y);
+		if (movePos.isHole())
+		{
+			for (int i = 0; i < noPlayers; i++)
+			{
+				valids[i] = false;
+				set[i] = true;
+			}
+			return valids;
+		}
+		if (movePos.isOccupied())
+		{
+			for (int i = 0; i < noPlayers; i++)
+			{
+				if (playerInfo[i].getNumberOfOverrideStones() == 0)
+				{
+					valids[i] = false;
+					set[i] = true;
+				} else
+				{
+					if (movePos.getStatus() == TileStatus.EXPANSION)
+					{
+						if (!set[i])
+						{
+							valids[i] = true;
+							set[i] = true;
+						}
+					}
+				}
+			}
+		}
+
+		MapWalker[] walker = new MapWalker[8];
+		boolean[] hasAdjacent = new boolean[noPlayers];
+		for (boolean b : hasAdjacent)
+		{
+			b = false;
+		}
+		boolean[][] dirOk = new boolean[noPlayers][8];
+		for(int p = 0; p < noPlayers; p++)
+		{
+			for(int d = 0; d < 8; d++)
+			{
+				dirOk[p][d] = false;
+			}
+		}
+		// Check for FlipRule:
+		for (int dir = 0; dir < 8; dir++) // initialise
+		{
+			// Initialize and step
+			walker[dir] = new MapWalker(this, moveVec.clone(), Vector2i.mapDirToVector(dir));
+			if (walker[dir].step())
+			{
+				// Look at Tile.
+				Tile t = walker[dir].getCurrentTile();
+				// if not Occupied, not adjacent
+				if (t.isOccupied())
+				{
+					boolean adjacent = false;
+					for (int p = 0; p < noPlayers; p++)
+					{
+						if (t.getStatus() != Player.mapPlayerNumberToTileStatus(p + 1))
+						{
+							hasAdjacent[p] = true;
+							dirOk[p][dir] = true;
+							adjacent = true;
+						}
+					}
+					if (!adjacent) // nobody has adjacent Tile
+					{
+						walker[dir].stopMoving();
+					}
+				} else
+				{
+					walker[dir].stopMoving();
+				}
+			}
+		}
+
+		for (int p = 0; p < noPlayers; p++)
+		{
+			if (!hasAdjacent[p])
+			{
+				if (!set[p])
+				{
+					valids[p] = false;
+					set[p] = true;
+				}
+			}
+		}
+
+		boolean allSet = true;
+		for (int p = 0; p < noPlayers; p++)
+		{
+			allSet = (allSet && set[p]);
+		}
+		// All set?
+		if (allSet)
+		{
+			return valids;
+		}
+
+		boolean movingWalkerLeft = true;
+		while (movingWalkerLeft)
+		{
+			movingWalkerLeft = false;
+			// perform steps
+			for (int i = 0; i < 8; i++)
+			{
+				if (walker[i].step())
+				{
+					Tile t = walker[i].getCurrentTile();
+					if (t.isOccupied())
+					{
+						// prevent loops
+						if (!walker[i].getPosition().equals(moveVec))
+						{
+							movingWalkerLeft = true;
+							for (int p = 0; p < noPlayers; p++)
+							{
+								if (t.getStatus() == Player.mapPlayerNumberToTileStatus(p + 1) && dirOk[p][i])
+								{
+									if (!set[p])
+									{
+										valids[p] = true;
+										set[p] = true;
+									}
+								}
+							}
+						} 
+						else
+						{
+							walker[i].stopMoving();
+						}
+					} 
+					else
+					{
+						walker[i].stopMoving(); // Disable Walker
+					}
+				}
+			}
+			// if all set
+			allSet = true;
+			for (int p = 0; p < noPlayers; p++)
+			{
+				allSet = (allSet && set[p]);
+			}
+			// All set?
+			if (allSet)
+			{
+				return valids;
+			}
+		}
+
+		return valids;
+	}
+
 	/**
 	 * Giving all the possible moves the plaer with specified playernumber can make.
 	 * 
@@ -147,281 +317,288 @@ public class Map {
 	{
 		MapManager mm = MapManager.getInstance();
 		HashSet<Move> possibleMoves = new HashSet<>();
-		
-		//searching for possible moves in building phase
-		if(MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
+
+		// searching for possible moves in building phase
+		if (MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
 			MapWalker mw = new MapWalker(this);
-			
-			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() > 0);
-			
-			//looking from every playerstone and searching the possible moves
-			for(int h = 0; h<mm.getHeight(); h++)
+
+			boolean overridePossible = (playerInfo[playerNumber - 1].getNumberOfOverrideStones() > 0);
+
+			// looking from every playerstone and searching the possible moves
+			for (int h = 0; h < mm.getHeight(); h++)
 			{
-				for(int w = 0; w < mm.getWidth(); w++) 
+				for (int w = 0; w < mm.getWidth(); w++)
 				{
-					Vector2i pos = new Vector2i(w,h);
-					if(getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+					Vector2i pos = new Vector2i(w, h);
+					if (getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 					{
-						for(int i = 0; i<8; i++) //creating a MapWalker in every direction
+						for (int i = 0; i < 8; i++) // creating a MapWalker in every direction
 						{
-							//creating MapWalker
+							// creating MapWalker
 							mw.setPosition(pos.clone());
 							mw.setDirection(Vector2i.mapDirToVector(i));
-							//Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							
-							if(!mw.canStep()) 
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+
+							if (!mw.canStep())
 							{
-								//adjacent hole
-								continue; //there is no possible move in this direction
+								// adjacent hole
+								continue; // there is no possible move in this direction
 							}
 							mw.step();
-//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							if(mw.getCurrentTile().isEmpty() || !mw.canStep()
-									|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+							if (mw.getCurrentTile().isEmpty() || !mw.canStep() || mw.getCurrentTile()
+									.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								//adjacent field is empty or already owned or next field is empty 
-								continue; //no enclosing of stones possible
+								// adjacent field is empty or already owned or next field is empty
+								continue; // no enclosing of stones possible
 							}
-							mw.step(); //making sure that direct adjacent fields are not valid moves
-//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							
-							//iterate till a hole, an empty field or an own stone is found 
-							while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
-									mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+							mw.step(); // making sure that direct adjacent fields are not valid moves
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+
+							// iterate till a hole, an empty field or an own stone is found
+							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
+									.getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								if(overridePossible) 
+								if (overridePossible)
 								{
-									//a new Move is found
-									Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber);
+									// a new Move is found
+									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber);
 									possibleMoves.add(move);
 								}
 								mw.step();
-//								Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
+								// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 							}
-											
-							if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+
+							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								//stopped on an owned stone
-								
-								//if not the starting stone
-								if(!mw.getPosition().equals(pos) && overridePossible) {
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-								}
-							}
-							else if(mw.getCurrentTile().isEmpty())
-							{
-								//stopped on a non-occupied field
-								switch(mw.getCurrentTile().getStatus()) 
+								// stopped on an owned stone
+
+								// if not the starting stone
+								if (!mw.getPosition().equals(pos) && overridePossible)
 								{
-								case EMPTY:
-									//There is only a regular move possible
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-									break;
-								case CHOICE:
-									for(int j = 1; j<=mm.getNumberOfPlayers(); j++)
-									{
-										//there are #player possible ways to switch players
-										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
-									}
-									break;
-								case INVERSION:
-									//There is only a regular move possible
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
-									break;
-								case BONUS:
-									//There is a choice between an extra bomb and an extra override stone
-									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
-									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber));
-									break;
-								default:
-									//cannot be the case
-									break;
 								}
-							}else
+							} else if (mw.getCurrentTile().isEmpty())
 							{
-								//no further step possible
-								//field is not empty (and not own stone)
-								if(overridePossible)
+								// stopped on a non-occupied field
+								switch (mw.getCurrentTile().getStatus())
+								{
+									case EMPTY:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+										break;
+									case CHOICE:
+										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
+										{
+											// there are #player possible ways to switch players
+											possibleMoves
+													.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber));
+										}
+										break;
+									case INVERSION:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
+										break;
+									case BONUS:
+										// There is a choice between an extra bomb and an extra override stone
+										possibleMoves.add(
+												new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber));
+										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
+												playerNumber));
+										break;
+									default:
+										// cannot be the case
+										break;
+								}
+							} else
+							{
+								// no further step possible
+								// field is not empty (and not own stone)
+								if (overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber));
 								}
 							}
 						}
-					}
-					else if(getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
 						possibleMoves.add(new Move(pos.clone(), (byte) 0, (byte) playerNumber));
 					}
 				}
 			}
-		}
-		else //finding possible moves in bombing phase
+		} else // finding possible moves in bombing phase
 		{
-			//if player has any bombs
-			if(playerInfo[playerNumber-1].getBombs() > 0)
+			// if player has any bombs
+			if (playerInfo[playerNumber - 1].getBombs() > 0)
 			{
-				//iterate over whole map and search for occupied fields
-				for(int i = 0; i<mm.getWidth(); i++)
+				// iterate over whole map and search for occupied fields
+				for (int i = 0; i < mm.getWidth(); i++)
 				{
-					for(int j = 0; j<mm.getHeight(); j++)
+					for (int j = 0; j < mm.getHeight(); j++)
 					{
-						if(!getTileAt(i, j).isHole())
+						if (!getTileAt(i, j).isHole())
 						{
-							Vector2i pos = new Vector2i(i,j);
+							Vector2i pos = new Vector2i(i, j);
 							possibleMoves.add(new Move(pos, (byte) 0, playerNumber));
 						}
 					}
 				}
 			}
-			//otherwise there are no possible moves
+			// otherwise there are no possible moves
 		}
-		
+
 		return possibleMoves;
 	}
-	
+
 	/**
-	 * Giving all the possible moves the player with specified playernumber can make.
+	 * Giving all the possible moves the player with specified playernumber can
+	 * make.
 	 * 
 	 * @param playerNumber
 	 * 
-	 * @return Possible Moves - HashSet of all possible Moves with extra info to make an order by calling any sort method
+	 * @return Possible Moves - HashSet of all possible Moves with extra info to
+	 *         make an order by calling any sort method
 	 */
 	public HashSet<Move> getPossibleMovesOrderable(byte playerNumber)
 	{
 		MapManager mm = MapManager.getInstance();
 		HashSet<Move> possibleMoves = new HashSet<>();
-		
-		//searching for possible moves in building phase
-		if(MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
+
+		// searching for possible moves in building phase
+		if (MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
 			MapWalker mw = new MapWalker(this);
-			
-			boolean overridePossible = (playerInfo[playerNumber-1].getNumberOfOverrideStones() > 0);
-			
-			//looking from every playerstone and searching the possible moves
-			for(int h = 0; h<mm.getHeight(); h++)
+
+			boolean overridePossible = (playerInfo[playerNumber - 1].getNumberOfOverrideStones() > 0);
+
+			// looking from every playerstone and searching the possible moves
+			for (int h = 0; h < mm.getHeight(); h++)
 			{
-				for(int w = 0; w < mm.getWidth(); w++) 
+				for (int w = 0; w < mm.getWidth(); w++)
 				{
-					Vector2i pos = new Vector2i(w,h);
-					if(getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+					Vector2i pos = new Vector2i(w, h);
+					if (getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 					{
-						for(int i = 0; i<8; i++) //creating a MapWalker in every direction
+						for (int i = 0; i < 8; i++) // creating a MapWalker in every direction
 						{
-							//creating MapWalker
+							// creating MapWalker
 							mw.setPosition(pos.clone());
 							mw.setDirection(Vector2i.mapDirToVector(i));
-							//Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							
-							if(!mw.canStep()) 
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+
+							if (!mw.canStep())
 							{
-								//adjacent hole
-								continue; //there is no possible move in this direction
+								// adjacent hole
+								continue; // there is no possible move in this direction
 							}
 							mw.step();
-//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							if(mw.getCurrentTile().isEmpty() || !mw.canStep()
-									|| mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+							if (mw.getCurrentTile().isEmpty() || !mw.canStep() || mw.getCurrentTile()
+									.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								//adjacent field is empty or already owned or next field is empty 
-								continue; //no enclosing of stones possible
+								// adjacent field is empty or already owned or next field is empty
+								continue; // no enclosing of stones possible
 							}
-							mw.step(); //making sure that direct adjacent fields are not valid moves
-//							Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
-							
-							//iterate till a hole, an empty field or an own stone is found 
-							while(mw.canStep() && !mw.getCurrentTile().isEmpty() &&
-									mw.getCurrentTile().getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+							mw.step(); // making sure that direct adjacent fields are not valid moves
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+
+							// iterate till a hole, an empty field or an own stone is found
+							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
+									.getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								if(overridePossible) 
+								if (overridePossible)
 								{
-									//a new Move is found
-									Move move = new Move(mw.getPosition().clone(),(byte) 0, playerNumber, MoveType.OVERRIDE_USE);
+									// a new Move is found
+									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveType.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
 								mw.step();
-//								Logger.log(LogLevel.DETAIL, mw.getPosition()  + " " + mw.getDirection());
+								// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 							}
-											
-							if(mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+
+							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								//stopped on an owned stone
-								
-								//if not the starting stone
-								if(!mw.getPosition().equals(pos) && overridePossible) {
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber, MoveType.SELF_OVERRIDE_USE));
-								}
-							}
-							else if(mw.getCurrentTile().isEmpty())
-							{
-								//stopped on a non-occupied field
-								switch(mw.getCurrentTile().getStatus()) 
+								// stopped on an owned stone
+
+								// if not the starting stone
+								if (!mw.getPosition().equals(pos) && overridePossible)
 								{
-								case EMPTY:
-									//There is only a regular move possible
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber, MoveType.NORMAL_BUILDING));
-									break;
-								case CHOICE:
-									for(int j = 1; j<=mm.getNumberOfPlayers(); j++)
-									{
-										//there are #player possible ways to switch players
-										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber, MoveType.CHOICE));
-									}
-									break;
-								case INVERSION:
-									//There is only a regular move possible
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber, MoveType.INVERSION));
-									break;
-								case BONUS:
-									//There is a choice between an extra bomb and an extra override stone
-									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE, playerNumber,
-											MoveType.BONUS_BOMB));
-									possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE, playerNumber,
-											MoveType.BONUS_OVERRIDE));
-									break;
-								default:
-									//cannot be the case
-									break;
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveType.SELF_OVERRIDE_USE));
 								}
-							}else
+							} else if (mw.getCurrentTile().isEmpty())
 							{
-								//no further step possible
-								//field is not empty (and not own stone)
-								if(overridePossible)
+								// stopped on a non-occupied field
+								switch (mw.getCurrentTile().getStatus())
 								{
-									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber, MoveType.OVERRIDE_USE));
+									case EMPTY:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+												MoveType.NORMAL_BUILDING));
+										break;
+									case CHOICE:
+										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
+										{
+											// there are #player possible ways to switch players
+											possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber,
+													MoveType.CHOICE));
+										}
+										break;
+									case INVERSION:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+												MoveType.INVERSION));
+										break;
+									case BONUS:
+										// There is a choice between an extra bomb and an extra override stone
+										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE,
+												playerNumber, MoveType.BONUS_BOMB));
+										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
+												playerNumber, MoveType.BONUS_OVERRIDE));
+										break;
+									default:
+										// cannot be the case
+										break;
+								}
+							} else
+							{
+								// no further step possible
+								// field is not empty (and not own stone)
+								if (overridePossible)
+								{
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveType.OVERRIDE_USE));
 								}
 							}
 						}
-					}
-					else if(getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
 						possibleMoves.add(new Move(pos.clone(), (byte) 0, (byte) playerNumber, MoveType.OVERRIDE_USE));
 					}
 				}
 			}
-		}
-		else //finding possible moves in bombing phase
+		} else // finding possible moves in bombing phase
 		{
-			//if player has any bombs
-			if(playerInfo[playerNumber-1].getBombs() > 0)
+			// if player has any bombs
+			if (playerInfo[playerNumber - 1].getBombs() > 0)
 			{
-				//iterate over whole map and search for occupied fields
-				for(int i = 0; i<mm.getWidth(); i++)
+				// iterate over whole map and search for occupied fields
+				for (int i = 0; i < mm.getWidth(); i++)
 				{
-					for(int j = 0; j<mm.getHeight(); j++)
+					for (int j = 0; j < mm.getHeight(); j++)
 					{
-						if(!getTileAt(i, j).isHole())
+						if (!getTileAt(i, j).isHole())
 						{
-							Vector2i pos = new Vector2i(i,j);
-							//bombing an own stone in the first place
-							if(getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber)) 
+							Vector2i pos = new Vector2i(i, j);
+							// bombing an own stone in the first place
+							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
 								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.SELF_BOMB));
 							}
-							//not bombing an own stone - most liekly a wiser choice
-							else 
+							// not bombing an own stone - most liekly a wiser choice
+							else
 							{
 								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.NORMAL_BOMBING));
 							}
@@ -429,12 +606,12 @@ public class Map {
 					}
 				}
 			}
-			//otherwise there are no possible moves
+			// otherwise there are no possible moves
 		}
-		
+
 		return possibleMoves;
 	}
-	
+
 	/**
 	 * Expecting the move to be valid
 	 * 
@@ -445,7 +622,7 @@ public class Map {
 	{
 		MapManager mm = MapManager.getInstance();
 		int playerIndex = move.getPlayerNumber() - 1;
-		
+
 		if (mm.getGamePhase() == GamePhase.BUILDING_PHASE)
 		{
 			// if tile is occupied
@@ -456,15 +633,15 @@ public class Map {
 			{
 				playerInfo[playerIndex].useOverrideStone();
 			}
-			
+
 			// flip set stone
 			// actualizing the map
-			getTileAt(move.getCoordinates()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())); 
-//			flipStone(move.getCoordinates().clone(), move.getPlayerNumber());
+			getTileAt(move.getCoordinates()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
+			// flipStone(move.getCoordinates().clone(), move.getPlayerNumber());
 
-			//temporary saving the tiles to flip - direct flipping brings bugs
+			// temporary saving the tiles to flip - direct flipping brings bugs
 			List<Tile> tilesToFlip = new LinkedList<>();
-			
+
 			// create Walker in every direction
 			for (int i = 0; i < 8; i++)
 			{
@@ -474,7 +651,8 @@ public class Map {
 				while (mw.getCurrentTile().isOccupied() && mw.canStep() && mw.getCurrentTile().getStatus() != Player
 						.mapPlayerNumberToTileStatus(move.getPlayerNumber()))
 				{
-//					Logger.log(LogLevel.DETAIL,"2.2." + debug + ". " + getTileAt(3, 0).getTransitionTo(Vector2i.UP()).getTargetPoint());
+					// Logger.log(LogLevel.DETAIL,"2.2." + debug + ". " + getTileAt(3,
+					// 0).getTransitionTo(Vector2i.UP()).getTargetPoint());
 					mw.step();
 				}
 
@@ -487,15 +665,16 @@ public class Map {
 					mw.step();
 					while (!(mw.getPosition().equals(move.getCoordinates())))
 					{
-						 // saving which stones have to be flipped
+						// saving which stones have to be flipped
 						tilesToFlip.add(getTileAt(mw.getPosition()));
 						mw.step();
 					}
 				}
 			}
-			
+
 			// actualizing the map
-			for(Tile tile : tilesToFlip) {
+			for (Tile tile : tilesToFlip)
+			{
 				tile.setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
 			}
 
@@ -508,47 +687,45 @@ public class Map {
 					// specialFieldInfo is expected to be a value between 1 and #player
 					byte playerNumber1 = move.getPlayerNumber();
 					byte playerNumber2 = move.getSpecialFieldInfo();
-					
-					//iterating over the map and swapping stones
-					for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
+
+					// iterating over the map and swapping stones
+					for (int h = 0; h < MapManager.getInstance().getHeight(); h++)
 					{
-						for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
+						for (int w = 0; w < MapManager.getInstance().getWidth(); w++)
 						{
-							tile = getTileAt(w,h);
-							if(tile.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber1))
+							tile = getTileAt(w, h);
+							if (tile.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber1))
 							{
 								tile.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
-							}
-							else if(tile.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber2))
+							} else if (tile.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber2))
 							{
 								tile.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
 							}
 						}
-						
+
 					}
 					break;
 				case INVERSION:
 					Tile t2;
-					
-					//looking from every playerstone and searching the possible moves
-					for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
+
+					// looking from every playerstone and searching the possible moves
+					for (int h = 0; h < MapManager.getInstance().getHeight(); h++)
 					{
-						for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
+						for (int w = 0; w < MapManager.getInstance().getWidth(); w++)
 						{
-							t2 = getTileAt(w,h);
-							if(t2.isOccupiedbyPlayer())
+							t2 = getTileAt(w, h);
+							if (t2.isOccupiedbyPlayer())
 							{
-								if(t2.getStatus().value == MapManager.getInstance().getNumberOfPlayers())
+								if (t2.getStatus().value == MapManager.getInstance().getNumberOfPlayers())
 								{
 									t2.setStatus(TileStatus.PLAYER_1);
-								}
-								else
+								} else
 								{
 									t2.setStatus(Player.mapPlayerNumberToTileStatus(t2.getStatus().value + 1));
 								}
 							}
 						}
-						
+
 					}
 					break;
 				case BONUS:
@@ -570,11 +747,11 @@ public class Map {
 			playerInfo[playerIndex].useBomb();
 			bombField(mm.getBombStrength(), move.getCoordinates().clone());
 		}
-		
-		//managing the turn
-		nextPlayerTurn = (byte) (move.getPlayerNumber() % mm.getNumberOfPlayers() + 1);		
+
+		// managing the turn
+		nextPlayerTurn = (byte) (move.getPlayerNumber() % mm.getNumberOfPlayers() + 1);
 	}
-	
+
 	/**
 	 * 
 	 * @param playernumber
@@ -587,78 +764,80 @@ public class Map {
 
 		return playerInfo[playernumber - 1];
 	}
-	
-//	/**
-//	 * 
-//	 * @param position
-//	 *            where to flip the stone
-//	 * @param playerNumber
-//	 *            which 'color' the stone will be flipped to
-//	 */
-//	private void flipStone(Vector2i position, byte playerNumber)
-//	{
-//		if (t.isOccupiedbyPlayer())
-//		{
-//			playerInfo[t.getStatus().value - 1].removeStone(position); // removing the oppenent's stone
-//		}
-//		playerInfo[playerNumber - 1].addStone(position); // adding the players stone
-//		getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber)); // actualizing the map
-//	}
-	
-//	/**
-//	 * Switches the stone coordinates between the Players with playerNumber1 and
-//	 * playernumber2 updates the map accordingly
-//	 * 
-//	 * @param playerNumber1
-//	 * @param playerNumber2
-//	 */
-//	private void switchStones(byte playerNumber1, byte playerNumber2)
-//	{
-//		Tile t;
-//		
-//		//looking from every playerstone and searching the possible moves
-//		for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
-//		{
-//			for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
-//			{
-//				t = getTileAt(w,h);
-//				if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber1))
-//				{
-//					t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
-//				}
-//				else if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber2))
-//				{
-//					t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
-//				}
-//			}
-//			
-//		}
-//	}
-	
-//	/**
-//	 * Inverses all playerstones. 
-//	 * Playernumber i owns the stones of (i mod #players + 1)
-//	 */
-//	private void inverseStones()
-//	{
-//		Tile t;
-//		
-//		//looking from every playerstone and searching the possible moves
-//		for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
-//		{
-//			for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
-//			{
-//				t = getTileAt(w,h);
-//				if(t.isOccupiedbyPlayer())
-//				{
-//					t.setStatus(Player.mapPlayerNumberToTileStatus(t.getStatus().value %
-//							MapManager.getInstance().getNumberOfPlayers() + 1));
-//				}
-//			}
-//			
-//		}
-//	}
-	
+
+	// /**
+	// *
+	// * @param position
+	// * where to flip the stone
+	// * @param playerNumber
+	// * which 'color' the stone will be flipped to
+	// */
+	// private void flipStone(Vector2i position, byte playerNumber)
+	// {
+	// if (t.isOccupiedbyPlayer())
+	// {
+	// playerInfo[t.getStatus().value - 1].removeStone(position); // removing the
+	// oppenent's stone
+	// }
+	// playerInfo[playerNumber - 1].addStone(position); // adding the players stone
+	// getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber));
+	// // actualizing the map
+	// }
+
+	// /**
+	// * Switches the stone coordinates between the Players with playerNumber1 and
+	// * playernumber2 updates the map accordingly
+	// *
+	// * @param playerNumber1
+	// * @param playerNumber2
+	// */
+	// private void switchStones(byte playerNumber1, byte playerNumber2)
+	// {
+	// Tile t;
+	//
+	// //looking from every playerstone and searching the possible moves
+	// for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
+	// {
+	// for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
+	// {
+	// t = getTileAt(w,h);
+	// if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber1))
+	// {
+	// t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
+	// }
+	// else if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber2))
+	// {
+	// t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
+	// }
+	// }
+	//
+	// }
+	// }
+
+	// /**
+	// * Inverses all playerstones.
+	// * Playernumber i owns the stones of (i mod #players + 1)
+	// */
+	// private void inverseStones()
+	// {
+	// Tile t;
+	//
+	// //looking from every playerstone and searching the possible moves
+	// for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
+	// {
+	// for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
+	// {
+	// t = getTileAt(w,h);
+	// if(t.isOccupiedbyPlayer())
+	// {
+	// t.setStatus(Player.mapPlayerNumberToTileStatus(t.getStatus().value %
+	// MapManager.getInstance().getNumberOfPlayers() + 1));
+	// }
+	// }
+	//
+	// }
+	// }
+
 	/**
 	 * method bombing the field with given radius and center of bomb
 	 * 
@@ -721,216 +900,229 @@ public class Map {
 			}
 		}
 	}
-	
-//	/**
-//	 * Creates a Map from String formatted as described in courseRules.pdf
-//	 * 
-//	 * @param inputString
-//	 *            the String to be converted into a map
-//	 */
-//	public Map(String inputString)
-//	{
-//		startingFields = new HashSet<>();
-//		positionOfExpansionStones = new HashSet<>();
-//
-//		Scanner scan = new Scanner(inputString);
-//		this.transitionCount = 0;
-//		try
-//		{
-//			this.numberOfPlayers = scan.nextInt();
-//			this.numberOfOverrides = scan.nextInt();
-//			this.numberOfBombs = scan.nextInt();
-//			this.bombStrength = scan.nextInt();
-//			this.height = scan.nextInt() + 2;
-//			this.width = scan.nextInt() + 2; // 2 extra lines and rows to surround the map with holes
-//			scan.nextLine();
-//		} catch (Exception e)
-//		{
-//			scan.close();
-//			throw new IllegalArgumentException("Metadata Error");
-//		}
-//		this.grid = new Tile[width * height];
-//
-//		// read in grid
-//		for (int y = 0; y < height; y++)
-//		{
-//			String row = null;
-//			if (!(y == 0 || y == height - 1)) // Skip new Borders as there is no row for them in the String
-//			{
-//				// Read a Line of the real map
-//				try
-//				{
-//					row = scan.nextLine();
-//				} catch (Exception e)
-//				{
-//					scan.close();
-//					throw new IllegalArgumentException("Mapdata Row Error (" + y + ")");
-//				}
-//			}
-//			int rowInd = 0;
-//			for (int x = 0; x < width; x++)
-//			{
-//				if (x == 0 || x == width - 1 || y == 0 || y == height - 1) // It's part of the border?
-//				{
-//					grid[x + y * height] = new Tile(TileStatus.HOLE); // Fill with holes
-//				} else
-//				{
-//					char curTile;
-//					// Read in the current type of field
-//					try
-//					{
-//						curTile = row.charAt(rowInd);
-//						rowInd++;
-//						// but skip blanks between the fields
-//						while (curTile == ' ')
-//						{
-//							curTile = row.charAt(rowInd);
-//							rowInd++;
-//						}
-//					} catch (Exception e)
-//					{
-//						scan.close();
-//						throw new IllegalArgumentException("Mapdata Col Error: (" + y + "," + x + ")" + row);
-//					}
-//
-//					// map the char from String to a Status
-//					TileStatus newStatus = TileStatus.mapCharToTileStatus(curTile);
-//					if (newStatus == TileStatus.INVALID)
-//					{
-//						scan.close();
-//						throw new IllegalArgumentException("Invalid Tiletype Error (" + y + "," + x + ")");
-//					} else if (newStatus.value >= 1 && newStatus.value <= 8) // occupied by player
-//					{
-//						startingFields.add(new Vector2i(x - 1, y - 1));
-//					} else if(newStatus == TileStatus.EXPANSION)
-//					{
-//						positionOfExpansionStones.add(new Vector2i(x - 1 ,y - 1));
-//					}
-//					// and add it to the grid
-//					grid[x + y * height] = new Tile(newStatus);
-//				}
-//			}
-//		}
-//		// read in Transitions
-//		while (scan.hasNextLine() && scan.hasNextInt())
-//		{
-//			// System.out.println(scan.toString()); // DEBUG
-//			int point1X;
-//			int point1Y;
-//			int point1D;
-//			int point2X;
-//			int point2Y;
-//			int point2D;
-//			try
-//			{
-//				// Read the information
-//				point1X = scan.nextInt();
-//				point1Y = scan.nextInt();
-//				point1D = scan.nextInt();
-//				scan.next(); // Skip "<->"
-//				point2X = scan.nextInt();
-//				point2Y = scan.nextInt();
-//				point2D = scan.nextInt();
-//			} catch (Exception e)
-//			{
-//				scan.close();
-//				throw new IllegalArgumentException("Transition Error Trans:" + transitionCount);
-//			}
-//
-//			Vector2i p1 = new Vector2i(point1X, point1Y); // Don't need to compensate Border as tiles are referenced
-//			Vector2i p2 = new Vector2i(point2X, point2Y); // by getTile method
-//			Vector2i p1OutDir = Vector2i.mapDirToVector(point1D);
-//			Vector2i p2OutDir = Vector2i.mapDirToVector(point2D);
-//			Vector2i p1InDir = Vector2i.scaled(p1OutDir, -1); // Inverse Direction: You go out going right but come in
-//			Vector2i p2InDir = Vector2i.scaled(p2OutDir, -1); // going left
-//
-//			// Check for Validity of Transitions:
-//			if(getTileAt(p1).isHole())
-//			{
-//				scan.close();
-//				throw new IllegalArgumentException("Transition Error: Transition attached to Hole " + p1);
-//			}
-//			if(getTileAt(p2).isHole())
-//			{
-//				scan.close();
-//				throw new IllegalArgumentException("Transition Error: Transition attached to Hole " + p2);
-//			}
-//			
-//			if (!getTileAt(Vector2i.sum(p1, p1OutDir)).isHole() || !getTileAt(Vector2i.sum(p2, p2OutDir)).isHole())
-//			{
-//				scan.close();
-//				throw new IllegalArgumentException("Transition Error: Tile not Connected to Hole");
-//			}
-//			getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
-//			getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
-//			transitionCount++;
-//		}
-//		scan.close();
-//	}
 
-//	/**
-//	 * @return the numberOfPlayers
-//	 */
-//	public int getNumberOfPlayers()
-//	{
-//		return numberOfPlayers;
-//	}
-//
-//	/**
-//	 * @return the numberOfOverrides
-//	 */
-//	public int getNumberOfOverrides()
-//	{
-//		return numberOfOverrides;
-//	}
-//
-//	/**
-//	 * @return the numberOfBombs
-//	 */
-//	public int getNumberOfBombs()
-//	{
-//		return numberOfBombs;
-//	}
-//
-//	/**
-//	 * @return the bombStrength
-//	 */
-//	public int getBombStrength()
-//	{
-//		return bombStrength;
-//	}
-//
-//	/**
-//	 * @return the height
-//	 */
-//	public int getHeight()
-//	{
-//		return height - 2;
-//	}
-//
-//	/**
-//	 * @return the width
-//	 */
-//	public int getWidth()
-//	{
-//		return width - 2;
-//	}
-//
-//	/**
-//	 * @return the starting fields
-//	 */
-//	public HashSet<Vector2i> getStartingFields()
-//	{
-//		return startingFields;
-//	}
-//
-//	/**
-//	 * @return the transitionCount
-//	 */
-//	public int getTransitionCount()
-//	{
-//		return transitionCount;
-//	}
+	// /**
+	// * Creates a Map from String formatted as described in courseRules.pdf
+	// *
+	// * @param inputString
+	// * the String to be converted into a map
+	// */
+	// public Map(String inputString)
+	// {
+	// startingFields = new HashSet<>();
+	// positionOfExpansionStones = new HashSet<>();
+	//
+	// Scanner scan = new Scanner(inputString);
+	// this.transitionCount = 0;
+	// try
+	// {
+	// this.numberOfPlayers = scan.nextInt();
+	// this.numberOfOverrides = scan.nextInt();
+	// this.numberOfBombs = scan.nextInt();
+	// this.bombStrength = scan.nextInt();
+	// this.height = scan.nextInt() + 2;
+	// this.width = scan.nextInt() + 2; // 2 extra lines and rows to surround the
+	// map with holes
+	// scan.nextLine();
+	// } catch (Exception e)
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Metadata Error");
+	// }
+	// this.grid = new Tile[width * height];
+	//
+	// // read in grid
+	// for (int y = 0; y < height; y++)
+	// {
+	// String row = null;
+	// if (!(y == 0 || y == height - 1)) // Skip new Borders as there is no row for
+	// them in the String
+	// {
+	// // Read a Line of the real map
+	// try
+	// {
+	// row = scan.nextLine();
+	// } catch (Exception e)
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Mapdata Row Error (" + y + ")");
+	// }
+	// }
+	// int rowInd = 0;
+	// for (int x = 0; x < width; x++)
+	// {
+	// if (x == 0 || x == width - 1 || y == 0 || y == height - 1) // It's part of
+	// the border?
+	// {
+	// grid[x + y * height] = new Tile(TileStatus.HOLE); // Fill with holes
+	// } else
+	// {
+	// char curTile;
+	// // Read in the current type of field
+	// try
+	// {
+	// curTile = row.charAt(rowInd);
+	// rowInd++;
+	// // but skip blanks between the fields
+	// while (curTile == ' ')
+	// {
+	// curTile = row.charAt(rowInd);
+	// rowInd++;
+	// }
+	// } catch (Exception e)
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Mapdata Col Error: (" + y + "," + x + ")"
+	// + row);
+	// }
+	//
+	// // map the char from String to a Status
+	// TileStatus newStatus = TileStatus.mapCharToTileStatus(curTile);
+	// if (newStatus == TileStatus.INVALID)
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Invalid Tiletype Error (" + y + "," + x +
+	// ")");
+	// } else if (newStatus.value >= 1 && newStatus.value <= 8) // occupied by
+	// player
+	// {
+	// startingFields.add(new Vector2i(x - 1, y - 1));
+	// } else if(newStatus == TileStatus.EXPANSION)
+	// {
+	// positionOfExpansionStones.add(new Vector2i(x - 1 ,y - 1));
+	// }
+	// // and add it to the grid
+	// grid[x + y * height] = new Tile(newStatus);
+	// }
+	// }
+	// }
+	// // read in Transitions
+	// while (scan.hasNextLine() && scan.hasNextInt())
+	// {
+	// // System.out.println(scan.toString()); // DEBUG
+	// int point1X;
+	// int point1Y;
+	// int point1D;
+	// int point2X;
+	// int point2Y;
+	// int point2D;
+	// try
+	// {
+	// // Read the information
+	// point1X = scan.nextInt();
+	// point1Y = scan.nextInt();
+	// point1D = scan.nextInt();
+	// scan.next(); // Skip "<->"
+	// point2X = scan.nextInt();
+	// point2Y = scan.nextInt();
+	// point2D = scan.nextInt();
+	// } catch (Exception e)
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Transition Error Trans:" +
+	// transitionCount);
+	// }
+	//
+	// Vector2i p1 = new Vector2i(point1X, point1Y); // Don't need to compensate
+	// Border as tiles are referenced
+	// Vector2i p2 = new Vector2i(point2X, point2Y); // by getTile method
+	// Vector2i p1OutDir = Vector2i.mapDirToVector(point1D);
+	// Vector2i p2OutDir = Vector2i.mapDirToVector(point2D);
+	// Vector2i p1InDir = Vector2i.scaled(p1OutDir, -1); // Inverse Direction: You
+	// go out going right but come in
+	// Vector2i p2InDir = Vector2i.scaled(p2OutDir, -1); // going left
+	//
+	// // Check for Validity of Transitions:
+	// if(getTileAt(p1).isHole())
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Transition Error: Transition attached to
+	// Hole " + p1);
+	// }
+	// if(getTileAt(p2).isHole())
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Transition Error: Transition attached to
+	// Hole " + p2);
+	// }
+	//
+	// if (!getTileAt(Vector2i.sum(p1, p1OutDir)).isHole() ||
+	// !getTileAt(Vector2i.sum(p2, p2OutDir)).isHole())
+	// {
+	// scan.close();
+	// throw new IllegalArgumentException("Transition Error: Tile not Connected to
+	// Hole");
+	// }
+	// getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
+	// getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
+	// transitionCount++;
+	// }
+	// scan.close();
+	// }
+
+	// /**
+	// * @return the numberOfPlayers
+	// */
+	// public int getNumberOfPlayers()
+	// {
+	// return numberOfPlayers;
+	// }
+	//
+	// /**
+	// * @return the numberOfOverrides
+	// */
+	// public int getNumberOfOverrides()
+	// {
+	// return numberOfOverrides;
+	// }
+	//
+	// /**
+	// * @return the numberOfBombs
+	// */
+	// public int getNumberOfBombs()
+	// {
+	// return numberOfBombs;
+	// }
+	//
+	// /**
+	// * @return the bombStrength
+	// */
+	// public int getBombStrength()
+	// {
+	// return bombStrength;
+	// }
+	//
+	// /**
+	// * @return the height
+	// */
+	// public int getHeight()
+	// {
+	// return height - 2;
+	// }
+	//
+	// /**
+	// * @return the width
+	// */
+	// public int getWidth()
+	// {
+	// return width - 2;
+	// }
+	//
+	// /**
+	// * @return the starting fields
+	// */
+	// public HashSet<Vector2i> getStartingFields()
+	// {
+	// return startingFields;
+	// }
+	//
+	// /**
+	// * @return the transitionCount
+	// */
+	// public int getTransitionCount()
+	// {
+	// return transitionCount;
+	// }
 
 	/**
 	 * Get a reference to a Tile
@@ -943,7 +1135,7 @@ public class Map {
 	 */
 	public Tile getTileAt(int x, int y)
 	{
-		return grid[(x + 1) + (y + 1) * (MapManager.getInstance().getWidth()+2)];
+		return grid[(x + 1) + (y + 1) * (MapManager.getInstance().getWidth() + 2)];
 	}
 
 	/**
@@ -955,41 +1147,42 @@ public class Map {
 	 */
 	public Tile getTileAt(Vector2i pos)
 	{
-		return grid[(pos.x + 1) + (pos.y + 1) * (MapManager.getInstance().getWidth()+2)];
+		return grid[(pos.x + 1) + (pos.y + 1) * (MapManager.getInstance().getWidth() + 2)];
 	}
-	
-	public byte getNextPlayerTurn() {
+
+	public byte getNextPlayerTurn()
+	{
 		return nextPlayerTurn;
 	}
-	
+
 	@Override
 	public Map clone()
 	{
 		Player[] playerInfoClone = new Player[playerInfo.length];
 		Tile[] gridClone = new Tile[grid.length];
-		
-		for(int i = 0; i<playerInfo.length; i++) 
+
+		for (int i = 0; i < playerInfo.length; i++)
 		{
 			playerInfoClone[i] = playerInfo[i].clone();
 		}
-		
-		for(int i = 0; i<grid.length; i++) 
+
+		for (int i = 0; i < grid.length; i++)
 		{
 			gridClone[i] = grid[i].clone();
 		}
-		
+
 		return new Map(gridClone, playerInfoClone, nextPlayerTurn);
 	}
-	
+
 	public void print()
 	{
 		MapManager mm = MapManager.getInstance();
-		
-		for(int y = 0; y <mm.getHeight()+2; y++)
+
+		for (int y = 0; y < mm.getHeight() + 2; y++)
 		{
-			for(int x = 0; x < mm.getWidth()+2; x++)
+			for (int x = 0; x < mm.getWidth() + 2; x++)
 			{
-				System.out.print(grid[(x) + (y*(mm.getWidth()+2))].getStatus().rep + " ");
+				System.out.print(grid[(x) + (y * (mm.getWidth() + 2))].getStatus().rep + " ");
 			}
 			System.out.println("");
 		}

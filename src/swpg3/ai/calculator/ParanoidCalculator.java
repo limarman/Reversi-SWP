@@ -1,11 +1,15 @@
 package swpg3.ai.calculator;
 
+import java.util.HashSet;
+
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
+import swpg3.main.GlobalSettings;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
+import swpg3.main.perfLogging.PerfLogger;
 
 /**
  * Simple Calculator 
@@ -40,16 +44,28 @@ public class ParanoidCalculator implements Calculator{
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().startNode();
+		}
+		
+		HashSet<Move> posMoves = map.getPossibleMoves(maxPlayerNumber);
 		//Should not be called - Player should have possible moves
-		if(map.getPossibleMoves(maxPlayerNumber).isEmpty()) 
+		if(posMoves.isEmpty()) 
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
 		}
 		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
+		
 		double maxValue = Double.NEGATIVE_INFINITY;
-		for(Move move : map.getPossibleMoves(maxPlayerNumber)) 
+		for(Move move : posMoves) 
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
@@ -73,11 +89,21 @@ public class ParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		//Player has no moves or is disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
+		HashSet<Move> posMoves = map.getPossibleMoves(currentPlayerNumber);
+		if(posMoves.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//player cannot change anything in the evaluation
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
@@ -93,8 +119,14 @@ public class ParanoidCalculator implements Calculator{
 			} 
 		}
 		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
+		
 		double minValue = Double.POSITIVE_INFINITY;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		for(Move move : posMoves) 
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
@@ -125,18 +157,34 @@ public class ParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		HashSet<Move> posMoves = map.getPossibleMoves(currentPlayerNumber);
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
-		if(map.getPossibleMoves(currentPlayerNumber).isEmpty()) 
+		if(posMoves.isEmpty()) 
 		{
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
 		}
 		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
+		
 		double maxValue = Double.NEGATIVE_INFINITY;
-		for(Move move : map.getPossibleMoves(currentPlayerNumber)) 
+		for(Move move : posMoves) 
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);

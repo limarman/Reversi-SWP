@@ -123,8 +123,7 @@ public class Move implements Comparable<Move>{
 	@Override
 	public String toString()
 	{
-		return "Player: " +	playerNumber + " Coords: " + coordinates.toString() +
-				" Special: " + specialFieldInfo;
+		return "(" + coordinates.toString()+ "," + playerNumber + "," + specialFieldInfo + ")";
 	}
 	
 	public void copyFrom(Move m) 

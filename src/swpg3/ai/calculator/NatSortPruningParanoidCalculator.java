@@ -7,8 +7,10 @@ import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
+import swpg3.main.GlobalSettings;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
+import swpg3.main.perfLogging.PerfLogger;
 
 /**
  * Calculator, which is like PruningParanoidCalculator but uses a natural order of Moves
@@ -43,6 +45,11 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().startNode();
+		}
+		
 		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
 
 		//Should not be called - Player should have possible moves
@@ -57,6 +64,12 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 		
 		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
 		Arrays.sort(possibleMovesOrdered);
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
 		
 		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{
@@ -85,7 +98,16 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
@@ -110,6 +132,12 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 		double minValue = beta;
 		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
 		Arrays.sort(possibleMovesOrdered);
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
 		
 		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{
@@ -148,7 +176,16 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 		//reached maximal depth
 		if(depth == 0) 
 		{
-			return eval.evaluatePosition(map, maxPlayerNumber);
+			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopLeaf();
+				PerfLogger.getInst().startNode();
+			}
+			
+			return evalErg;
+			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		HashSet<Move> possibleMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
@@ -163,6 +200,12 @@ public class NatSortPruningParanoidCalculator implements Calculator{
 		double maxValue = alpha;
 		Move[] possibleMovesOrdered = possibleMoves.toArray(new Move[0]); 
 		Arrays.sort(possibleMovesOrdered);
+		
+		if(GlobalSettings.log_performance)
+		{
+			PerfLogger.getInst().stopInner();
+			PerfLogger.getInst().startNode();
+		}
 		
 		for(int i = possibleMovesOrdered.length-1; i>=0; i--) 
 		{

@@ -5,4 +5,5 @@ public final class GlobalSettings {
 	
 	public static boolean ab_pruning;
 	public static boolean log_performance;
+	public static boolean log_ext_perf;
 }

@@ -14,7 +14,10 @@ import swpg3.main.cli.CliOption;
 import swpg3.main.cli.CliOptionType;
 import swpg3.main.cli.CliParser;
 import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.LogTag;
 import swpg3.main.logging.Logger;
+import swpg3.main.perfLogging.PerfLogger;
+import swpg3.main.perfLogging.Stopwatch;
 import swpg3.net.Message;
 import swpg3.net.MessageType;
 import swpg3.net.NetworkManager;
@@ -149,14 +152,43 @@ public class Phteven{
 	{
 		if(m.getType() == MessageType.MAP_INIT) // MessageType 2
 		{
+			Stopwatch mapManTime = null;
+			Stopwatch aiTime = null;
 			String map = m.retrieveMap();
 			Logger.log(LogLevel.INFO, "Received Map.");
 			
+			
+			if(GlobalSettings.log_ext_perf)
+			{
+				mapManTime = new Stopwatch();
+				mapManTime.start();
+			}
 			// Initialize Map
 			mapMan.initializeMap(map);
+			
+			if(GlobalSettings.log_ext_perf)
+			{
+				mapManTime.stop();
+				aiTime = new Stopwatch();
+				aiTime.start();
+			}
+			
 			ai.initialize();
-			Logger.logMap(LogLevel.INFO, mapMan.getCurrentMap());
+			
+			if(GlobalSettings.log_ext_perf)
+			{
+				aiTime.stop();
+			}
+
 			Logger.log(LogLevel.DETAIL, "AI and MapManager initialized!");
+			Logger.logMap(LogLevel.INFO, mapMan.getCurrentMap());
+			
+			if(GlobalSettings.log_ext_perf)
+			{
+				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Map-Man init: " + mapManTime);
+				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "AI init: " + aiTime);
+			}
+			
 		}
 		else if(m.getType() == MessageType.PLAYER_NUMBER_ASSIGN) // MessageType 3
 		{
@@ -171,22 +203,26 @@ public class Phteven{
 			int depthLimit = m.retrieveDepthLimit();
 			Logger.log(LogLevel.INFO, "Received Moverequest: (" + timeLimit + ", " + depthLimit + ")");
 			
-//			Logger.log(LogLevel.DETAIL, "Current Midtime: " + totalTime / movesAsked);
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().reset();
+				PerfLogger.getInst().startTotal();
+			}
 			
-//						
-//			movesAsked++;
-//			double beforeTime = System.currentTimeMillis();
 			
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
 			
-//			totalTime += (System.currentTimeMillis() - beforeTime) / 1000;
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().stopTotal();
+			}
+			
 			
 			if(bestMove == null) 
 			{
 				Logger.log(LogLevel.ERROR, "Best returned move is null!");
 			}
-//			HashSet<Move> moves = mapMan.getCurrentMap().getPossibleMoves(playerNumber);
 			try
 			{
 				net.sendMessage(Message.newMoveReply(bestMove));
@@ -195,13 +231,35 @@ public class Phteven{
 			{
 			}
 			
+			if(GlobalSettings.log_performance)
+			{
+				PerfLogger.getInst().log();
+			}
+			
 		}
 		else if(m.getType() == MessageType.MOVE_ANNOUNCE) // MessageType 6
 		{
 			Move move = m.retrieveAnouncedMove();
 			Logger.log(LogLevel.INFO, "Received Move: " + move);
 			// Apply Move to the map
-			mapMan.applyMove(move);
+			
+			if(GlobalSettings.log_ext_perf)
+			{
+				Stopwatch watch = new Stopwatch();
+				watch.start();
+				mapMan.applyMove(move);
+				watch.stop();
+				
+				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Applied Move: " + move + ": " + watch);
+			}
+			else
+			{
+				mapMan.applyMove(move);
+			}
+			
+			
+			
+			
 			Logger.log(LogLevel.DETAIL, "Applied Move:");
 			Logger.logMap(LogLevel.DETAIL, mapMan.getCurrentMap());
 		}
@@ -264,8 +322,12 @@ public class Phteven{
 				new CliOption('p', "port", true, CliOptionType.INTPARAM, "12345", "Serverport to connect to");
 		CliOption loglevelOpt =
 				new CliOption('l', "loglevel", false, CliOptionType.INTPARAM, "3", "Loglevel: 0-None to 5-Debug");
+		CliOption log_file =
+				new CliOption('o', "log-file", false, CliOptionType.STRINGPARAM, "sysout", "Specify the logfile to be written in. sysout = stdout");
 		CliOption log_perfomance =
 				new CliOption(' ', "log-performance", false, CliOptionType.FLAG, "", "Enables permance logging. Slows down, due to Wall of text");
+		CliOption log_ext_perf =
+				new CliOption(' ', "log-ext-perf", false, CliOptionType.FLAG, "", "Enables extended permance logging. Incredible Wall of Text! implies --log-performance");
 		CliOption ab_pruning = 
 				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "", "Activates Alpha-Beta-Pruning");
 		
@@ -273,7 +335,9 @@ public class Phteven{
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
 		parser.addOption(loglevelOpt);
+		parser.addOption(log_file);
 		parser.addOption(log_perfomance);
+		parser.addOption(log_ext_perf);
 		parser.addOption(ab_pruning);
 		
 		//actual parsing:
@@ -283,7 +347,20 @@ public class Phteven{
 		}
 		
 		// Initialize the Logger:
-		Logger.init(LogLevel.fromInt(loglevelOpt.getInt()));
+		String logFile = log_file.getString();
+		if(logFile.equals("sysout")) 
+		{
+			Logger.init(LogLevel.fromInt(loglevelOpt.getInt()));
+		}
+		else
+		{
+			Logger.init(LogLevel.fromInt(loglevelOpt.getInt()), true, logFile);
+			if(!Logger.isActive())
+			{
+				System.out.println("ERROR: Could not open logFile!");
+				System.exit(1);
+			}
+		}
 		
 		Logger.log(LogLevel.DEBUG, "Logger initialized in DEBUG Mode. Prepare for a Wall of Text :P");
 		
@@ -292,9 +369,15 @@ public class Phteven{
 		// Global Settings:
 		GlobalSettings.ab_pruning = ab_pruning.isSet();
 		GlobalSettings.log_performance = log_perfomance.isSet();
+		if(log_ext_perf.isSet())
+		{
+			GlobalSettings.log_ext_perf = true;
+			GlobalSettings.log_performance = true;
+		}
 		
-		Logger.log(LogLevel.DEBUG, "Alpha-Beta.-Pruning set to: " + GlobalSettings.ab_pruning);
-		Logger.log(LogLevel.DEBUG, "Perfomance logging set to: " + GlobalSettings.log_performance);
+		Logger.log(LogLevel.DEBUG, "Alpha-Beta.-Pruning set to:   " + GlobalSettings.ab_pruning);
+		Logger.log(LogLevel.DEBUG, "Perfomance logging set to:    " + GlobalSettings.log_performance);
+		Logger.log(LogLevel.DEBUG, "Extended Perf logging set to: " + GlobalSettings.log_ext_perf);
 		
 		
 		// In piece may he rest

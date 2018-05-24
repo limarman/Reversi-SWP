@@ -3,7 +3,9 @@ package swpg3.ai;
 import java.util.HashSet;
 
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.NatSortPruningParanoidCalculator;
 import swpg3.ai.calculator.ParanoidCalculator;
+import swpg3.ai.calculator.PruningParanoidCalculator;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.Vector2i;
@@ -99,7 +101,9 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-		calc = new ParanoidCalculator();
+		calc = new NatSortPruningParanoidCalculator();
+		       //new PruningParanoidCalculator();
+		       //new ParanoidCalculator();
 		eva = new InversionaryEvaluator();
 		anna.analyseMap();
 		setParameters();
@@ -137,7 +141,7 @@ public class AI {
 //			Logger.log(LogLevel.ERROR, "No move was found!");
 //		}
 		double SystimeBefore = System.currentTimeMillis();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, 1, bestMove); //TODO: Change depth later
+		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, bestMove); //TODO: Change depth later
 		double SystimeAfter = System.currentTimeMillis();
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);

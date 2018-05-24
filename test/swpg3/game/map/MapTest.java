@@ -405,6 +405,50 @@ class MapTest {
 	}
 	
 	@Test
+	void isMoveValidAllPlayerstest()
+	{
+		String mapString = "3\n"
+				+ "3\n"
+				+ "0 1\n"
+				+ "10 10\n"
+				+ "0 0 0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0 0 0\n"
+				+ "0 3 0 1 1 1 0 0 0 0\n"
+				+ "0 0 1 2 2 2 0 0 0 0\n"
+				+ "0 0 1 2 2 2 0 0 0 0\n"
+				+ "0 0 1 2 2 2 i 0 0 0\n"
+				+ "0 0 1 2 2 3 0 0 0 0\n"
+				+ "0 0 0 0 2 2 0 0 0 0\n"
+				+ "0 x 0 0 0 2 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0 0 0\n"
+				+ "0 0 1 <-> 0 9 6";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);
+		}
+		catch(Exception e) {
+			System.out.println(e.toString());
+			fail("map could not be read.");
+		}
+		Map map = mm.getCurrentMap();
+		
+		for(int y = 0; y < mm.getHeight(); y++)
+		{
+			for(int x = 0; x < mm.getWidth(); x++)
+			{
+				boolean[] valids = map.isMoveValidAllPlayers(x, y);
+				
+				for(int i = 0; i < mm.getNumberOfPlayers(); i++)
+				{
+					assertEquals(map.isMoveValid(new Move(x,y,(byte)0, (byte)(i+1) )), valids[i], "(" + x + "," + y + ")" + i);
+				}
+			}
+		}
+	}
+	
+	@Test
 	void StoneFlipBugTest()
 	{
 		String mapString = "2\n"
