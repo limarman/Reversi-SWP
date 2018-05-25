@@ -186,37 +186,48 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				}
 				else if(t.isEmpty())
 				{
-					for(byte i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++) 
+//					for(byte i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++) 
+//					{
+//						//check whether move is possible
+//						if(t.getStatus() == TileStatus.BONUS) 
+//						{
+//							if(map.isMoveValid(new Move(new Vector2i(w, h), Move.ADD_OVERRIDESTONE, i)))
+//							{
+//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+//							}
+//						}
+//						else if(t.getStatus() == TileStatus.CHOICE)
+//						{
+//							if(map.isMoveValid(new Move(new Vector2i(w, h), i, i)))
+//							{
+//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+//							}
+//						}
+//						//counting the inversion tiles
+//						else if(t.getStatus() == TileStatus.INVERSION) 
+//						{
+//							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
+//							{
+//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+//							}
+//						}
+//						else //no special field info needed
+//						{
+//							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
+//							{
+//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
+//							}
+//						}
+//					}
+					
+					//count free valid moves
+					boolean valids[] = map.isMoveValidAllPlayers(w, h);
+					
+					for(int i = 0; i<valids.length; i++) 
 					{
-						//check whether move is possible
-						if(t.getStatus() == TileStatus.BONUS) 
+						if(valids[i]) 
 						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), Move.ADD_OVERRIDESTONE, i)))
-							{
-								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-							}
-						}
-						else if(t.getStatus() == TileStatus.CHOICE)
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), i, i)))
-							{
-								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-							}
-						}
-						//counting the inversion tiles
-						else if(t.getStatus() == TileStatus.INVERSION) 
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
-							{
-								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-							}
-						}
-						else //no special field info needed
-						{
-							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
-							{
-								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-							}
+							attributesPerPlayer[i][FREE_POS_MOVES]++;
 						}
 					}
 					

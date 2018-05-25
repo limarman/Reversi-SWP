@@ -150,7 +150,9 @@ public class Map {
 		}
 
 		Tile movePos = getTileAt(x, y);
-		if (movePos.isHole())
+		
+		//basic checking
+		if (movePos.isHole()) //stone cannot be placed on a hole
 		{
 			for (int i = 0; i < noPlayers; i++)
 			{
@@ -159,7 +161,7 @@ public class Map {
 			}
 			return valids;
 		}
-		if (movePos.isOccupied())
+		if (movePos.isOccupied()) //if no overrideStones avail - stone cannot be placed
 		{
 			for (int i = 0; i < noPlayers; i++)
 			{
@@ -167,8 +169,10 @@ public class Map {
 				{
 					valids[i] = false;
 					set[i] = true;
-				} else
+				}
+				else
 				{
+					//otherwise - if overrideStones are avail and stone is expansion stone -> move is valid
 					if (movePos.getStatus() == TileStatus.EXPANSION)
 					{
 						if (!set[i])
@@ -183,10 +187,13 @@ public class Map {
 
 		MapWalker[] walker = new MapWalker[8];
 		boolean[] hasAdjacent = new boolean[noPlayers];
-		for (boolean b : hasAdjacent)
+		
+		//initializing hasAdjacent-array
+		for(int i = 0; i<hasAdjacent.length; i++)
 		{
-			b = false;
+			hasAdjacent[i] = false;
 		}
+		
 		boolean[][] dirOk = new boolean[noPlayers][8];
 		for(int p = 0; p < noPlayers; p++)
 		{
@@ -196,7 +203,7 @@ public class Map {
 			}
 		}
 		// Check for FlipRule:
-		for (int dir = 0; dir < 8; dir++) // initialise
+		for (int dir = 0; dir < 8; dir++) // initialize
 		{
 			// Initialize and step
 			walker[dir] = new MapWalker(this, moveVec.clone(), Vector2i.mapDirToVector(dir));
@@ -307,7 +314,7 @@ public class Map {
 	}
 
 	/**
-	 * Giving all the possible moves the plaer with specified playernumber can make.
+	 * Giving all the possible moves the player with specified playernumber can make.
 	 * 
 	 * @param playerNumber
 	 * 

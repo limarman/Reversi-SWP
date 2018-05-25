@@ -1,6 +1,3 @@
-/**
- * 
- */
 package swpg3.game.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -415,7 +412,7 @@ class MapTest {
 				+ "0 0 0 0 0 0 0 0 0 0\n"
 				+ "0 3 0 1 1 1 0 0 0 0\n"
 				+ "0 0 1 2 2 2 0 0 0 0\n"
-				+ "0 0 1 2 2 2 0 0 0 0\n"
+				+ "0 0 1 2 2 2 c 0 0 0\n"
 				+ "0 0 1 2 2 2 i 0 0 0\n"
 				+ "0 0 1 2 2 3 0 0 0 0\n"
 				+ "0 0 0 0 2 2 0 0 0 0\n"
@@ -442,7 +439,22 @@ class MapTest {
 				
 				for(int i = 0; i < mm.getNumberOfPlayers(); i++)
 				{
-					assertEquals(map.isMoveValid(new Move(x,y,(byte)0, (byte)(i+1) )), valids[i], "(" + x + "," + y + ")" + i);
+					if(map.getTileAt(x, y).getStatus() == TileStatus.CHOICE) {
+						
+						assertEquals(map.isMoveValid(new Move(x,y,(byte)(i+1), (byte)(i+1) )), valids[i], "mistake move at: " +
+								"(" + x + "," + y + ")" + "Player: " + (i+1));
+					}
+					else  if(map.getTileAt(x,y).getStatus() == TileStatus.BONUS)
+					{
+						assertEquals(map.isMoveValid(new Move(x,y,Move.ADD_OVERRIDESTONE, (byte)(i+1) )), valids[i], "mistake move at: " +
+								"(" + x + "," + y + ")" + "Player: " + (i+1));
+					}
+					else
+					{
+						assertEquals(map.isMoveValid(new Move(x,y,(byte)0, (byte)(i+1) )), valids[i], "mistake move at: " +
+								"(" + x + "," + y + ")" + "Player: " + (i+1));
+					}
+					
 				}
 			}
 		}

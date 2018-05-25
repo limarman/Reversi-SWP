@@ -3,7 +3,6 @@ package swpg3.ai;
 import java.util.HashSet;
 
 import swpg3.ai.calculator.Calculator;
-import swpg3.ai.calculator.NatSortPruningParanoidCalculator;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
 import swpg3.ai.calculator.movesorter.NaturalSorter;
@@ -12,6 +11,7 @@ import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
+import swpg3.main.GlobalSettings;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
 
@@ -102,9 +102,14 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-		calc =  //new PruningParanoidCalculator(new NaturalSorter());
-			    new ParanoidCalculator();
-				new NatSortPruningParanoidCalculator();
+		if(GlobalSettings.ab_pruning) 
+		{
+			calc = new PruningParanoidCalculator(new NaturalSorter());
+		}
+		else 
+		{
+			calc = new ParanoidCalculator();
+		}
 		eva = new InversionaryEvaluator();
 		anna.analyseMap();
 		setParameters();
