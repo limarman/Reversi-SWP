@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import swpg3.MapManager;
-import swpg3.Vector2i;
+import swpg3.game.Vector2i;
+import swpg3.game.map.MapManager;
 
 class AnalyserTest {
 

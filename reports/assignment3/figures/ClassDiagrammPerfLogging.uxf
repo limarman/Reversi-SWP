@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>300</x>
+      <y>90</y>
+      <w>280</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>PerfLogger &lt;Singleton&gt;
+--
+-totalTime: Stopwatch
+-inner
+-eaves: List&lt;Stopwach&gt;
+--
++startTotal(): void
++stopTotal(): void
++startNode(): void
++stopInner(): void
++stopLeaf(): void
++reset(): void
++compute(): void
++log(): void
+...
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>650</x>
+      <y>130</y>
+      <w>270</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Stopwatch
+--
+-starttime: long
+-endtime:long
+--
++start(): void
++stop(): void
++getElapsedTime(): long
++reset(): void
+...
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>280</x>
+      <y>50</y>
+      <w>660</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>swpg3.main.perfLogging</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>570</x>
+      <y>190</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

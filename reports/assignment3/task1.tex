@@ -1,0 +1,49 @@
+\section{Task 1}
+Unsere Implementation des Minimax-Algorithmus ist eine sogennante Paranoid-Suche und nutzt im wesentlichen drei Methoden und zusätzlich die Bewertungsfunktion. Diese wären:
+\begin{enumerate}
+\item[•]Starting Player
+\item[•]Min Player
+\item[•]Max Player
+\end{enumerate}
+Der Callgraph für den Algorithmus mit den Methoden ist in der Abbildung \ref{fig::callgraph-minimax} zu sehen.
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[scale=0.25]{figures/MinMaxCallGraph.pdf}
+		\caption{Callgraph des Minimax-Algorithmus}
+		\label{fig::callgraph-minimax}
+	\end{center}
+\end{figure}
+Starting Player ist der Einstiegspunkt der rekursiven Baumsuche. Dieser erhält als Parameter das Tiefenlimit und spielt die Rolle des Maximalspielers, also er versucht den besten Zug zu finden, welcher den Stellungswert maximiert. Er unterscheidet sich vom Max-Spieler in tieferen Rekursionsebenen, denn er aktualisiert den besten Zug (welcher am Ende zurückgegeben werden soll), sollte ein neu erforschter Teilbaum eine Verbesserung gegenüber den alten Ergebnissen liefern.\\
+Ansonsten rufen sich Min- und Max-Spieler gegenseitig auf, mit jeweils dekrementierter Restrechentiefe. Dabei versucht der Max-Spieler den Stellungswert zu maximieren, wohingegen der Min-Spieler minimiert. Da wir nicht zwingend ein Spiel mit zwei Spielern vorliegen haben und der Paranoid Strategie folgen, gibt es nur einen Max-Spieler und unter Umständen mehrere Min-Spieler. Folgt also nach dem Min-Spieler nicht der Max-Spieler ($nextPlayer != startingPlayer$), dann ruft der Min-Spieler einen weiteren Min-Spieler (und damit dieselbe Methode mit dekrementierter Tiefe) auf.\\
+Ist die Resttiefe ausgeschöpft ($depth == 0$), dann bricht die Rekursion ab und die Abbruchstellung wird evaluiert, ausgehend von aktueller Evaluationsfunktion.\\
+%Für einen genaueren Einblick in den Min-Spieler (Max-Spieler) sei auf den nachstehenden Code  verwiesen.
+%\lstset{language=Java}
+%\begin{lstlisting}
+%
+%double minPlayer(Position pos, int depth, Player curPlayer){
+%  // Resttiefe aufgebraucht
+%  if(t==0){
+%  return evaluate(pos);
+%  }
+%  //generiere alle moeglichen Zuege
+%  possMoves = pos.getPossibleMoves();
+%	
+%  if(possMoves.isEmpty()){ //Spieler keine Zuege -> setzt aus
+%    if(curPlayer.next == startPlayer){
+%      return maxPlayer(pos, depth-1, curPlayer.next);	
+%    }	
+%    else{
+%      return minPlayer(pos, depth-1, curPlayer.next);
+%    }
+%  }
+%  double evaluation = +Inf;
+%
+%  //iteriere ueber alle moeglichen Zuege und minimiere Wert
+%  for(Move move : possMoves){
+%    double value = maxPlayer(pos.apply(move))
+%    evaluation = min(evaluation, value);
+%  } 
+%	
+%return evaluation;
+%}
+%\end{lstlisting}
