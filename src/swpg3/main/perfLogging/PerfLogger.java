@@ -130,20 +130,20 @@ public class PerfLogger {
 		compute();
 		
 		
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Elapsed total: %9dns/%6dµs/%3dms", totalTime.getElapsedTime(), totalTime.getElapsedTime()/1000, totalTime.getElapsedTime()/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Elapsed total: %9dns/%6dus/%3dms", totalTime.getElapsedTime(), totalTime.getElapsedTime()/1000, totalTime.getElapsedTime()/1000000));
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Nodes visited: " + (noInnerNodes + noLeaves));
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "InnerNodes visited: " + noInnerNodes);
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Leaves visited: " + noLeaves);
 		
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf Sum : %9dns/%6dµs/%3dms", leafSum, leafSum/1000, leafSum/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf min : %9dns/%6dµs/%3dms", leafMin, leafMin/1000, leafMin/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf max : %9dns/%6dµs/%3dms", leafMax, leafMax/1000, leafMax/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf avg : %9dns/%6dµs/%3dms", leafAvg, leafAvg/1000, leafAvg/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf Sum : %9dns/%6dus/%3dms", leafSum, leafSum/1000, leafSum/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf min : %9dns/%6dus/%3dms", leafMin, leafMin/1000, leafMin/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf max : %9dns/%6dus/%3dms", leafMax, leafMax/1000, leafMax/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf avg : %9dns/%6dus/%3dms", leafAvg, leafAvg/1000, leafAvg/1000000));
 		
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner Sum: %9dns/%6dµs/%3dms", innerSum, innerSum/1000, innerSum/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner min: %9dns/%6dµs/%3dms", innerMin, innerMin/1000, innerMin/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner max: %9dns/%6dµs/%3dms", innerMax, innerMax/1000, innerMax/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner avg: %9dns/%6dµs/%3dms", innerAvg, innerAvg/1000, innerAvg/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner Sum: %9dns/%6dus/%3dms", innerSum, innerSum/1000, innerSum/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner min: %9dns/%6dus/%3dms", innerMin, innerMin/1000, innerMin/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner max: %9dns/%6dus/%3dms", innerMax, innerMax/1000, innerMax/1000000));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner avg: %9dns/%6dus/%3dms", innerAvg, innerAvg/1000, innerAvg/1000000));
 	}
 	public Stopwatch getTotalTime()
 	{

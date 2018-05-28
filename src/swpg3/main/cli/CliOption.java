@@ -20,14 +20,14 @@ public class CliOption {
 	private String	parameter;
 
 
-	public CliOption(char shortName, String longName, boolean mandatory, CliOptionType type, String defaultPa, String description)
+	public CliOption(char shortName, String longName, boolean mandatory, CliOptionType type, String defaultParam, String description)
 	{
 		super();
 		this.shortName = shortName;
 		this.longName = longName;
 		this.mandatory = mandatory;
 		this.type = type;
-		this.defaultParam = defaultPa;
+		this.defaultParam = defaultParam;
 		this.description = description;
 	}
 

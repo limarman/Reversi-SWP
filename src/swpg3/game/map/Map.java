@@ -30,6 +30,8 @@ public class Map {
 	private Player[]	playerInfo;
 	private byte		nextPlayerTurn;
 
+	public static int times = 0;
+	
 	/**
 	 * Creates a Map from fieldArray and playerInfo
 	 * 
@@ -136,6 +138,12 @@ public class Map {
 		}
 	}
 
+	/**
+	 * Returns a boolean array with one boolean per player, indicating whether a move on the square (x,y) is possible for the player
+	 * @param x - x coordinate of the field
+	 * @param y - y coordinate of the field
+	 * @return boolean array with length = numberOfPlayers
+	 */
 	public boolean[] isMoveValidAllPlayers(int x, int y)
 	{
 		int noPlayers = MapManager.getInstance().getNumberOfPlayers();
@@ -261,6 +269,7 @@ public class Map {
 		boolean movingWalkerLeft = true;
 		while (movingWalkerLeft)
 		{
+			times++;
 			movingWalkerLeft = false;
 			// perform steps
 			for (int i = 0; i < 8; i++)

@@ -54,22 +54,35 @@ RWTH Aachen \\ % Your institution for the title page
 %----------------------------------------------------------------------------------------
 
 %------------------------------------------------
-\section{Task 1}
+\section{Task 1 & 2}
 %------------------------------------------------
 
 \begin{frame}
-\frametitle{Frame Title}
-
+\frametitle{Aufbau der Paranoid-Baumsuche}
+Wir nutzen folgende Player (Methoden):
+\begin{enumerate}
+\item[•] Starting Max-Player
+\item[•] Max-Player
+\item[•] Min-Player
+\end{enumerate}\hfill\break
+Mit den Aufgaben:
+\begin{enumerate}
+\item[•] \textbf{Starting Max-Player:} wie Max-Player, aktualisiert jedoch den aktuell besten Zug
+\item[•] \textbf{Max-Player:} maximiert den Stellungswert über die Möglichkeiten
+\item[•] \textbf{Min-Player:} minimiert den Stellungswert über die Möglichkeiten
+\end{enumerate}
 
 \end{frame}
 
 %------------------------------------------------
-\section{Task 2}
-%------------------------------------------------
 
 \begin{frame}
-\frametitle{Frame Title}
+\frametitle{Callgraph der Algorithmen}
 
+
+\begin{center}
+	\includegraphics[scale=0.2]{figures/MinMaxCallGraph.pdf}
+\end{center}
 
 \end{frame}
 
@@ -161,7 +174,8 @@ RWTH Aachen \\ % Your institution for the title page
 \begin{frame}
 \frametitle{Fragen und Rückmeldung}
   \begin{itemize}
-    \item Reports kommen sehr spät, Anmerkungen meist schon umgesetzt
+    \item<1-> Reports kommen sehr spät, Anmerkungen meist schon umgesetzt
+    \item<2-> Ist es erlaubt/sinnvoll eine Map-Datenbank zu führen?
   \end{itemize}
 \end{frame}
 

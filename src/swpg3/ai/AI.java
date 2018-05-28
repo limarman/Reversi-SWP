@@ -122,32 +122,8 @@ public class AI {
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
 		Move bestMove = new Move();
-//		double currentBestEval = Double.NEGATIVE_INFINITY;
-//		Map map = MapManager.getInstance().getCurrentMap();
-//		
-//		HashSet<Move> possibleMoves = map.getPossibleMoves(playerNumber);
-//		
-//		if(possibleMoves.isEmpty())
-//		{
-//			Logger.log(LogLevel.INFO, "There is no possible move");
-//		}
-//		
-//		for (Move move : possibleMoves) {
-//			Map appliedMove = map.clone();
-//			appliedMove.applyMove(move);
-//			double evaluation = eva.evaluatePosition(appliedMove, playerNumber);
-//			if(evaluation > currentBestEval)
-//			{
-//				currentBestEval = evaluation;
-//				currentBest = move;
-//			}
-//		}
-//		if(currentBest == null) 
-//		{
-//			Logger.log(LogLevel.ERROR, "No move was found!");
-//		}
 		double SystimeBefore = System.currentTimeMillis();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, bestMove); //TODO: Change depth later
+		double evaluation = calc.calculateBestMove(eva, playerNumber, 1, bestMove); //TODO: Change depth later
 		double SystimeAfter = System.currentTimeMillis();
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);

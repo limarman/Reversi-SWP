@@ -21,9 +21,9 @@ class TimingTest {
 	@Test
 	void getBestMoveTimingtest()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 1;
-		int depthLimit = 1;
+		int depthLimit = 3;
 		GlobalSettings.ab_pruning = true;
 		
 		if(!doTest)
@@ -71,7 +71,7 @@ class TimingTest {
 			long innerMinS = 0;
 			long innerAvgS = 0;
 			long innerSumS = 0;
-			
+					
 			long mapCloneS = 0;
 			
 			for(int i = 0; i < numberOfRuns; i++)
@@ -79,6 +79,7 @@ class TimingTest {
 				log.reset();
 				
 				log.startTotal();
+				Map.times = 0;
 				ai.getBestMove((byte)1, depthLimit, 1000);
 				log.stopTotal();
 				
@@ -100,7 +101,7 @@ class TimingTest {
 				
 				Stopwatch maptimer = new Stopwatch();
 				maptimer.start();
-				Map newMap = map.clone();
+				//Map newMap = map.clone();
 				maptimer.stop();
 				mapCloneS += maptimer.getElapsedTime();
 				
@@ -121,23 +122,25 @@ class TimingTest {
 			
 			mapCloneS /= numberOfRuns;
 			
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("MapCloning: %9dns/%6dµs/%3dms", mapCloneS, mapCloneS/1000, mapCloneS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("MapCloning: %9dns/%6dus/%3dms", mapCloneS, mapCloneS/1000, mapCloneS/1000000));
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "");
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Elapsed total: %9dns/%6dµs/%3dms", totalTimeSum, totalTimeSum/1000, totalTimeSum/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Elapsed total: %9dns/%6dus/%3dms", totalTimeSum, totalTimeSum/1000, totalTimeSum/1000000));
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Nodes visited: " + (noInnerSum + noLeavesSum));
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "InnerNodes visited: " + noInnerSum);
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Leaves visited: " + noLeavesSum);
 			
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf Sum : %9dns/%6dµs/%3dms", leaveSumS, leaveSumS/1000, leaveSumS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf min : %9dns/%6dµs/%3dms", leaveMinS, leaveMinS/1000, leaveMinS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf max : %9dns/%6dµs/%3dms", leaveMaxS, leaveMaxS/1000, leaveMaxS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf avg : %9dns/%6dµs/%3dms", leaveAvgS, leaveAvgS/1000, leaveAvgS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf Sum : %9dns/%6dus/%3dms", leaveSumS, leaveSumS/1000, leaveSumS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf min : %9dns/%6dus/%3dms", leaveMinS, leaveMinS/1000, leaveMinS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf max : %9dns/%6dus/%3dms", leaveMaxS, leaveMaxS/1000, leaveMaxS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Leaf avg : %9dns/%6dus/%3dms", leaveAvgS, leaveAvgS/1000, leaveAvgS/1000000));
 			
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner Sum: %9dns/%6dµs/%3dms", innerSumS, innerSumS/1000, innerSumS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner min: %9dns/%6dµs/%3dms", innerMinS, innerMinS/1000, innerMinS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner max: %9dns/%6dµs/%3dms", innerMaxS, innerMaxS/1000, innerMaxS/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner avg: %9dns/%6dµs/%3dms", innerAvgS, innerAvgS/1000, innerAvgS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner Sum: %9dns/%6dus/%3dms", innerSumS, innerSumS/1000, innerSumS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner min: %9dns/%6dus/%3dms", innerMinS, innerMinS/1000, innerMinS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner max: %9dns/%6dus/%3dms", innerMaxS, innerMaxS/1000, innerMaxS/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner avg: %9dns/%6dus/%3dms", innerAvgS, innerAvgS/1000, innerAvgS/1000000));
 			
+			System.out.println("Mapwhile executed times: " + Map.times);
+
 			assertTrue(true);
 		}
 	}
@@ -145,7 +148,7 @@ class TimingTest {
 	@Test
 	void EvaluateTimingTest()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)
@@ -196,7 +199,7 @@ class TimingTest {
 			System.out.println("Evaluation: " + eval);
 			evaTime /= numberOfRuns;
 			
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("EvaTime: %9dns/%6d�s/%3dms", evaTime, evaTime/1000, evaTime/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("EvaTime: %9dns/%6dus/%3dms", evaTime, evaTime/1000, evaTime/1000000));
 		}
 	}
 	
@@ -259,11 +262,15 @@ class TimingTest {
 				assertTrue(valids[0], "Valid Move not valid!");
 			}
 			
+			Map.times = 0;
+			boolean[] valids = m.isMoveValidAllPlayers(5, 9);
+			System.out.println("Mapwhile execeuted times: " + Map.times);
+						
 			validTimeAll /= numberOfRuns;
 			validTimeSingle /= numberOfRuns;
 			
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime All   : %9dns/%6d�s/%3dms", validTimeAll, validTimeAll/1000, validTimeAll/1000000));
-			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime Single: %9dns/%6d�s/%3dms", validTimeSingle, validTimeSingle/1000, validTimeSingle/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime All   : %9dns/%6dus/%3dms", validTimeAll, validTimeAll/1000, validTimeAll/1000000));
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime Single: %9dns/%6dus/%3dms", validTimeSingle, validTimeSingle/1000, validTimeSingle/1000000));
 		}
 	}
 

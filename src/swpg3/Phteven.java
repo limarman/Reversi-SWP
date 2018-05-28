@@ -329,7 +329,7 @@ public class Phteven{
 		CliOption log_ext_perf =
 				new CliOption(' ', "log-ext-perf", false, CliOptionType.FLAG, "", "Enables extended permance logging. Incredible Wall of Text! implies --log-performance");
 		CliOption ab_pruning = 
-				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "", "Activates Alpha-Beta-Pruning");
+				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "true", "Activates Alpha-Beta-Pruning");
 		
 		
 		parser.addOption(serverOpt);

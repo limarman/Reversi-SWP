@@ -17,7 +17,6 @@ public class MapWalker {
 	private Vector2i	position;
 	private Vector2i	direction;
 	private boolean		movementStopped;
-
 	/**
 	 * @param map
 	 */
