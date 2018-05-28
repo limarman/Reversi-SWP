@@ -15,7 +15,7 @@ public final class VersionMaster {
 
 	private static String	assignment	= "3";
 	private static String	major		= "2";
-	private static String	minor		= "2";
+	private static String	minor		= "3";
 	private static String	sub			= "1";
 
 	/*
@@ -23,6 +23,7 @@ public final class VersionMaster {
 	 * + new feature
 	 * * changed feature
 	 * - removed
+	 * 3.2.3-1 *Alpha-Beta is now disabled by cmd-switch
 	 * 
 	 * 3.2.2-1:	+Added Performance Logging
 	 * 			+Added isMoveValidAllPlayers method

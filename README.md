@@ -27,8 +27,10 @@ This is a list of all commandline arguments:
 | `-p`      | `--port`     | INT    | yes          |               | The serverport you want to connect to     |
 | `-h`      | `--help`     | FLAG   | no           |               | Prints a hopefully helping text |
 | `-l`      | `--loglevel` | INT    | no           | 3             | The maximum LogLevel that should be printed. 0:NONE 1:ERROR 2:WARNING 3:INFO 4:DETAIL 5:DEBUG |
+| `-o`      | `--log-file` | STRING | no          | sysout         | Specify an output FIle for Logging. Default is sysout. |
 |            | `--log-performance`|FLAG|no        |                | Enables performance Logging. Logging the performance can have an Impact on the performance and will generate more output.|
-|            | `--ab-pruning`|FLAG   |no           |               | Enables Alpha-Beta-Pruning               |
+|            | `--log-ext-perf`| FLAG| no          |               | Enables extended performance Logging, which offers more information.|
+|            | `--ab-pruning`|FLAG   |no           |               | Disables Alpha-Beta-Pruning               |
     
 Arguments with either a STRING or INT option require an additional option after them.
 

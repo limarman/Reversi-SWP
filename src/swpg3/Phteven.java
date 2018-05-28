@@ -329,7 +329,7 @@ public class Phteven{
 		CliOption log_ext_perf =
 				new CliOption(' ', "log-ext-perf", false, CliOptionType.FLAG, "", "Enables extended permance logging. Incredible Wall of Text! implies --log-performance");
 		CliOption ab_pruning = 
-				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "true", "Activates Alpha-Beta-Pruning");
+				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "true", "Disables Alpha-Beta-Pruning");
 		
 		
 		parser.addOption(serverOpt);
@@ -364,10 +364,15 @@ public class Phteven{
 		
 		Logger.log(LogLevel.DEBUG, "Logger initialized in DEBUG Mode. Prepare for a Wall of Text :P");
 		
-		
+		String params = "";
+		for(String arg : args)
+		{
+			params += arg + " ";
+		}
+		Logger.log(LogLevel.DEBUG, "CMD-Args: " + params);
 		
 		// Global Settings:
-		GlobalSettings.ab_pruning = ab_pruning.isSet();
+		GlobalSettings.ab_pruning = !ab_pruning.isSet();
 		GlobalSettings.log_performance = log_perfomance.isSet();
 		if(log_ext_perf.isSet())
 		{
