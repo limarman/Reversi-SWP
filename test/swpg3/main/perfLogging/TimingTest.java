@@ -148,7 +148,7 @@ class TimingTest {
 	@Test
 	void EvaluateTimingTest()
 	{
-		boolean doTest = false;
+		boolean doTest = true;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)
@@ -170,8 +170,7 @@ class TimingTest {
 					+ "0 0 1 2 2 2 0 0 0 0\n"
 					+ "0 0 0 c 2 2 0 0 0 0\n"
 					+ "0 x 0 0 0 2 0 0 0 0\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 1 <-> 0 9 6";
+					+ "0 0 0 0 0 0 0 0 0 0\n";
 			
 			MapManager mm = MapManager.getInstance();
 			AI ai = AI.getInstance();
