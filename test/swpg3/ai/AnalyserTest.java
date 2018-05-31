@@ -1,10 +1,10 @@
 package swpg3.ai;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 
 class AnalyserTest {
@@ -41,11 +41,11 @@ class AnalyserTest {
 		anna.analyseMap();
 				
 		assertEquals(AI.PLAYABLE_SQUARES, 264, "Playable Squares not correctly determined.");
-		assertTrue(AI.solidSquares.contains(new Vector2i(3,0)), "Missing solid tile at (3,0)");
-		assertTrue(AI.solidSquares.contains(new Vector2i(4,0)), "Missing solid tile at (4,0)");
-		assertTrue(AI.solidSquares.contains(new Vector2i(0,3)), "Missing solid tile at (0,3)");
+		assertTrue(AI.solidSquares.get(3,0), "Missing solid tile at (3,0)");
+		assertTrue(AI.solidSquares.get(4,0), "Missing solid tile at (4,0)");
+		assertTrue(AI.solidSquares.get(0,3), "Missing solid tile at (0,3)");
 
-		assertEquals(AI.solidSquares.size(), 14, "Solid Squares not correctly determined.");
+		assertEquals(14, AI.numberOfSolidSquares,"Solid Squares not correctly determined.");
 	}
 
 }

@@ -1,7 +1,6 @@
 package swpg3.ai;
 
-import java.util.HashSet;
-
+import swpg3.game.BitMap;
 import swpg3.game.Vector2i;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
@@ -29,8 +28,9 @@ public class Analyser {
 	//##################################################
 	public void analyseMap()
 	{
-		AI.solidSquares = new HashSet<>();
+		AI.solidSquares = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
 		int playableSquares = 0;
+		int numberOfSolidSquares = 0;
 		Map map = MapManager.getInstance().getCurrentMap();
 		for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
 		{
@@ -61,12 +61,14 @@ public class Analyser {
 					//all directions are blocked -> solidSquare
 					if(directionsBlocked[0] && directionsBlocked[1] && directionsBlocked[2] && directionsBlocked[3])
 					{
-						AI.solidSquares.add(pos.clone());
+						AI.solidSquares.set(pos.x, pos.y, true);
+						numberOfSolidSquares++;
 					}
 				}
 			}
 		}
 			
 		AI.PLAYABLE_SQUARES = playableSquares;
+		AI.numberOfSolidSquares = numberOfSolidSquares;
 	}
 }

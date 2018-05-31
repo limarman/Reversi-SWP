@@ -8,6 +8,7 @@ import swpg3.ai.calculator.PruningParanoidCalculator;
 import swpg3.ai.calculator.movesorter.NaturalSorter;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
+import swpg3.game.BitMap;
 import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
@@ -76,7 +77,8 @@ public class AI {
 	// Static map-properties
 	//##################################################
 	public static int PLAYABLE_SQUARES;
-	public static HashSet<Vector2i> solidSquares;
+	public static BitMap solidSquares;
+	public static int numberOfSolidSquares;
 	
 	//currently unused -> should weakSquares become normal squares when the solid square is taken?
 	@SuppressWarnings("unused")
@@ -165,7 +167,7 @@ public class AI {
 		return PLAYABLE_SQUARES;
 	}
 	
-	public HashSet<Vector2i> getSolidSquares()
+	public BitMap getSolidSquares()
 	{
 		return solidSquares;
 	}

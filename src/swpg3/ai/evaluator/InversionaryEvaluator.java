@@ -1,10 +1,10 @@
 package swpg3.ai.evaluator;
 
 import swpg3.ai.AI;
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
+import swpg3.game.IntegerWrapper;
 import swpg3.game.Player;
-import swpg3.game.Vector2i;
-import swpg3.game.VectorSetWrapper;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
@@ -74,9 +74,9 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				inversable_evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]);
 				inversable_evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
-				if(AI.solidSquares.size() != 0) 
+				if(AI.numberOfSolidSquares != 0) 
 				{
-					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.solidSquares.size()), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
@@ -178,7 +178,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					//increment stonecount
 					attributesPerPlayer[playerNumber-1][STONE_COUNT]++;
 					
-					if(AI.solidSquares.contains(new Vector2i(w,h))) 
+					if(AI.solidSquares.get(w,h)) 
 					{
 						//increment solid stone count
 						attributesPerPlayer[playerNumber-1][SOLID_STONES]++;
@@ -242,23 +242,34 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		}
 		
 		//analysis of the mobility
-		VectorSetWrapper[] coordinates = new VectorSetWrapper[MapManager.getInstance().getNumberOfPlayers()];
-		for(int i = 0; i<coordinates.length; i++) 
-		{
-			coordinates[i] = new VectorSetWrapper();
-		}
-		fillFreeMovesHorizontallyEastSide(map, coordinates);
-		fillFreeMovesHorizontallyWestSide(map, coordinates);
-		fillFreeMovesVerticallyNorthSide(map, coordinates);
-		fillFreeMovesVerticallySouthSide(map, coordinates);
-		fillFreeMovesDiagonallyNorthEastSide(map, coordinates);
-		fillFreeMovesDiagonallySouthWestSide(map, coordinates);
-		fillFreeMovesSemiDiagonallyNorthWestSide(map, coordinates);
-		fillFreeMovesSemiDiagonallySouthEastSide(map, coordinates);
 		
-		for(int i = 0; i<coordinates.length; i++) 
+		//creating the counter for free possibleMoves
+		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
+		for(int i = 0; i<noPossibleMoves.length; i++) 
 		{
-			attributesPerPlayer[i][FREE_POS_MOVES] = coordinates[i].getSize();
+			noPossibleMoves[i] = new IntegerWrapper();
+		}
+		
+		//creating the bitmaps of the map
+		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
+		
+		for(int i = 0; i<bitmaps.length; i++) 
+		{
+			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
+		}
+		
+		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
+				
+		for(int i = 0; i<noPossibleMoves.length; i++) 
+		{
+			attributesPerPlayer[i][FREE_POS_MOVES] = noPossibleMoves[i].getValue();
 		}
 		
 		//finding out how many turns till own turn
@@ -329,15 +340,19 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		
 		return playerIndex-1; //conversion back to index
 	}
-	
+		
 	/**
 	 * Iterates horizontally in direction east over the map and finds the free valid moves. Dismisses the Transitions.
 	 * @param map
-	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 * @param noPossibleMoves - array of coordinatesSet, to fill the possible Moves in
+	 * @param bitmaps - one bitmap for every player, indicating whether a move has already been added
 	 */
-	private void fillFreeMovesHorizontallyEastSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesHorizontallyEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int numberOfPlayers = coordinates.length; 
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -362,12 +377,14 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					//skipping if there is no x-ray
 					if(!isXRayEmpty) 
 					{
-						//adding a move for every player (except of lastPlayerIndex)
+						//adding a move for every player, if not already added (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,h));
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
+								
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -412,9 +429,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesHorizontallyWestSide(Map map, VectorSetWrapper[] coordinates)
+	private void fillFreeMovesHorizontallyWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps)
 	{
-		int numberOfPlayers = coordinates.length; 
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -442,9 +462,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,h));
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -490,9 +511,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesVerticallyNorthSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesVerticallyNorthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int numberOfPlayers = coordinates.length; 
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -520,9 +544,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,h));
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -567,9 +592,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesVerticallySouthSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesVerticallySouthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int numberOfPlayers = coordinates.length; 
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -597,9 +625,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,h));
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -644,12 +673,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesDiagonallyNorthEastSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesDiagonallyNorthEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
 		int width = MapManager.getInstance().getWidth();
 		int height = MapManager.getInstance().getHeight();
 		
-		int numberOfPlayers = coordinates.length; 
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -678,9 +707,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,invh));
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -748,9 +778,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(invw,h));
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -801,12 +832,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesDiagonallySouthWestSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesDiagonallySouthWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
 		int width = MapManager.getInstance().getWidth();
 		int height = MapManager.getInstance().getHeight();
 		
-		int numberOfPlayers = coordinates.length; 
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -835,9 +866,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(invw,h));
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -904,9 +936,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,invh));
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -959,12 +992,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesSemiDiagonallySouthEastSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesSemiDiagonallySouthEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
 		int width = MapManager.getInstance().getWidth();
 		int height = MapManager.getInstance().getHeight();
 		
-		int numberOfPlayers = coordinates.length; 
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -993,9 +1026,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,invh));
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -1065,9 +1099,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(invw,h));
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -1117,12 +1152,12 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	 * @param map
 	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
 	 */
-	private void fillFreeMovesSemiDiagonallyNorthWestSide(Map map, VectorSetWrapper[] coordinates) 
+	private void fillFreeMovesSemiDiagonallyNorthWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
 		int width = MapManager.getInstance().getWidth();
 		int height = MapManager.getInstance().getHeight();
 		
-		int numberOfPlayers = coordinates.length; 
+		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
 		boolean isXRayEmpty = true;
 		int lastPlayerIndex = -1;
@@ -1151,9 +1186,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(invw,h));
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}
@@ -1220,9 +1256,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						//adding a move for every player (except of lastPlayerIndex)
 						for(int i = 0; i<numberOfPlayers; i++) 
 						{
-							if(hasXRay[i] && i!=lastPlayerIndex) 
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
 							{
-								coordinates[i].add(new Vector2i(w,invh));
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
 							}
 							hasXRay[i] = false; //bringing back to false
 						}

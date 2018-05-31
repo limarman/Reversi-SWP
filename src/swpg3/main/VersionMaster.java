@@ -13,9 +13,9 @@ public final class VersionMaster {
 		return assignment + "." + major + "." + minor + "-" + sub;
 	}
 
-	private static String	assignment	= "3";
+	private static String	assignment	= "4";
 	private static String	major		= "2";
-	private static String	minor		= "3";
+	private static String	minor		= "1";
 	private static String	sub			= "1";
 
 	/*
@@ -23,7 +23,13 @@ public final class VersionMaster {
 	 * + new feature
 	 * * changed feature
 	 * - removed
-	 * 3.2.3-1 *Alpha-Beta is now disabled by cmd-switch
+	 * 
+	 * 4.2.1.1: Optimization update
+	 * 			*changed/optimized search for mobility
+	 * 			*changed data structure for solid squares
+	 * 			*optimized applyMove in bombing phase
+	 * 
+	 * 3.2.3-1: *Alpha-Beta is now disabled by cmd-switch
 	 * 
 	 * 3.2.2-1:	+Added Performance Logging
 	 * 			+Added isMoveValidAllPlayers method
