@@ -1,6 +1,5 @@
 package swpg3.game.map;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,10 +27,7 @@ public class Map {
 
 	private Tile[]		grid;
 	private Player[]	playerInfo;
-	private byte		nextPlayerTurn;
-
-	public static int times = 0;
-	
+	private byte		nextPlayerTurn;	
 	/**
 	 * Creates a Map from fieldArray and playerInfo
 	 * 
@@ -269,7 +265,6 @@ public class Map {
 		boolean movingWalkerLeft = true;
 		while (movingWalkerLeft)
 		{
-			times++;
 			movingWalkerLeft = false;
 			// perform steps
 			for (int i = 0; i < 8; i++)
@@ -782,79 +777,6 @@ public class Map {
 		return playerInfo[playernumber - 1];
 	}
 
-	// /**
-	// *
-	// * @param position
-	// * where to flip the stone
-	// * @param playerNumber
-	// * which 'color' the stone will be flipped to
-	// */
-	// private void flipStone(Vector2i position, byte playerNumber)
-	// {
-	// if (t.isOccupiedbyPlayer())
-	// {
-	// playerInfo[t.getStatus().value - 1].removeStone(position); // removing the
-	// oppenent's stone
-	// }
-	// playerInfo[playerNumber - 1].addStone(position); // adding the players stone
-	// getTileAt(position).setStatus(Player.mapPlayerNumberToTileStatus(playerNumber));
-	// // actualizing the map
-	// }
-
-	// /**
-	// * Switches the stone coordinates between the Players with playerNumber1 and
-	// * playernumber2 updates the map accordingly
-	// *
-	// * @param playerNumber1
-	// * @param playerNumber2
-	// */
-	// private void switchStones(byte playerNumber1, byte playerNumber2)
-	// {
-	// Tile t;
-	//
-	// //looking from every playerstone and searching the possible moves
-	// for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
-	// {
-	// for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
-	// {
-	// t = getTileAt(w,h);
-	// if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber1))
-	// {
-	// t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber2));
-	// }
-	// else if(t.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber2))
-	// {
-	// t.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
-	// }
-	// }
-	//
-	// }
-	// }
-
-	// /**
-	// * Inverses all playerstones.
-	// * Playernumber i owns the stones of (i mod #players + 1)
-	// */
-	// private void inverseStones()
-	// {
-	// Tile t;
-	//
-	// //looking from every playerstone and searching the possible moves
-	// for(int h = 0; h<MapManager.getInstance().getHeight(); h++)
-	// {
-	// for(int w = 0; w < MapManager.getInstance().getWidth(); w++)
-	// {
-	// t = getTileAt(w,h);
-	// if(t.isOccupiedbyPlayer())
-	// {
-	// t.setStatus(Player.mapPlayerNumberToTileStatus(t.getStatus().value %
-	// MapManager.getInstance().getNumberOfPlayers() + 1));
-	// }
-	// }
-	//
-	// }
-	// }
-
 	/**
 	 * method bombing the field with given radius and center of bomb
 	 * 
@@ -865,10 +787,20 @@ public class Map {
 	 */
 	private void bombField(int radius, Vector2i position)
 	{
-		HashMap<Vector2i, Integer> positionsToBomb = new HashMap<>();
-		checkFieldsToBomb(radius, position.clone(), positionsToBomb);
+		int[][] integerMap = new int[MapManager.getInstance().getWidth()]
+				[MapManager.getInstance().getHeight()];
+		
+		for(int w = 0; w<MapManager.getInstance().getWidth(); w++) 
+		{
+			for(int h = 0; h<MapManager.getInstance().getHeight(); h++) 
+			{
+				integerMap[w][h] = -1; //mark not visited
+			}
+		}
+		List<Vector2i> positionsToBomb = new LinkedList<>();
+		checkFieldsToBomb(radius, position.clone(), positionsToBomb, integerMap);
 
-		for (Vector2i positionToBomb : positionsToBomb.keySet())
+		for (Vector2i positionToBomb : positionsToBomb)
 		{
 			getTileAt(positionToBomb).setStatus(TileStatus.HOLE); // bombing the positionField
 		}
@@ -881,23 +813,23 @@ public class Map {
 	 * @param radius
 	 * @param position
 	 * @param fieldsToBomb
-	 *            - HashMap which is going to be filled with positions
+	 *            - List which is going to be filled with positions
 	 */
-	private void checkFieldsToBomb(int radius, Vector2i position, HashMap<Vector2i, Integer> positionsToBomb)
+	private void checkFieldsToBomb(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap)
 	{
 		if (radius < 0)
 			return; // no bombing
 
-		if (!positionsToBomb.containsKey(position))
+		if (integerMap[position.x][position.y] == -1)
 		{
-			positionsToBomb.put(position.clone(), radius); // adding to the HashMap
-		} else if (positionsToBomb.get(position) >= radius) // Tile has already been visited with bigger radius
+			positionsToBomb.add(position.clone()); // adding to the List
+			integerMap[position.x][position.y] = radius;
+		} else if (integerMap[position.x][position.y] >= radius) // Tile has already been visited with bigger radius
 		{
 			return; // No need for further recursion as all reachable tiles were already reached
 		} else // Tile has already been visited, but with smaller radius
 		{
-			positionsToBomb.remove(position);
-			positionsToBomb.put(position, radius); // actualize the radius the tile was visited for coming visitors
+			integerMap[position.x][position.y] = radius; // actualize the radius the tile was visited for coming visitors
 		}
 
 		if (radius == 0) // only current position has to be bombed
@@ -912,235 +844,12 @@ public class Map {
 			if (mw.canStep())
 			{ // adjacent Field is not a hole
 				mw.step();
-				checkFieldsToBomb(radius - 1, mw.getPosition().clone(), positionsToBomb);
+				checkFieldsToBomb(radius - 1, mw.getPosition().clone(), positionsToBomb, integerMap);
 				mw.setPosition(position.clone());
 			}
 		}
 	}
-
-	// /**
-	// * Creates a Map from String formatted as described in courseRules.pdf
-	// *
-	// * @param inputString
-	// * the String to be converted into a map
-	// */
-	// public Map(String inputString)
-	// {
-	// startingFields = new HashSet<>();
-	// positionOfExpansionStones = new HashSet<>();
-	//
-	// Scanner scan = new Scanner(inputString);
-	// this.transitionCount = 0;
-	// try
-	// {
-	// this.numberOfPlayers = scan.nextInt();
-	// this.numberOfOverrides = scan.nextInt();
-	// this.numberOfBombs = scan.nextInt();
-	// this.bombStrength = scan.nextInt();
-	// this.height = scan.nextInt() + 2;
-	// this.width = scan.nextInt() + 2; // 2 extra lines and rows to surround the
-	// map with holes
-	// scan.nextLine();
-	// } catch (Exception e)
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Metadata Error");
-	// }
-	// this.grid = new Tile[width * height];
-	//
-	// // read in grid
-	// for (int y = 0; y < height; y++)
-	// {
-	// String row = null;
-	// if (!(y == 0 || y == height - 1)) // Skip new Borders as there is no row for
-	// them in the String
-	// {
-	// // Read a Line of the real map
-	// try
-	// {
-	// row = scan.nextLine();
-	// } catch (Exception e)
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Mapdata Row Error (" + y + ")");
-	// }
-	// }
-	// int rowInd = 0;
-	// for (int x = 0; x < width; x++)
-	// {
-	// if (x == 0 || x == width - 1 || y == 0 || y == height - 1) // It's part of
-	// the border?
-	// {
-	// grid[x + y * height] = new Tile(TileStatus.HOLE); // Fill with holes
-	// } else
-	// {
-	// char curTile;
-	// // Read in the current type of field
-	// try
-	// {
-	// curTile = row.charAt(rowInd);
-	// rowInd++;
-	// // but skip blanks between the fields
-	// while (curTile == ' ')
-	// {
-	// curTile = row.charAt(rowInd);
-	// rowInd++;
-	// }
-	// } catch (Exception e)
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Mapdata Col Error: (" + y + "," + x + ")"
-	// + row);
-	// }
-	//
-	// // map the char from String to a Status
-	// TileStatus newStatus = TileStatus.mapCharToTileStatus(curTile);
-	// if (newStatus == TileStatus.INVALID)
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Invalid Tiletype Error (" + y + "," + x +
-	// ")");
-	// } else if (newStatus.value >= 1 && newStatus.value <= 8) // occupied by
-	// player
-	// {
-	// startingFields.add(new Vector2i(x - 1, y - 1));
-	// } else if(newStatus == TileStatus.EXPANSION)
-	// {
-	// positionOfExpansionStones.add(new Vector2i(x - 1 ,y - 1));
-	// }
-	// // and add it to the grid
-	// grid[x + y * height] = new Tile(newStatus);
-	// }
-	// }
-	// }
-	// // read in Transitions
-	// while (scan.hasNextLine() && scan.hasNextInt())
-	// {
-	// // System.out.println(scan.toString()); // DEBUG
-	// int point1X;
-	// int point1Y;
-	// int point1D;
-	// int point2X;
-	// int point2Y;
-	// int point2D;
-	// try
-	// {
-	// // Read the information
-	// point1X = scan.nextInt();
-	// point1Y = scan.nextInt();
-	// point1D = scan.nextInt();
-	// scan.next(); // Skip "<->"
-	// point2X = scan.nextInt();
-	// point2Y = scan.nextInt();
-	// point2D = scan.nextInt();
-	// } catch (Exception e)
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Transition Error Trans:" +
-	// transitionCount);
-	// }
-	//
-	// Vector2i p1 = new Vector2i(point1X, point1Y); // Don't need to compensate
-	// Border as tiles are referenced
-	// Vector2i p2 = new Vector2i(point2X, point2Y); // by getTile method
-	// Vector2i p1OutDir = Vector2i.mapDirToVector(point1D);
-	// Vector2i p2OutDir = Vector2i.mapDirToVector(point2D);
-	// Vector2i p1InDir = Vector2i.scaled(p1OutDir, -1); // Inverse Direction: You
-	// go out going right but come in
-	// Vector2i p2InDir = Vector2i.scaled(p2OutDir, -1); // going left
-	//
-	// // Check for Validity of Transitions:
-	// if(getTileAt(p1).isHole())
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Transition Error: Transition attached to
-	// Hole " + p1);
-	// }
-	// if(getTileAt(p2).isHole())
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Transition Error: Transition attached to
-	// Hole " + p2);
-	// }
-	//
-	// if (!getTileAt(Vector2i.sum(p1, p1OutDir)).isHole() ||
-	// !getTileAt(Vector2i.sum(p2, p2OutDir)).isHole())
-	// {
-	// scan.close();
-	// throw new IllegalArgumentException("Transition Error: Tile not Connected to
-	// Hole");
-	// }
-	// getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
-	// getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
-	// transitionCount++;
-	// }
-	// scan.close();
-	// }
-
-	// /**
-	// * @return the numberOfPlayers
-	// */
-	// public int getNumberOfPlayers()
-	// {
-	// return numberOfPlayers;
-	// }
-	//
-	// /**
-	// * @return the numberOfOverrides
-	// */
-	// public int getNumberOfOverrides()
-	// {
-	// return numberOfOverrides;
-	// }
-	//
-	// /**
-	// * @return the numberOfBombs
-	// */
-	// public int getNumberOfBombs()
-	// {
-	// return numberOfBombs;
-	// }
-	//
-	// /**
-	// * @return the bombStrength
-	// */
-	// public int getBombStrength()
-	// {
-	// return bombStrength;
-	// }
-	//
-	// /**
-	// * @return the height
-	// */
-	// public int getHeight()
-	// {
-	// return height - 2;
-	// }
-	//
-	// /**
-	// * @return the width
-	// */
-	// public int getWidth()
-	// {
-	// return width - 2;
-	// }
-	//
-	// /**
-	// * @return the starting fields
-	// */
-	// public HashSet<Vector2i> getStartingFields()
-	// {
-	// return startingFields;
-	// }
-	//
-	// /**
-	// * @return the transitionCount
-	// */
-	// public int getTransitionCount()
-	// {
-	// return transitionCount;
-	// }
-
+	
 	/**
 	 * Get a reference to a Tile
 	 * 

@@ -1,14 +1,14 @@
 package swpg3.ai.evaluator;
 
 import swpg3.ai.AI;
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
+import swpg3.game.IntegerWrapper;
 import swpg3.game.Player;
-import swpg3.game.Vector2i;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
-import swpg3.game.move.Move;
 
 /**
  * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
@@ -74,9 +74,9 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				inversable_evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]);
 				inversable_evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
-				if(AI.solidSquares.size() != 0) 
+				if(AI.numberOfSolidSquares != 0) 
 				{
-					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.solidSquares.size()), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
@@ -178,7 +178,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					//increment stonecount
 					attributesPerPlayer[playerNumber-1][STONE_COUNT]++;
 					
-					if(AI.solidSquares.contains(new Vector2i(w,h))) 
+					if(AI.solidSquares.get(w,h)) 
 					{
 						//increment solid stone count
 						attributesPerPlayer[playerNumber-1][SOLID_STONES]++;
@@ -220,16 +220,16 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 //						}
 //					}
 					
-					//count free valid moves
-					boolean valids[] = map.isMoveValidAllPlayers(w, h);
-					
-					for(int i = 0; i<valids.length; i++) 
-					{
-						if(valids[i]) 
-						{
-							attributesPerPlayer[i][FREE_POS_MOVES]++;
-						}
-					}
+//					//count free valid moves
+//					boolean valids[] = map.isMoveValidAllPlayers(w, h);
+//					
+//					for(int i = 0; i<valids.length; i++) 
+//					{
+//						if(valids[i]) 
+//						{
+//							attributesPerPlayer[i][FREE_POS_MOVES]++;
+//						}
+//					}
 					
 				}//otherwise it was a hole/expansion-stone
 				
@@ -239,6 +239,37 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				}
 
 			}
+		}
+		
+		//analysis of the mobility
+		
+		//creating the counter for free possibleMoves
+		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
+		for(int i = 0; i<noPossibleMoves.length; i++) 
+		{
+			noPossibleMoves[i] = new IntegerWrapper();
+		}
+		
+		//creating the bitmaps of the map
+		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
+		
+		for(int i = 0; i<bitmaps.length; i++) 
+		{
+			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
+		}
+		
+		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
+		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
+				
+		for(int i = 0; i<noPossibleMoves.length; i++) 
+		{
+			attributesPerPlayer[i][FREE_POS_MOVES] = noPossibleMoves[i].getValue();
 		}
 		
 		//finding out how many turns till own turn
@@ -308,6 +339,972 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		}
 		
 		return playerIndex-1; //conversion back to index
+	}
+		
+	/**
+	 * Iterates horizontally in direction east over the map and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param noPossibleMoves - array of coordinatesSet, to fill the possible Moves in
+	 * @param bitmaps - one bitmap for every player, indicating whether a move has already been added
+	 */
+	private void fillFreeMovesHorizontallyEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from west to east
+		for(int h = 0; h<MapManager.getInstance().getHeight(); h++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			for(int w = 0; w<MapManager.getInstance().getWidth(); w++) 
+			{
+				Tile t = map.getTileAt(w,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player, if not already added (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
+								
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Iterates horizontally in direction west over the map and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesHorizontallyWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps)
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from east to west
+		for(int h = MapManager.getInstance().getHeight()-1; h>=0; h--) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			for(int w = MapManager.getInstance().getWidth()-1; w>=0; w--) 
+			{
+				Tile t = map.getTileAt(w,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing 
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Iterates vertically in direction north over the map and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesVerticallyNorthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from south to north
+		for(int w = MapManager.getInstance().getWidth()-1; w>=0; w--) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			for(int h = MapManager.getInstance().getHeight()-1; h>=0; h--) 
+			{
+				Tile t = map.getTileAt(w,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Iterates vertically in direction south over the map and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesVerticallySouthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from north to south
+		for(int w = 0; w<MapManager.getInstance().getWidth(); w++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			for(int h = 0; h<MapManager.getInstance().getHeight(); h++) 
+			{
+				Tile t = map.getTileAt(w,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Iterates diagonally over the map in direction north-east and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesDiagonallyNorthEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from south-west to north-east - first half (starting from left top to bottom)
+		for(int h = 0; h<height; h++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int w = 0,invh = h;
+			while(w < width && invh >= 0)
+			{
+				Tile t = map.getTileAt(w,invh);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invh--;
+				w++;
+			}
+
+		}
+		
+		//iterating from south-west to north-east - second half (starting bottom left to right)
+		for(int w = 1; w<width; w++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int h = height-1 ,invw = w;
+			while(invw < width && h >= 0)
+			{
+				Tile t = map.getTileAt(invw,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invw++;
+				h--;
+			}
+		
+		}
+		
+	}
+	
+	/**
+	 * Iterates diagonally over the map in direction south-west and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesDiagonallySouthWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from south-west to north-east - first half (starting top left to right)
+		for(int w = 0; w<width; w++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int h = 0 ,invw = w;
+			while(invw >= 0 && h < height)
+			{
+				Tile t = map.getTileAt(invw,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invw--;
+				h++;
+			}
+		}
+		
+		//iterating from south-west to north-east - second half (starting from right top to bottom)
+		for(int h = 1; h<height; h++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int w = width-1 ,invh = h;
+			while(w >=0 && invh < height)
+			{
+				Tile t = map.getTileAt(w,invh);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invh++;
+				w--;
+			}
+			
+
+		}
+		
+		
+	}
+	
+	/**
+	 * Iterates semi-diagonally over the map in direction south-east and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesSemiDiagonallySouthEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from south-west to north-east - first half (starting from right top to bottom)
+		for(int h = height-1; h>=0; h--) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int w = 0 ,invh = h;
+			while(w < width && invh < height)
+			{
+				Tile t = map.getTileAt(w,invh);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invh++;
+				w++;
+			}
+			
+
+		}
+				
+		
+		//iterating from north-west to south-east - second half (starting top left to right)
+		for(int w = 1; w<width; w++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int h = 0 ,invw = w;
+			while(invw < width && h < height)
+			{
+				Tile t = map.getTileAt(invw,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to south-east
+				invw++;
+				h++;
+			}
+		}
+		
+	}
+	
+	/**
+	 * Iterates semi-diagonally over the map in direction north-west and finds the free valid moves. Dismisses the Transitions.
+	 * @param map
+	 * @param coordinates - array of coordinatesSet, to fill the possible Moves in
+	 */
+	private void fillFreeMovesSemiDiagonallyNorthWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
+	{
+		int width = MapManager.getInstance().getWidth();
+		int height = MapManager.getInstance().getHeight();
+		
+		int numberOfPlayers = noPossibleMoves.length; 
+		boolean[] hasXRay = new boolean[numberOfPlayers];
+		boolean isXRayEmpty = true;
+		int lastPlayerIndex = -1;
+		
+		//iterating from north-west to south-east - first half (starting top left to right)
+		for(int w = 0; w<width; w++) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int h = height-1 ,invw = w;
+			while(invw >= 0 && h >= 0)
+			{
+				Tile t = map.getTileAt(invw,h);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(invw, h) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(invw, h, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to south-east
+				invw--;
+				h--;
+			}
+		}
+		
+		//iterating from south-west to north-east - second half (starting from right top to bottom)
+		for(int h = height-2; h>=0; h--) 
+		{
+			//clearing all x-rays from players
+			for(int i = 0; i<numberOfPlayers; i++) 
+			{
+				hasXRay[i] = false;
+			}
+			
+			lastPlayerIndex = -1;
+			isXRayEmpty = true;
+			
+			int w = width-1 ,invh = h;
+			while(w >= 0 && invh >= 0)
+			{
+				Tile t = map.getTileAt(w,invh);
+				if(t.isEmpty()) 
+				{
+					//skipping if there is no x-ray
+					if(!isXRayEmpty) 
+					{
+						//adding a move for every player (except of lastPlayerIndex)
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							if(!bitmaps[i].get(w, invh) && hasXRay[i] && i!=lastPlayerIndex) 
+							{
+								bitmaps[i].set(w, invh, true);
+								noPossibleMoves[i].incrementValue();
+							}
+							hasXRay[i] = false; //bringing back to false
+						}
+						
+						//erasing - setting to false already happened
+						isXRayEmpty = true;
+						lastPlayerIndex = -1;
+					}
+				}
+				else if(t.isOccupied()) 
+				{
+					lastPlayerIndex = t.getStatus().value-1;
+					if(t.isOccupiedbyPlayer()) 
+					{
+						hasXRay[lastPlayerIndex] = true;
+						isXRayEmpty = false;
+					}
+					else //otherwise it is an expansion stone
+					{
+						lastPlayerIndex = -1;
+					}
+				}
+				else //Tile is a hole
+				{
+					if(!isXRayEmpty) {
+						//clearing all x-rays from players
+						for(int i = 0; i<numberOfPlayers; i++) 
+						{
+							hasXRay[i] = false;
+						}
+						
+						lastPlayerIndex = -1;
+						isXRayEmpty = true;
+					}
+				}
+				
+				//moving diagonally to north-east
+				invh--;
+				w--;
+			}
+			
+
+		}
+				
+		
 	}
 			
 		

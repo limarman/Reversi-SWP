@@ -32,21 +32,27 @@ class TimingTest {
 		}
 		else
 		{
-			String mapString = "2\n"
-					+ "3\n"
-					+ "0 1\n"
-					+ "10 10\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 0 1 1 1 0 0 0 0\n"
-					+ "0 0 1 2 2 2 b 0 0 0\n"
-					+ "0 0 1 2 2 2 0 0 0 0\n"
-					+ "0 0 1 2 2 2 i 0 0 0\n"
-					+ "0 0 1 2 2 2 0 0 0 0\n"
-					+ "0 0 0 c 2 2 0 0 0 0\n"
-					+ "0 x 0 0 0 2 0 0 0 0\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 1 <-> 0 9 6";
+			String mapString = "3\r\n" +
+					"50\r\n" +
+					"2 1\r\n" +
+					"17 20\r\n" +
+					"- - - 0 0 - - 0 0 0 0 - - - - - - - 0 0\r\n" +
+					"- - 0 c 0 0 0 i 0 3 0 0 - - - - - - 2 b\r\n" +
+					"0 0 b 0 0 0 0 0 1 2 1 0 0 - - 0 0 1 c 0\r\n" +
+					"0 0 1 3 x x x 0 - - b 1 3 1 0 0 0 2 3 0\r\n" +
+					"- 2 1 2 3 0 0 0 - - c 2 2 i 0 3 1 0 c 0\r\n" +
+					"- 2 1 2 1 2 3 0 - - 3 1 0 0 0 i 2 1 0 0\r\n" +
+					"- b 1 2 0 x 0 0 - - c 2 1 0 0 - - - 0 0\r\n" +
+					"0 0 0 1 c 1 2 0 0 x 3 2 1 0 0 - - - 0 c\r\n" +
+					"0 0 i 0 3 2 2 0 0 0 0 x x b 0 - - - 0 0\r\n" +
+					"0 0 0 0 0 x x 0 b 0 0 0 0 0 0 - - - 0 0\r\n" +
+					"- - - - 0 0 0 c - - - 0 0 0 0 - - - i 0\r\n" +
+					"- - - - 0 i 0 0 - - - 0 0 0 0 b 0 0 0 0\r\n" +
+					"- - - - 0 0 0 0 - - - i 0 0 0 0 0 0 0 0\r\n" +
+					"- - - - 0 0 0 0 - - - 0 0 x x x 0 0 0 0\r\n" +
+					"0 0 0 b 0 0 0 0 0 0 3 3 2 x x c 0 0 0 0\r\n" +
+					"x x x x 0 0 0 0 c 0 0 2 2 0 0 0 0 x x x\r\n" +
+					"0 0 0 c 0 0 0 0 0 0 1 1 3 2 0 0 0 0 0 0\r\n";
 			
 			MapManager mm = MapManager.getInstance();
 			AI ai = AI.getInstance();
@@ -79,7 +85,6 @@ class TimingTest {
 				log.reset();
 				
 				log.startTotal();
-				Map.times = 0;
 				ai.getBestMove((byte)1, depthLimit, 1000);
 				log.stopTotal();
 				
@@ -139,8 +144,6 @@ class TimingTest {
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner max: %9dns/%6dus/%3dms", innerMaxS, innerMaxS/1000, innerMaxS/1000000));
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("Inner avg: %9dns/%6dus/%3dms", innerAvgS, innerAvgS/1000, innerAvgS/1000000));
 			
-			System.out.println("Mapwhile executed times: " + Map.times);
-
 			assertTrue(true);
 		}
 	}
@@ -148,7 +151,7 @@ class TimingTest {
 	@Test
 	void EvaluateTimingTest()
 	{
-		boolean doTest = false;
+		boolean doTest = true;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)
@@ -157,29 +160,36 @@ class TimingTest {
 		}
 		else
 		{
-			String mapString = "3\n"
-					+ "3\n"
-					+ "0 1\n"
-					+ "10 10\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 0 1 1 1 0 0 0 0\n"
-					+ "0 0 1 2 2 2 b 0 0 0\n"
-					+ "0 0 1 2 2 2 0 0 0 0\n"
-					+ "0 0 1 2 2 2 i 0 0 0\n"
-					+ "0 0 1 2 2 2 0 0 0 0\n"
-					+ "0 0 0 c 2 2 0 0 0 0\n"
-					+ "0 x 0 0 0 2 0 0 0 0\n"
-					+ "0 0 0 0 0 0 0 0 0 0\n"
-					+ "0 0 1 <-> 0 9 6";
+			String mapString = "3\r\n" +
+					"50\r\n" +
+					"2 1\r\n" +
+					"17 20\r\n" +
+					"- - - 0 0 - - 0 0 0 0 - - - - - - - 0 0\r\n" +
+					"- - 0 c 0 0 0 i 0 3 0 0 - - - - - - 2 b\r\n" +
+					"0 0 b 0 0 0 0 0 1 2 1 0 0 - - 0 0 1 c 0\r\n" +
+					"0 0 1 3 x x x 0 - - b 1 3 1 0 0 0 2 3 0\r\n" +
+					"- 2 1 2 3 0 0 0 - - c 2 2 i 0 3 1 0 c 0\r\n" +
+					"- 2 1 2 1 2 3 0 - - 3 1 0 0 0 i 2 1 0 0\r\n" +
+					"- b 1 2 0 x 0 0 - - c 2 1 0 0 - - - 0 0\r\n" +
+					"0 0 0 1 c 1 2 0 0 x 3 2 1 0 0 - - - 0 c\r\n" +
+					"0 0 i 0 3 2 2 0 0 0 2 x x b 0 - - - 0 0\r\n" +
+					"0 0 0 0 0 x x 0 b 1 1 0 2 0 0 - - - 0 0\r\n" +
+					"- - - - 2 3 0 c - - - 0 1 0 0 - - - i 0\r\n" +
+					"- - - - 1 i 2 0 - - - 0 3 1 0 b 1 0 0 0\r\n" +
+					"- - - - 3 2 1 2 - - - i 0 2 1 2 0 1 2 0\r\n" +
+					"- - - - 3 1 1 0 - - - 0 0 x x x 2 1 3 0\r\n" +
+					"0 0 3 b 2 3 3 2 1 0 3 3 2 x x c 0 2 3 0\r\n" +
+					"x 2 x x 2 2 0 2 c 0 0 2 2 0 0 0 0 x x x\r\n" +
+					"0 1 2 c 3 0 1 0 0 0 1 1 3 2 0 0 0 0 0 0\r\n";
 			
 			MapManager mm = MapManager.getInstance();
 			AI ai = AI.getInstance();
 			Logger.init(LogLevel.INFO);
-			
+						
 			mm.initializeMap(mapString);
 			Map m = mm.getCurrentMap();
 			ai.initialize();
+			
 			Evaluator eva = new InversionaryEvaluator();
 			
 			long evaTime = 0;
@@ -262,9 +272,7 @@ class TimingTest {
 				assertTrue(valids[0], "Valid Move not valid!");
 			}
 			
-			Map.times = 0;
 			boolean[] valids = m.isMoveValidAllPlayers(5, 9);
-			System.out.println("Mapwhile execeuted times: " + Map.times);
 						
 			validTimeAll /= numberOfRuns;
 			validTimeSingle /= numberOfRuns;

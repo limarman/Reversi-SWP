@@ -54,9 +54,9 @@ public class RelativeEvaluator implements Evaluator{
 				evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
-				if(AI.solidSquares.size() != 0) 
+				if(AI.numberOfSolidSquares != 0) 
 				{
-					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.solidSquares.size()), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
@@ -214,7 +214,7 @@ public class RelativeEvaluator implements Evaluator{
 					//increment stonecount
 					attributesPerPlayer[playerNumber-1][STONE_COUNT]++;
 					
-					if(AI.solidSquares.contains(new Vector2i(w,h))) 
+					if(AI.solidSquares.get(w,h)) 
 					{
 						//increment solid stone count
 						attributesPerPlayer[playerNumber-1][SOLID_STONES]++;

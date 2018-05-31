@@ -49,7 +49,7 @@ public class EgocentricEvaluator implements Evaluator {
 							//count own stones
 							stoneCount++;
 							
-							if(AI.solidSquares.contains(new Vector2i(w,h)))
+							if(AI.solidSquares.get(w,h))
 							{
 								//count solid Squares
 								solidSquareCount++;
