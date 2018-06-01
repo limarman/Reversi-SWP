@@ -328,9 +328,10 @@ public class Phteven{
 				new CliOption(' ', "log-performance", false, CliOptionType.FLAG, "", "Enables permance logging. Slows down, due to Wall of text");
 		CliOption log_ext_perf =
 				new CliOption(' ', "log-ext-perf", false, CliOptionType.FLAG, "", "Enables extended permance logging. Incredible Wall of Text! implies --log-performance");
-		CliOption ab_pruning = 
-				new CliOption(' ', "ab-pruning", false, CliOptionType.FLAG, "true", "Disables Alpha-Beta-Pruning");
-		
+		CliOption disable_ab = 
+				new CliOption(' ', "disable-ab", false, CliOptionType.FLAG, "false", "Disables Alpha-Beta-Pruning");
+		CliOption dis_sorting = 
+				new CliOption(' ', "disable-sort", false, CliOptionType.FLAG, "false", "Disable move sorting");
 		
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
@@ -338,7 +339,8 @@ public class Phteven{
 		parser.addOption(log_file);
 		parser.addOption(log_perfomance);
 		parser.addOption(log_ext_perf);
-		parser.addOption(ab_pruning);
+		parser.addOption(disable_ab);
+		parser.addOption(dis_sorting);
 		
 		//actual parsing:
 		if(!parser.parse(args))
@@ -372,7 +374,8 @@ public class Phteven{
 		Logger.log(LogLevel.INFO, "CMD-Args: " + params);
 		
 		// Global Settings:
-		GlobalSettings.ab_pruning = !ab_pruning.isSet();
+		GlobalSettings.ab_pruning = !disable_ab.isSet();
+		GlobalSettings.move_sorting = !dis_sorting.isSet();
 		GlobalSettings.log_performance = log_perfomance.isSet();
 		if(log_ext_perf.isSet())
 		{

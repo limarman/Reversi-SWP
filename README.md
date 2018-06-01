@@ -30,7 +30,8 @@ This is a list of all commandline arguments:
 | `-o`      | `--log-file` | STRING | no          | sysout         | Specify an output FIle for Logging. Default is sysout. |
 |            | `--log-performance`|FLAG|no        |                | Enables performance Logging. Logging the performance can have an Impact on the performance and will generate more output.|
 |            | `--log-ext-perf`| FLAG| no          |               | Enables extended performance Logging, which offers more information.|
-|            | `--ab-pruning`|FLAG   |no           |               | Disables Alpha-Beta-Pruning               |
+|            | `--disable-ab`|FLAG   |no           |               | Disables Alpha-Beta-Pruning               |
+|            | `--disable-sort`|FLAg|no            |               | Disables move-sorting                    |
     
 Arguments with either a STRING or INT option require an additional option after them.
 
