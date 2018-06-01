@@ -24,6 +24,8 @@ public final class VersionMaster {
 	 * * changed feature
 	 * - removed
 	 * 
+	 * 4.2.2-2: *Fixed Bug with Transitions
+	 * 
 	 * 4.2.2-1: *Fixed MapReadBug
 	 *          *Fixed Bug in BitMap
 	 * 
