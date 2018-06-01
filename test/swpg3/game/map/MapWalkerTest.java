@@ -431,7 +431,12 @@ class MapWalkerTest {
 				MapWalker mw = new MapWalker(mm.getCurrentMap(), new Vector2i(10,24), Vector2i.mapDirToVector(1));
 				assertTrue(mw.canStep(), "MapWalker cannot step but there is a transition!");
 				mw.step();
-				assertEquals(new Vector2i(10,0), mw.getCurrentTile(), "MapWalker was not moved correctly!");
+				assertEquals(new Vector2i(10,0), mw.getPosition(), "MapWalker was not moved correctly!");
+				
+				mw = new MapWalker(mm.getCurrentMap(), new Vector2i(10,0), Vector2i.mapDirToVector(1));
+				assertTrue(mw.canStep(), "MapWalker cannot step but there is a transition!");
+				mw.step();
+				assertEquals(new Vector2i(10,24), mw.getPosition(), "MapWalker was not moved correctly!");
 	}
 
 }

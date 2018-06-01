@@ -194,7 +194,7 @@ public class MapManager {
 			}
 			
 			currentMap.getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
-			if(!p1.equals(p2) && !p1OutDir.equals(p2OutDir)) // a Transition can go back to starting point: only add one
+			if(!(p1.equals(p2) && p1OutDir.equals(p2OutDir))) // a Transition can go back to starting point: only add one
 			{
 				currentMap.getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
 			}
