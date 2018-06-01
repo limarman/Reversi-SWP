@@ -369,7 +369,7 @@ public class Phteven{
 		{
 			params += arg + " ";
 		}
-		Logger.log(LogLevel.DEBUG, "CMD-Args: " + params);
+		Logger.log(LogLevel.INFO, "CMD-Args: " + params);
 		
 		// Global Settings:
 		GlobalSettings.ab_pruning = !ab_pruning.isSet();
