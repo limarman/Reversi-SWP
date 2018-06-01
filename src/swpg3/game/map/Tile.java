@@ -75,10 +75,21 @@ public class Tile {
 	 */
 	public void addTransition(Transition tran, Vector2i leavingDirection) throws IllegalArgumentException
 	{
-		if (!hasTransitionTo(leavingDirection) && !leavingDirection.isZero())
-			arbitraryTransitions[(leavingDirection.x + 1) + (leavingDirection.y + 1) * 3] = tran;
+		if (!hasTransitionTo(leavingDirection))
+		{
+			if(!leavingDirection.isZero())
+			{
+				arbitraryTransitions[(leavingDirection.x + 1) + (leavingDirection.y + 1) * 3] = tran;
+			}
+			else
+			{
+				throw new IllegalArgumentException("Zero-Dir:" + leavingDirection); // might be overkill
+			}
+		}
 		else
-			throw new IllegalArgumentException(); // might be overkill
+		{
+			throw new IllegalArgumentException("double Transition!" + leavingDirection); // might be overkill
+		}
 	}
 
 	/**

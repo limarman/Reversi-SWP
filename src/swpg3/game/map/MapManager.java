@@ -192,8 +192,13 @@ public class MapManager {
 				scan.close();
 				throw new IllegalArgumentException("Transition Error: Tile not Connected to Hole");
 			}
+			
 			currentMap.getTileAt(p1).addTransition(new Transition(p2, p2InDir), p1OutDir);
-			currentMap.getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
+			if(!p1.equals(p2) && !p1OutDir.equals(p2OutDir)) // a Transition can go back to starting point: only add one
+			{
+				currentMap.getTileAt(p2).addTransition(new Transition(p1, p1InDir), p2OutDir);
+			}
+			
 			transitionCount++;
 		}
 		scan.close();

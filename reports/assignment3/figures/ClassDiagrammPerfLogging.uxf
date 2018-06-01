@@ -4,16 +4,16 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>300</x>
-      <y>90</y>
+      <x>290</x>
+      <y>80</y>
       <w>280</w>
       <h>240</h>
     </coordinates>
     <panel_attributes>PerfLogger &lt;Singleton&gt;
 --
 -totalTime: Stopwatch
--inner
--eaves: List&lt;Stopwach&gt;
+-inner: List &lt;Stopwatch&gt;
+-leaves: List&lt;Stopwatch&gt;
 --
 +startTotal(): void
 +stopTotal(): void
@@ -31,8 +31,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>650</x>
-      <y>130</y>
+      <x>640</x>
+      <y>120</y>
       <w>270</w>
       <h>160</h>
     </coordinates>
@@ -52,8 +52,8 @@
   <element>
     <id>UMLPackage</id>
     <coordinates>
-      <x>280</x>
-      <y>50</y>
+      <x>270</x>
+      <y>40</y>
       <w>660</w>
       <h>300</h>
     </coordinates>
@@ -63,8 +63,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>570</x>
-      <y>190</y>
+      <x>560</x>
+      <y>180</y>
       <w>100</w>
       <h>30</h>
     </coordinates>

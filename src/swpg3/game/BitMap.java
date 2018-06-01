@@ -8,12 +8,12 @@ package swpg3.game;
 public class BitMap {
 
 	private boolean[] map;
-	private int height;
+	private int width;
 	
 	
 	public BitMap(int width, int height) 
 	{
-		this.height = height;
+		this.width = width;
 		map = new boolean[width*height];
 	}
 	
@@ -25,7 +25,7 @@ public class BitMap {
 	 */
 	public boolean get(int x, int y) 
 	{
-		return map[x + y * height];
+		return map[x + y * width];
 	}
 	
 	/**
@@ -36,7 +36,7 @@ public class BitMap {
 	 */
 	public void set(int x, int y, boolean val) 
 	{
-		map[x + y * height] = val;
+		map[x + y * width] = val;
 	}
 	
 }

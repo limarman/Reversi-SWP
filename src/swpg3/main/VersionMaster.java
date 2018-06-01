@@ -15,7 +15,7 @@ public final class VersionMaster {
 
 	private static String	assignment	= "4";
 	private static String	major		= "2";
-	private static String	minor		= "1";
+	private static String	minor		= "2";
 	private static String	sub			= "1";
 
 	/*
@@ -24,7 +24,10 @@ public final class VersionMaster {
 	 * * changed feature
 	 * - removed
 	 * 
-	 * 4.2.1.1: Optimization update
+	 * 4.2.2-1: *Fixed MapReadBug
+	 *          *Fixed Bug in BitMap
+	 * 
+	 * 4.2.1-1: Optimization update
 	 * 			*changed/optimized search for mobility
 	 * 			*changed data structure for solid squares
 	 * 			*optimized applyMove in bombing phase

@@ -6,8 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
@@ -493,6 +498,59 @@ class MapTest {
 		assertEquals(TileStatus.PLAYER_1, map.getTileAt(0, 4).getStatus(), "(0,4)");
 		assertEquals(TileStatus.PLAYER_1, map.getTileAt(1, 2).getStatus(), "(1,2)");
 		assertEquals(TileStatus.PLAYER_1, map.getTileAt(2, 3).getStatus(), "(2,3)");
+	}
+	
+	
+	@Test
+	void mapReadBugTest()
+	{
+		Scanner in = null;
+		try
+		{
+			in = new Scanner(new FileReader("maps/other/014_25_25_8_25_rnd_1.txt"));
+		} catch (FileNotFoundException e)
+		{
+			fail("FileNotFound");
+		}
+		StringBuilder sb = new StringBuilder();
+		while(in.hasNextLine()) {
+		    sb.append(in.nextLine() + "\n");
+		}
+		in.close();
+		String mapString = sb.toString();
+		
+		MapManager mm = MapManager.getInstance();
+		
+		mm.initializeMap(mapString);
+		
+		
+		// Success, because no exception is thrown
+	}
+	
+	@Test
+	void mapReadBugMap2Test()
+	{
+		Scanner in = null;
+		try
+		{
+			in = new Scanner(new FileReader("maps/other/015_25_25_2_25_rnd_1.txt"));
+		} catch (FileNotFoundException e)
+		{
+			fail("FileNotFound");
+		}
+		StringBuilder sb = new StringBuilder();
+		while(in.hasNextLine()) {
+		    sb.append(in.nextLine() + "\n");
+		}
+		in.close();
+		String mapString = sb.toString();
+		
+		MapManager mm = MapManager.getInstance();
+		
+		mm.initializeMap(mapString);
+		
+		
+		// Success, because no exception is thrown
 	}
 
 }
