@@ -125,7 +125,7 @@ public class AI {
 	{
 		Move bestMove = new Move();
 //		double SystimeBefore = System.currentTimeMillis();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, 1, bestMove);
+		double evaluation = calc.calculateBestMove(eva, playerNumber, 2, bestMove);
 //		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 //		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
 		return bestMove;

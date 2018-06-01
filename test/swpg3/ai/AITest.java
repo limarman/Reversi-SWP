@@ -46,5 +46,6 @@ class AITest {
 		
 		assertNotEquals(null, m);
 	}
+
 }
 
