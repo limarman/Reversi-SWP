@@ -9,8 +9,6 @@ import swpg3.game.Player;
 import swpg3.game.Vector2i;
 import swpg3.game.move.Move;
 import swpg3.game.move.MoveType;
-import swpg3.main.logging.LogLevel;
-import swpg3.main.logging.Logger;
 
 /**
  * A class to store Map information
@@ -682,7 +680,7 @@ public class Map {
 						// saving which stones have to be flipped
 						tilesToFlip.add(getTileAt(mw.getPosition()));
 						mw.step();
-						Logger.log(LogLevel.DEBUG, "On Move: " + move + "Coordinates: " + mw.getPosition() + "Direction: " + mw.getDirection());
+						//Logger.log(LogLevel.DEBUG, "On Move: " + move + "Coordinates: " + mw.getPosition() + "Direction: " + mw.getDirection());
 					}
 				}
 			}

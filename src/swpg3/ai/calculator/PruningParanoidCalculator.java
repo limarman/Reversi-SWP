@@ -94,7 +94,7 @@ public class PruningParanoidCalculator implements Calculator{
 		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
+			//Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
