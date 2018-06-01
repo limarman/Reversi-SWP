@@ -435,7 +435,7 @@ public class Map {
 						}
 					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, (byte) playerNumber));
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber));
 					}
 				}
 			}
@@ -587,7 +587,7 @@ public class Map {
 						}
 					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, (byte) playerNumber, MoveType.OVERRIDE_USE));
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveType.OVERRIDE_USE));
 					}
 				}
 			}
@@ -680,6 +680,7 @@ public class Map {
 						// saving which stones have to be flipped
 						tilesToFlip.add(getTileAt(mw.getPosition()));
 						mw.step();
+						//Logger.log(LogLevel.DEBUG, "On Move: " + move + "Coordinates: " + mw.getPosition() + "Direction: " + mw.getDirection());
 					}
 				}
 			}
