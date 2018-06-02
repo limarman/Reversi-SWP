@@ -46,6 +46,7 @@ public class Map {
 
 	/**
 	 * Tests if a given move is valid for current gamestate
+	 * TODO: There is a bug with tiles which have a transition into themselves
 	 * 
 	 * @param move
 	 *            move to test
@@ -512,7 +513,16 @@ public class Map {
 								// adjacent field is empty or already owned or next field is empty
 								continue; // no enclosing of stones possible
 							}
+							
+							Vector2i neighbourPos = mw.getPosition().clone(); //remember the direct neighbour tile
 							mw.step(); // making sure that direct adjacent fields are not valid moves
+							
+							// if the neighbour tile had a transition into itsself - enclosing is not possible
+							if(mw.getPosition().equals(neighbourPos))
+							{
+								continue;
+							}
+							
 							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 
 							// iterate till a hole, an empty field or an own stone is found
