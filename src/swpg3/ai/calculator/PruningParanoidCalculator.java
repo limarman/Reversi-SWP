@@ -2,6 +2,7 @@ package swpg3.ai.calculator;
 
 import java.util.HashSet;
 
+import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.BogoSorter;
 import swpg3.ai.calculator.movesorter.MoveSorter;
 import swpg3.ai.evaluator.Evaluator;
@@ -40,10 +41,10 @@ public class PruningParanoidCalculator implements Calculator{
 		this.sorter = sorter;
 	}
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long timeLimit, Move bestMove) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
-		return startingMaxPlayer(eval, playerNumber, depth, map, bestMove);
+		return startingMaxPlayer(eval, playerNumber, depth, Clockmaster.getTimeDeadLine(timeLimit), map, bestMove);
 	}
 	
 	/**
@@ -55,7 +56,7 @@ public class PruningParanoidCalculator implements Calculator{
 	 * @param bestMove - reference to write the best move into
 	 * @return
 	 */
-	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, Map map, Move bestMove) 
+	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, Move bestMove) 
 	{	
 		// there is no calculating possible
 		// should not happen
@@ -77,7 +78,8 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map,
+					Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		}
 		
 		//sorting the moves with the provided MoveSorter
@@ -94,11 +96,12 @@ public class PruningParanoidCalculator implements Calculator{
 		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
+			//Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, maxValue, Double.POSITIVE_INFINITY);
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap,
+					maxValue, Double.POSITIVE_INFINITY);
 
 			if(value > maxValue) //updating the evaluation 
 			{
@@ -106,13 +109,18 @@ public class PruningParanoidCalculator implements Calculator{
 				maxValue = value;
 				//no pruning needed - as Positive_Infinity is never reached
 			}
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
 		}
 		
 		return maxValue;
 
 	}
 	
-	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map,
+	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map,
 			double alpha, double beta) 
 	{
 		//reached maximal depth
@@ -126,11 +134,17 @@ public class PruningParanoidCalculator implements Calculator{
 				PerfLogger.getInst().startNode();
 			}
 			
+			if(System.currentTimeMillis() >= calcDeadLine) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
+		
+			
 			return evalErg;
 			
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
 		
 		
 		//Player has no moves or is disqualified
@@ -142,11 +156,11 @@ public class PruningParanoidCalculator implements Calculator{
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
+				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
 			}
 			else //next is min player
 			{
-				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
+				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
 			} 
 		}
 		
@@ -169,11 +183,16 @@ public class PruningParanoidCalculator implements Calculator{
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, alpha, minValue);
+				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, alpha, minValue);
 			}
 			else //next is min player
 			{
-				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, alpha, minValue);
+				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, alpha, minValue);
+			}
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
 			}
 			
 			if(value < minValue) //updating the evaluation 
@@ -189,7 +208,7 @@ public class PruningParanoidCalculator implements Calculator{
 		return minValue;
 	}
 	
-	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map,
+	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map,
 			double alpha, double beta) 
 	{
 		//reached maximal depth
@@ -203,16 +222,21 @@ public class PruningParanoidCalculator implements Calculator{
 				PerfLogger.getInst().startNode();
 			}
 			
+			if(System.currentTimeMillis() >= calcDeadLine) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
+			
 			return evalErg;
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
 		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
 		if(possibleMovesOrderable.isEmpty()) 
 		{
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map, alpha, beta);
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
 		}
 		
 		double maxValue = alpha;
@@ -230,7 +254,12 @@ public class PruningParanoidCalculator implements Calculator{
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap, maxValue, beta);
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, maxValue, beta);
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
 			
 			if(value > maxValue) //updating the evaluation 
 			{

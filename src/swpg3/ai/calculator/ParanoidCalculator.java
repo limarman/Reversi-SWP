@@ -2,6 +2,7 @@ package swpg3.ai.calculator;
 
 import java.util.HashSet;
 
+import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
@@ -19,10 +20,10 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class ParanoidCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long timeLimit, Move bestMove) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
-		return startingMaxPlayer(eval, playerNumber, depth, map, bestMove);
+		return startingMaxPlayer(eval, playerNumber, depth, Clockmaster.getTimeDeadLine(timeLimit), map, bestMove);
 	}
 	
 	/**
@@ -34,7 +35,7 @@ public class ParanoidCalculator implements Calculator{
 	 * @param bestMove - reference to write the best move into
 	 * @return
 	 */
-	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, Map map, Move bestMove) 
+	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, Move bestMove) 
 	{
 		// there is no calculating possible
 		// should not happen
@@ -49,13 +50,13 @@ public class ParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
+		byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
 		//Should not be called - Player should have possible moves
 		if(posMoves.isEmpty()) 
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
-			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map);
 		}
 		
 		if(GlobalSettings.log_performance)
@@ -69,14 +70,18 @@ public class ParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
-			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap);
-
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap);
+			
 			if(value > maxValue) //updating the evaluation 
 			{
 				bestMove.copyFrom(move);
 				maxValue = value;
+			}
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
 			}
 		}
 		
@@ -84,7 +89,7 @@ public class ParanoidCalculator implements Calculator{
 
 	}
 	
-	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map) 
+	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map) 
 	{
 		//reached maximal depth
 		if(depth == 0) 
@@ -97,25 +102,31 @@ public class ParanoidCalculator implements Calculator{
 				PerfLogger.getInst().startNode();
 			}
 			
+			if(System.currentTimeMillis() >= calcDeadLine) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
+			
 			return evalErg;
 			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
-		//Player has no moves or is disqualified
+		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		
+		//Player has no moves or is disqualified
 		if(posMoves.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//player cannot change anything in the evaluation
-			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
+				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map);
 			}
 			else //next is min player
 			{
-				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
+				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map);
 			} 
 		}
 		
@@ -130,17 +141,21 @@ public class ParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
-			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			double value;
 			
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap);
+				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap);
 			}
 			else //next is min player
 			{
-				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap);
+				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap);
+			}
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
 			}
 			
 			if(value < minValue) //updating the evaluation 
@@ -152,7 +167,7 @@ public class ParanoidCalculator implements Calculator{
 		return minValue;
 	}
 	
-	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, Map map) 
+	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map) 
 	{
 		//reached maximal depth
 		if(depth == 0) 
@@ -165,16 +180,21 @@ public class ParanoidCalculator implements Calculator{
 				PerfLogger.getInst().startNode();
 			}
 			
+			if(System.currentTimeMillis() >= calcDeadLine) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
+			
 			return evalErg;
 			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
+		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
 		if(posMoves.isEmpty()) 
 		{
-			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, map);
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map);
 		}
 		
 		if(GlobalSettings.log_performance)
@@ -188,9 +208,13 @@ public class ParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
-			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, nextMap);
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap);
+			
+			if(value == Clockmaster.TIME_OUT) 
+			{
+				return Clockmaster.TIME_OUT;
+			}
 			
 			if(value > maxValue) //updating the evaluation 
 			{

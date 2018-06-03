@@ -10,9 +10,10 @@ public interface Calculator {
 	 * @param eval - used Evaluator
 	 * @param playerNumber - number of player to move
 	 * @param depth - wished depth to calculate
+	 * @param timeLimit - time given for the calculation of the best move
 	 * @param bestMove - reference to fill out with the best move
 	 * @return the evaluation
 	 */
-	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove);
+	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long timeLimit, Move bestMove);
 	
 }

@@ -14,6 +14,8 @@ import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
 import swpg3.main.GlobalSettings;
+import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.Logger;
 
 public class AI {
 	
@@ -40,7 +42,7 @@ public class AI {
 	public static double SC_TP_I;
 	
 	//Mobility parameter
-	public static double MOBILITY_BONUS = 20;
+	public static double MOBILITY_BONUS = 15;
 	
 	public static double M_SV;
 	public static double M_MV;
@@ -66,7 +68,7 @@ public class AI {
 	public static double PP_TV_I = 0.7;
 	public static double PP_EV_I = 0;
 	public static double PP_TP_I;
-	
+		
 	//tools
 	private Analyser anna;
 	private Calculator calc;
@@ -78,7 +80,7 @@ public class AI {
 	public static int PLAYABLE_SQUARES;
 	public static BitMap solidSquares;
 	public static int numberOfSolidSquares;
-	
+		
 	//currently unused -> should weakSquares become normal squares when the solid square is taken?
 	@SuppressWarnings("unused")
 	protected HashSet<Vector2i> weakSquares;
@@ -105,7 +107,6 @@ public class AI {
 		anna = Analyser.getInstance();
 		if(GlobalSettings.ab_pruning) 
 		{
-			
 			calc = new PruningParanoidCalculator((GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter());
 		}
 		else 
@@ -113,6 +114,7 @@ public class AI {
 			calc = new ParanoidCalculator();
 		}
 		eva = new InversionaryEvaluator();
+//		eva = new RelativeEvaluator();
 		anna.analyseMap();
 		setParameters();
 	}
@@ -124,9 +126,8 @@ public class AI {
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
 		Move bestMove = new Move();
-//		double SystimeBefore = System.currentTimeMillis();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, 1, bestMove);
-//		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
+		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit == 0 ? 3 : depthLimit, timeLimit == 0 ? 15*1000 : timeLimit-30, bestMove);
+		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 //		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
 		return bestMove;
 	}
@@ -141,7 +142,7 @@ public class AI {
 			return;
 		}
 		
-		int movesToEnd = 5;
+		int movesToEnd = 3;
 		double turnPoint = (PLAYABLE_SQUARES - (numberOfPlayers * movesToEnd))/((double)PLAYABLE_SQUARES);
 		
 		//setting the turningPoints

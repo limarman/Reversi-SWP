@@ -9,6 +9,8 @@ import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
+import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.Logger;
 
 /**
  * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
@@ -70,6 +72,11 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			//summing up the by inversion changeable evaluations for every player
 			for(int i = 0; i<numberOfPlayers; i++) 
 			{
+//				Logger.log(LogLevel.DETAIL, "Player " + (i+1) + ": ");
+//				Logger.log(LogLevel.DETAIL, "Mobility: " + evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]));
+//				Logger.log(LogLevel.DETAIL, "StoneCount: " + evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
+//						occupiedSquares/((double)AI.PLAYABLE_SQUARES)));
+//				Logger.log(LogLevel.DETAIL, "SolidSquares: " + evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES)));
 				inversable_evaluations[i] = 0;
 				inversable_evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]);
 				inversable_evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
@@ -130,6 +137,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			
 			
 		}
+//		Logger.log(LogLevel.DETAIL, ""+evaluation);
 		return evaluation;
 	}
 	
@@ -220,16 +228,16 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 //						}
 //					}
 					
-//					//count free valid moves
-//					boolean valids[] = map.isMoveValidAllPlayers(w, h);
-//					
-//					for(int i = 0; i<valids.length; i++) 
-//					{
-//						if(valids[i]) 
-//						{
-//							attributesPerPlayer[i][FREE_POS_MOVES]++;
-//						}
-//					}
+					//count free valid moves
+					boolean valids[] = map.isMoveValidAllPlayers(w, h);
+					
+					for(int i = 0; i<valids.length; i++) 
+					{
+						if(valids[i]) 
+						{
+							attributesPerPlayer[i][FREE_POS_MOVES]++;
+						}
+					}
 					
 				}//otherwise it was a hole/expansion-stone
 				
@@ -241,36 +249,36 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			}
 		}
 		
-		//analysis of the mobility
-		
-		//creating the counter for free possibleMoves
-		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
-		for(int i = 0; i<noPossibleMoves.length; i++) 
-		{
-			noPossibleMoves[i] = new IntegerWrapper();
-		}
-		
-		//creating the bitmaps of the map
-		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
-		
-		for(int i = 0; i<bitmaps.length; i++) 
-		{
-			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
-		}
-		
-		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
-				
-		for(int i = 0; i<noPossibleMoves.length; i++) 
-		{
-			attributesPerPlayer[i][FREE_POS_MOVES] = noPossibleMoves[i].getValue();
-		}
+//		//analysis of the mobility
+//		
+//		//creating the counter for free possibleMoves
+//		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
+//		for(int i = 0; i<noPossibleMoves.length; i++) 
+//		{
+//			noPossibleMoves[i] = new IntegerWrapper();
+//		}
+//		
+//		//creating the bitmaps of the map
+//		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
+//		
+//		for(int i = 0; i<bitmaps.length; i++) 
+//		{
+//			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
+//		}
+//		
+//		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
+//				
+//		for(int i = 0; i<noPossibleMoves.length; i++) 
+//		{
+//			attributesPerPlayer[i][FREE_POS_MOVES] = noPossibleMoves[i].getValue();
+//		}
 		
 		//finding out how many turns till own turn
 		int nextToMove = map.getNextPlayerTurn();

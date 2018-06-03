@@ -18,9 +18,10 @@ import swpg3.main.perfLogging.PerfLogger;
  * @author Ramil
  *
  */
+@Deprecated
 public class NatSortPruningParanoidCalculator implements Calculator{
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long time, Move bestMove) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		return startingMaxPlayer(eval, playerNumber, depth, map, bestMove);
