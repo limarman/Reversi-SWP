@@ -94,7 +94,8 @@ public class Map {
 				if (walker[i].step())
 				{
 					Tile t = walker[i].getCurrentTile();
-					if (t.isOccupied() && t.getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()))
+					if (t.isOccupied() && t.getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()) &&
+							!walker[i].getPosition().equals(move.getCoordinates()))
 						hasAdjacentTile = true;
 					else
 						walker[i].stopMoving(); // Disable Walker

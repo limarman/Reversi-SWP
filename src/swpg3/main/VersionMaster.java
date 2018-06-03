@@ -16,13 +16,15 @@ public final class VersionMaster {
 	private static String	assignment	= "4";
 	private static String	major		= "2";
 	private static String	minor		= "2";
-	private static String	sub			= "1";
+	private static String	sub			= "3";
 
 	/*
 	 * CHANGELOG:
 	 * + new feature
 	 * * changed feature
 	 * - removed
+	 * 
+	 * 4.2.2-3: *Fixed Bug in isMoveValidMethod
 	 * 
 	 * 4.2.2-2: *Fixed Bug with Transitions
 	 * 
