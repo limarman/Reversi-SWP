@@ -130,10 +130,10 @@ public class PerfLogger {
 		compute();
 		
 		
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %6d", "nv-Nodes", noInnerNodes + noLeaves));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %6d", "iv-InnerNodes", noInnerNodes));
+		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %6d", "lv-Leaves", noLeaves));
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %9dns/%6dus/%3dms", "tt-total-time", totalTime.getElapsedTime(), totalTime.getElapsedTime()/1000, totalTime.getElapsedTime()/1000000));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %d", "nv-Nodes", noInnerNodes + noLeaves));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %d", "iv-InnerNodes", noInnerNodes));
-		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %d", "lv-Leaves", noLeaves));
 		
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %9dns/%6dus/%3dms", "ls-Leaf Sum", leafSum, leafSum/1000, leafSum/1000000));
 		Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("%-13s: %9dns/%6dus/%3dms", "lm-Leaf min", leafMin, leafMin/1000, leafMin/1000000));

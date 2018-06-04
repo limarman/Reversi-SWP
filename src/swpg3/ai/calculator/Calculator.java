@@ -1,7 +1,6 @@
 package swpg3.ai.calculator;
 
 import swpg3.ai.evaluator.Evaluator;
-import swpg3.game.move.Move;
 
 public interface Calculator {
 	
@@ -10,9 +9,10 @@ public interface Calculator {
 	 * @param eval - used Evaluator
 	 * @param playerNumber - number of player to move
 	 * @param depth - wished depth to calculate
-	 * @param bestMove - reference to fill out with the best move
+	 * @param calcDeadLine - Deadline till when the move has to be calculated
+	 * @param form - form to fill out by the calculator during the process of calculating
 	 * @return the evaluation
 	 */
-	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, Move bestMove);
+	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form);
 	
 }
