@@ -20,10 +20,11 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class ParanoidCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long timeLimit, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, Move bestMove) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
-		return startingMaxPlayer(eval, playerNumber, depth, Clockmaster.getTimeDeadLine(timeLimit), map, bestMove);
+		int realDepth = (depth == 0 ? 1 : depth);
+		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, bestMove);
 	}
 	
 	/**

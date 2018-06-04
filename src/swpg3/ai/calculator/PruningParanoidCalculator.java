@@ -41,10 +41,11 @@ public class PruningParanoidCalculator implements Calculator{
 		this.sorter = sorter;
 	}
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long timeLimit, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, Move bestMove) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
-		return startingMaxPlayer(eval, playerNumber, depth, Clockmaster.getTimeDeadLine(timeLimit), map, bestMove);
+		int realDepth = (depth == 0 ? 1 : depth);
+		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, bestMove);
 	}
 	
 	/**
