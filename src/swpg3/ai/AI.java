@@ -3,6 +3,7 @@ package swpg3.ai;
 import java.util.HashSet;
 
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.IterativeDeepeningCalculator;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
@@ -114,7 +115,16 @@ public class AI {
 //		{
 //			calc = new ParanoidCalculator();
 //		}
-		calc = new IterativeDeepeningCalculator();
+		
+		if(GlobalSettings.ab_pruning) 
+		{
+			calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(
+					(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()));
+		}
+		else 
+		{
+			calc = new IterativeDeepeningCalculator(new ParanoidCalculator());
+		}
 		eva = new InversionaryEvaluator();
 //		eva = new RelativeEvaluator();
 		anna.analyseMap();
@@ -127,11 +137,12 @@ public class AI {
 	
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
-		Move bestMove = new Move();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit, Clockmaster.getTimeDeadLine(timeLimit-100), bestMove);
+		CalculatorForm form = new CalculatorForm();
+		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit,
+				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 //		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
-		return bestMove;
+		return form.getBestMove();
 	}
 	
 	private void setParameters()

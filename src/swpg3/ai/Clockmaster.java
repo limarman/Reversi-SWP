@@ -8,4 +8,10 @@ public class Clockmaster {
 	{
 		return System.currentTimeMillis() + time;
 	}
+	
+	public static boolean exceedsDeadline(long deadLine, long time) 
+	{
+		return System.currentTimeMillis() + time >= deadLine;
+	}
+	
 }

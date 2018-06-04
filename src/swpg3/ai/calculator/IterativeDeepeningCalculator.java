@@ -3,7 +3,6 @@ package swpg3.ai.calculator;
 import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.NaturalSorter;
 import swpg3.ai.evaluator.Evaluator;
-import swpg3.game.move.Move;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
 
@@ -25,37 +24,57 @@ public class IterativeDeepeningCalculator implements Calculator{
 	}
 	
 	@Override
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, Move bestMove) {
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) {
 		
 		double evaluation  = 0;
 		
 		int curDepth = 1;
-		Move bestMoveCurDepth = new Move();
+		CalculatorForm currentForm = new CalculatorForm();	
 		double evaluationCurDepth = 0;
 		
-		while(depth == 0 || curDepth<=depth) {
+		//cases:
+		//depth == 0 - there is no depthLimit OR
+		//curDepth <= depth - we are not exceeding the given limit
+		//Additionally to one of the upper cases, there has to be true, that we have not seen everything we can see
+		while((depth == 0 || curDepth<=depth) && !currentForm.hasCalculatedToEnd()) {
 		
+			currentForm.resetForm();
+			currentForm.setCalculatedToEnd(true); //staying true if no min-max Player argues
+			
+			//Time measurement
+			long preTime = System.currentTimeMillis();
+			
 			//outsource the work to the given Calculator
-			evaluationCurDepth = usedCalc.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, bestMoveCurDepth);
+			evaluationCurDepth = usedCalc.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm);
+			
+			long takenTime = System.currentTimeMillis() - preTime;
 			
 			if(evaluationCurDepth == Clockmaster.TIME_OUT) 
 			{
 				//do not update the best move
 				//only way to leave the while-loop
-				Logger.log(LogLevel.INFO, "Reached Depth: " + (curDepth-1));
+				Logger.log(LogLevel.INFO, "Timeoutet with Depth: " + (curDepth-1));
 				return evaluation;
 			}
 			else //search has not time-outed
 			{
-				bestMove.copyFrom(bestMoveCurDepth); //actualize the best move
+				form.setBestMove(currentForm.getBestMove()); //actualize the best move
 				evaluation = evaluationCurDepth; 
-				curDepth++;
 				
-				//TODO: check whether further calculation should be done
+				//estimate the time needed for next depth
+				if(Clockmaster.exceedsDeadline(calcDeadLine, takenTime * currentForm.getMaxBranchingFactor())) 
+				{
+					Logger.log(LogLevel.INFO, "Aborted with Depth: " + curDepth);
+					return evaluation;
+				}
+				
+				curDepth++;
 			}			
 		}
 		
-		//called only when there is a upper bound for the depth
+		//called when there is a upper bound for the depth
+		//or the calculator have calculated to the end
+		Logger.log(LogLevel.INFO, "Calculated to (given) end.");
 		return evaluation;
 	}
 

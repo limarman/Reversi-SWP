@@ -41,11 +41,12 @@ public class PruningParanoidCalculator implements Calculator{
 		this.sorter = sorter;
 	}
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, Move bestMove) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
+		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
 		int realDepth = (depth == 0 ? 1 : depth);
-		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, bestMove);
+		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form);
 	}
 	
 	/**
@@ -57,13 +58,14 @@ public class PruningParanoidCalculator implements Calculator{
 	 * @param bestMove - reference to write the best move into
 	 * @return
 	 */
-	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, Move bestMove) 
+	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
 	{	
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
 		{
 			Logger.log(LogLevel.WARNING, "Received minimax search with depth 0.");
+			form.setCalculatedToEnd(false);
 			return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
@@ -73,13 +75,18 @@ public class PruningParanoidCalculator implements Calculator{
 		}
 		
 		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		int branchingFactor = possibleMovesOrderable.size();
+		if(branchingFactor > form.getMaxBranchingFactor()) 
+		{
+			form.setMaxBranchingFactor(branchingFactor);
+		}
 		
 		//Should not be called - Player should have possible moves
 		if(possibleMovesOrderable.isEmpty()) 
 		{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map,
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, 0,
 					Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		}
 		
@@ -101,12 +108,12 @@ public class PruningParanoidCalculator implements Calculator{
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap,
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0,
 					maxValue, Double.POSITIVE_INFINITY);
-
+						
 			if(value > maxValue) //updating the evaluation 
 			{
-				bestMove.copyFrom(sortedMoves[i]);
+				form.setBestMove(sortedMoves[i]);
 				maxValue = value;
 				//no pruning needed - as Positive_Infinity is never reached
 			}
@@ -121,14 +128,15 @@ public class PruningParanoidCalculator implements Calculator{
 
 	}
 	
-	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map,
-			double alpha, double beta) 
+	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
+			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
 		//reached maximal depth
 		if(depth == 0) 
 		{
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
-			
+			form.setCalculatedToEnd(false);
+
 			if(GlobalSettings.log_performance)
 			{
 				PerfLogger.getInst().stopLeaf();
@@ -146,22 +154,39 @@ public class PruningParanoidCalculator implements Calculator{
 		}
 		
 		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
-		
+		int branchingFactor = possibleMovesOrderable.size();
+		if(branchingFactor > form.getMaxBranchingFactor()) 
+		{
+			form.setMaxBranchingFactor(branchingFactor);
+		}
 		
 		//Player has no moves or is disqualified
 		if(possibleMovesOrderable.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
+			//There is no possible move (in this gamephase)
+			if(passesInRow >= MapManager.getInstance().getNumberOfPlayers()) 
+			{
+				double value =  eval.evaluatePosition(map, maxPlayerNumber);
+				
+				if(System.currentTimeMillis() >= calcDeadLine) 
+				{
+					return Clockmaster.TIME_OUT;
+				}
+				
+				return value;
+			}
+			
 			//player cannot change anything in the evaluation
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
+				return maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
 			}
 			else //next is min player
 			{
-				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
+				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
 			} 
 		}
 		
@@ -184,11 +209,11 @@ public class PruningParanoidCalculator implements Calculator{
 			//if next is max player
 			if(nextPlayerNumber == maxPlayerNumber) 
 			{
-				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, alpha, minValue);
+				value = maxPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0, alpha, minValue);
 			}
 			else //next is min player
 			{
-				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, alpha, minValue);
+				value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0, alpha, minValue);
 			}
 			
 			if(value == Clockmaster.TIME_OUT) 
@@ -209,13 +234,14 @@ public class PruningParanoidCalculator implements Calculator{
 		return minValue;
 	}
 	
-	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, Map map,
-			double alpha, double beta) 
+	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
+			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
 		//reached maximal depth
 		if(depth == 0) 
 		{
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
+			form.setCalculatedToEnd(false);
 			
 			if(GlobalSettings.log_performance)
 			{
@@ -232,12 +258,30 @@ public class PruningParanoidCalculator implements Calculator{
 		}
 		
 		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
+		int branchingFactor = possibleMovesOrderable.size();
+		if(branchingFactor > form.getMaxBranchingFactor()) 
+		{
+			form.setMaxBranchingFactor(branchingFactor);
+		}
 		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
 		if(possibleMovesOrderable.isEmpty()) 
 		{
+			//There is no possible move (in this gamephase)
+			if(passesInRow >= MapManager.getInstance().getNumberOfPlayers()) 
+			{
+				double value =  eval.evaluatePosition(map, maxPlayerNumber);
+				
+				if(System.currentTimeMillis() >= calcDeadLine) 
+				{
+					return Clockmaster.TIME_OUT;
+				}
+				
+				return value;
+			}
+			
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, map, alpha, beta);
+			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
 		}
 		
 		double maxValue = alpha;
@@ -255,7 +299,7 @@ public class PruningParanoidCalculator implements Calculator{
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
-			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, nextMap, maxValue, beta);
+			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0, maxValue, beta);
 			
 			if(value == Clockmaster.TIME_OUT) 
 			{
