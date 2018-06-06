@@ -516,6 +516,7 @@ public class Map {
 							}
 							
 							Vector2i neighbourPos = mw.getPosition().clone(); //remember the direct neighbour tile
+							Vector2i lastDirection;
 							mw.step(); // making sure that direct adjacent fields are not valid moves
 							
 							// if the neighbour tile had a transition into itsself - enclosing is not possible
@@ -524,7 +525,6 @@ public class Map {
 								continue;
 							}
 							
-							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 
 							// iterate till a hole, an empty field or an own stone is found
 							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
@@ -537,8 +537,16 @@ public class Map {
 											MoveType.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
+								//remembering from where the MapWalker came from and which direction he walked
+								neighbourPos = mw.getPosition().clone();
+								lastDirection = mw.getDirection().clone();
 								mw.step();
-								// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+								
+								//if the walk made a loop over transition - there will be no (valid) new moves found
+								if(mw.getPosition().equals(neighbourPos) && Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection)) 
+								{
+									break;
+								}
 							}
 
 							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
