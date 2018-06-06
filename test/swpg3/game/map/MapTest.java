@@ -494,6 +494,37 @@ class MapTest {
 		assertEquals(TileStatus.PLAYER_1, map.getTileAt(2, 3).getStatus(), "(2,3)");
 	}
 	
+	
+	@Test
+	void getPossibleMovesTest4()
+	{
+		String mapString = "2\n"
+				+ "3\n"
+				+ "0 1\n"
+				+ "5 5\n"
+				+ "0 0 0 0 0\n"
+				+ "0 0 0 0 0\n"
+				+ "0 0 1 2 2\n"
+				+ "0 0 0 0 0\n"
+				+ "0 0 0 0 0\n"
+				+ "4 2 2 <-> 4 2 2\n";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);
+		}
+		catch(Exception e) {
+			System.out.println(e.toString());
+			fail("map could not be read.");
+		}
+		Map map = mm.getCurrentMap();
+		
+		assertFalse(map.isMoveValid(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
+		assertFalse(map.getPossibleMovesOrderable((byte)1).contains(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
+	}
+	
+	
 	@Test
 	void getPossibleMovesTest3() 
 	{
