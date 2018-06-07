@@ -107,24 +107,31 @@ public class AI {
 	public void initialize()
 	{
 		anna = Analyser.getInstance();
-//		if(GlobalSettings.ab_pruning) 
-//		{
-//			calc = new PruningParanoidCalculator((GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter());
-//		}
-//		else 
-//		{
-//			calc = new ParanoidCalculator();
-//		}
+		if(GlobalSettings.iterative_deepening)
+		{
+			if(GlobalSettings.ab_pruning) 
+			{
+				calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(
+						(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()));
+			}
+			else 
+			{
+				calc = new IterativeDeepeningCalculator(new ParanoidCalculator());
+			}
+		}
+		else
+		{
+			if(GlobalSettings.ab_pruning) 
+				{
+					calc = new PruningParanoidCalculator((GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter());
+				}
+				else 
+				{
+					calc = new ParanoidCalculator();
+				}
+		}
+
 		
-		if(GlobalSettings.ab_pruning) 
-		{
-			calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(
-					(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()));
-		}
-		else 
-		{
-			calc = new IterativeDeepeningCalculator(new ParanoidCalculator());
-		}
 		eva = new InversionaryEvaluator();
 //		eva = new RelativeEvaluator();
 		anna.analyseMap();

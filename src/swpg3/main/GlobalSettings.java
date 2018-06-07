@@ -5,6 +5,7 @@ public final class GlobalSettings {
 	
 	public static boolean ab_pruning = true;
 	public static boolean move_sorting = true;
+	public static boolean iterative_deepening;
 	public static boolean log_performance;
 	public static boolean log_ext_perf;
 }
