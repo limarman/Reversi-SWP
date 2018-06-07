@@ -23,6 +23,9 @@ public class IterativeDeepeningCalculator implements Calculator{
 		this.usedCalc = calc;
 	}
 	
+	/**
+	 * Does not fill out the Calculatorform completely yet. Because it is not needed.
+	 */
 	@Override
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) {
 		
@@ -51,19 +54,32 @@ public class IterativeDeepeningCalculator implements Calculator{
 			
 			if(evaluationCurDepth == Clockmaster.TIME_OUT) 
 			{
-				//do not update the best move
-				//only way to leave the while-loop
+				//only update best move if there is no move found yet (sad happening)
+				//equivalent to timing out with depth 1
+				if(curDepth == 1) 
+				{
+					//fill out the form
+					form.setBestMove(currentForm.getBestMove());
+					form.setMaxBranchingFactor(currentForm.getMaxBranchingFactor());
+					form.setCalculatedToEnd(false);
+					evaluation = evaluationCurDepth;
+				}
+				
+				//Leave the iteration
 				Logger.log(LogLevel.INFO, "Timeoutet with Depth: " + (curDepth-1));
 				return evaluation;
 			}
 			else //search has not time-outed
 			{
+				//fill out the form
 				form.setBestMove(currentForm.getBestMove()); //actualize the best move
+				form.setMaxBranchingFactor(currentForm.getMaxBranchingFactor());
 				evaluation = evaluationCurDepth; 
 				
 				//estimate the time needed for next depth
 				if(Clockmaster.exceedsDeadline(calcDeadLine, takenTime * currentForm.getMaxBranchingFactor())) 
 				{
+					form.setCalculatedToEnd(false);
 					Logger.log(LogLevel.INFO, "Aborted with Depth: " + curDepth);
 					return evaluation;
 				}
@@ -74,7 +90,12 @@ public class IterativeDeepeningCalculator implements Calculator{
 		
 		//called when there is a upper bound for the depth
 		//or the calculator have calculated to the end
-		Logger.log(LogLevel.INFO, "Calculated to (given) end.");
+		if(!currentForm.hasCalculatedToEnd()) 
+		{
+			form.setCalculatedToEnd(false);
+			Logger.log(LogLevel.INFO, "Calculated to the end.");
+		}
+		Logger.log(LogLevel.INFO, "Calculated to given depth.");
 		return evaluation;
 	}
 

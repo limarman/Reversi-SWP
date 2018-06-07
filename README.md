@@ -32,6 +32,7 @@ This is a list of all commandline arguments:
 |            | `--log-ext-perf`| FLAG| no          |               | Enables extended performance Logging, which offers more information.|
 |            | `--disable-ab`|FLAG   |no           |               | Disables Alpha-Beta-Pruning               |
 |            | `--disable-sort`|FLAg|no            |               | Disables move-sorting                    |
+|            | `--disable-itDeep`|FLAg|no            |               | Disables iterative deepening            |
     
 Arguments with either a STRING or INT option require an additional option after them.
 

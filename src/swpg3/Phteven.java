@@ -332,6 +332,8 @@ public class Phteven{
 				new CliOption(' ', "disable-ab", false, CliOptionType.FLAG, "false", "Disables Alpha-Beta-Pruning");
 		CliOption dis_sorting = 
 				new CliOption(' ', "disable-sort", false, CliOptionType.FLAG, "false", "Disable move sorting");
+		CliOption disable_itDeep =
+				new CliOption(' ', "disable-itDeep", false, CliOptionType.FLAG, "false", "Disable Iterative deepening");
 		
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
@@ -341,6 +343,7 @@ public class Phteven{
 		parser.addOption(log_ext_perf);
 		parser.addOption(disable_ab);
 		parser.addOption(dis_sorting);
+		parser.addOption(disable_itDeep);
 		
 		//actual parsing:
 		if(!parser.parse(args))
@@ -377,6 +380,7 @@ public class Phteven{
 		GlobalSettings.ab_pruning = !disable_ab.isSet();
 		GlobalSettings.move_sorting = !dis_sorting.isSet();
 		GlobalSettings.log_performance = log_perfomance.isSet();
+		GlobalSettings.iterative_deepening = !disable_itDeep.isSet();
 		if(log_ext_perf.isSet())
 		{
 			GlobalSettings.log_ext_perf = true;
@@ -384,6 +388,8 @@ public class Phteven{
 		}
 		
 		Logger.log(LogLevel.DEBUG, "Alpha-Beta.-Pruning set to:   " + GlobalSettings.ab_pruning);
+		Logger.log(LogLevel.DEBUG, "Move Soting set to:   " + GlobalSettings.ab_pruning);
+		Logger.log(LogLevel.DEBUG, "Iterative deepening set to:   " + GlobalSettings.ab_pruning);
 		Logger.log(LogLevel.DEBUG, "Perfomance logging set to:    " + GlobalSettings.log_performance);
 		Logger.log(LogLevel.DEBUG, "Extended Perf logging set to: " + GlobalSettings.log_ext_perf);
 		
