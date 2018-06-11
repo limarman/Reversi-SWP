@@ -1,1 +1,29 @@
 \section{Task 1}
+In unserer Implementierung der Vorsortierung der Züge nutzt der PruningParanoidCalculator das Interface MoveSorter, welche die Methode $sortMoves()$ stellt. Wir haben bisher zwei konkrete Implementierungen dieses Interfaces. Einmal den BogoSorter und einmal den NaturalSorter (siehe Abbildung \ref{fig::movesorting-classdiagram}).
+
+\begin{figure}[h]
+	\begin{center}
+		\label{fig::movesorting-classdiagram}
+		\includegraphics[scale=0.4]{"movesorting-classdiagram"}
+		\caption{Klassendiagramm für das MoveSorting}
+	\end{center}
+\end{figure}
+
+\subsection*{BogoSorter}
+Der Name ist Programm. Der BogoSorter sortiert die Züge nicht, sondern konvertiert einfach die Datenstruktur. Dementsprechend ist die Implementierung nicht besonders spannend.
+\subsection*{NaturalSorter}
+Der NaturalSorter sortiert die Züge entsprechend der "natürlichen" Güte der Züge im Hinblick auf unsere Bewertungsfuntkion. Diese behandelt z.B. Override-Stones als Joker und platziert sie ungern. Demnach werden diese Züge ans Ende sortiert. Im Gegensatz dazu, werden Züge auf Bonusfelder, welche die Möglichkeit geben einen weiteren Override-Stein zu bekommen, an den Anfang der Datenstruktur sortiert. Die vollständige Reihenfolge der Sortierung ist in der \textbf{Buildingphase}:
+\begin{align*}
+&BONUS_{OVERRIDE} > CHOICE > BONUS_{BOMB} > INVERSION >  NORMAL \\ &> OVERRIDEUSE > OVERRIDEUSE_{SELF}
+\end{align*}
+wobei $OVERRIDEUSE_{SELF}$ einen Zug bezeichnet, welcher sowohl einen Override-Stein nutzt als auch einen eigenen Stein überschreibt. Und in der \textbf{BombingPhase}:
+\begin{align*}
+NORMAL > BOMBING_{SELF}
+\end{align*}
+Die undifferenzierte Zugsortierung in der BombingPhase ist dadurch zu erklären, dass
+\begin{enumerate}
+\item[1.] wir das Pruning und eine große Tiefe in dieser Spielphase nicht als besonders wichtig erachten.
+\item[2.] eine feinere Sortierung zusätzliche Berechnungen zur Folge hätte, da wir beim Generieren der möglichen Züge in dieser Phase nicht besonders viel Information bekommen.
+\end{enumerate}
+
+

@@ -388,8 +388,8 @@ public class Phteven{
 		}
 		
 		Logger.log(LogLevel.DEBUG, "Alpha-Beta.-Pruning set to:   " + GlobalSettings.ab_pruning);
-		Logger.log(LogLevel.DEBUG, "Move Soting set to:   " + GlobalSettings.ab_pruning);
-		Logger.log(LogLevel.DEBUG, "Iterative deepening set to:   " + GlobalSettings.ab_pruning);
+		Logger.log(LogLevel.DEBUG, "Move Sorting set to:   " + GlobalSettings.move_sorting);
+		Logger.log(LogLevel.DEBUG, "Iterative deepening set to:   " + GlobalSettings.iterative_deepening);
 		Logger.log(LogLevel.DEBUG, "Perfomance logging set to:    " + GlobalSettings.log_performance);
 		Logger.log(LogLevel.DEBUG, "Extended Perf logging set to: " + GlobalSettings.log_ext_perf);
 		
