@@ -97,7 +97,7 @@ class PruningCalculatorTest {
 		
 		Evaluator eva = new InversionaryEvaluator();
 		
-		Calculator it_calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(new NaturalSorter()));
+		Calculator it_calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(new NaturalSorter()), new MaxNCalculator());
 		Calculator ab_calc = new PruningParanoidCalculator();
 		Calculator mini_calc = new ParanoidCalculator();
 		

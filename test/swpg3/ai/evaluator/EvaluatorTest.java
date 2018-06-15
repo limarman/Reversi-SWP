@@ -311,6 +311,26 @@ class EvaluatorTest {
 		assertEquals(1, f.get(eva), "Inversion stone count mismatch!");
 
 	}
+	
+	@Test
+	void testInversionaryEvaluatorcalcCurrentPrize() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException 
+	{
+		Evaluator eva = new InversionaryEvaluator();
+		
+		//test the (private) calculateCurrentPrize Method (with reflections)
+		Method curPrize = RelativeEvaluator.class.getDeclaredMethod("calculateCurrentPrize", double[].class, byte.class);
+		curPrize.setAccessible(true);
+		
+		double[] stoneCounts = {100, 5, 200, 30};
+		
+		assertEquals(curPrize.invoke(eva, stoneCounts, (byte)1), 110, "Prize for first Player miscalced");
+		assertEquals(curPrize.invoke(eva, stoneCounts, (byte)2), 20, "Prize for second Player miscalced");
+		assertEquals(curPrize.invoke(eva, stoneCounts, (byte)3), 250, "Prize for third Player miscalced");
+		assertEquals(curPrize.invoke(eva, stoneCounts, (byte)4), 50, "Prize for fourth Player miscalced");
+
+	}
+	
+	
 
 	
 	private double round(double value, int places) {
@@ -320,5 +340,7 @@ class EvaluatorTest {
 	    bd = bd.setScale(places, RoundingMode.HALF_UP);
 	    return bd.doubleValue();
 	}
+	
+	
 
 }

@@ -3,12 +3,15 @@ package swpg3.ai.calculator;
 import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.NaturalSorter;
 import swpg3.ai.evaluator.Evaluator;
+import swpg3.game.GamePhase;
+import swpg3.game.map.MapManager;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
 
 public class IterativeDeepeningCalculator implements Calculator{
 
-	private Calculator usedCalc;
+	private Calculator usedCalcBuilding;
+	private Calculator usedCalcBombing;
 	
 	//TODO: implement clever move-sorting
 	
@@ -16,11 +19,13 @@ public class IterativeDeepeningCalculator implements Calculator{
 	 * Default constructor uses AlphaBeta Pruning with natural move sorting
 	 */
 	public IterativeDeepeningCalculator() {
-		this.usedCalc = new PruningParanoidCalculator(new NaturalSorter());
+		this.usedCalcBuilding = new PruningParanoidCalculator(new NaturalSorter());
+		this.usedCalcBombing = new MaxNCalculator();
 	}
 	
-	public IterativeDeepeningCalculator(Calculator calc) {
-		this.usedCalc = calc;
+	public IterativeDeepeningCalculator(Calculator calcBuilding, Calculator calcBombing) {
+		this.usedCalcBuilding = calcBuilding;
+		this.usedCalcBombing = calcBombing;
 	}
 	
 	/**
@@ -48,7 +53,12 @@ public class IterativeDeepeningCalculator implements Calculator{
 			long preTime = System.currentTimeMillis();
 			
 			//outsource the work to the given Calculator
-			evaluationCurDepth = usedCalc.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm);
+			if(MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE) {
+				evaluationCurDepth = usedCalcBuilding.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm);
+			} else //Bombing Phase
+			{
+				evaluationCurDepth = usedCalcBombing.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm);
+			}
 			
 			long takenTime = System.currentTimeMillis() - preTime;
 			

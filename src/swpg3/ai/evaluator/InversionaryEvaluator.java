@@ -114,7 +114,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		else //Bombing Phase
 		{			
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-			double [] stoneCount = new double[numberOfPlayers];
+			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
 			
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
@@ -133,7 +133,32 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			double[] probs = calculateProbabilities(playerNumber, stoneCount);
 			
 			//expected prize - according to probabilites
-			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			double stone_evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			
+			//calculate absolute bombingPower
+			int bombStrength = MapManager.getInstance().getBombStrength();
+			int bombingPower = 0;
+			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
+			{
+				//A bomb with radius x bombs a square with width (x+1) and height (x+1)
+				bombingPower += map.getPlayer(i).getBombs() * (bombStrength+1) * (bombStrength+1);
+			}
+			
+			//calculate the prize of player if there would not be any bombs left (current standing)
+			int currentPrize = calculateCurrentPrize(stoneCount, playerNumber);
+			
+			
+			//calculate weighting factor
+			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
+			int CONST = 2; //can be modified
+			double weight = bombingPower / ((double)(CONST * AI.PLAYABLE_SQUARES));
+			if(weight > 1) 
+			{
+				weight = 1; //should not be over 1
+			}
+			
+			//weighted evaluation
+			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
 			
 			
 		}

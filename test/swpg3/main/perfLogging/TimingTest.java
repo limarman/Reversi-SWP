@@ -21,7 +21,7 @@ class TimingTest {
 	@Test
 	void getBestMoveTimingtest()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 10;
 		int depthLimit = 3;
 		GlobalSettings.ab_pruning = true;
