@@ -81,6 +81,8 @@ public class ParanoidCalculator implements Calculator{
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0);
 									
+			//System.out.println("Move: " + move + " Value: " + value);
+			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);

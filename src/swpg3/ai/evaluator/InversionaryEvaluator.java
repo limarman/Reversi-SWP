@@ -9,8 +9,6 @@ import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
-import swpg3.main.logging.LogLevel;
-import swpg3.main.logging.Logger;
 
 /**
  * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
@@ -140,8 +138,11 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			int bombingPower = 0;
 			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
 			{
-				//A bomb with radius x bombs a square with width (x+1) and height (x+1)
-				bombingPower += map.getPlayer(i).getBombs() * (bombStrength+1) * (bombStrength+1);
+				Player p = map.getPlayer(i);
+				if(!p.isDisqualified()) {
+					//A bomb with radius x bombs a square with width (2x+1) and height (2x+1)
+					bombingPower += p.getBombs() * (2*bombStrength+1) * (2*bombStrength+1);
+				}
 			}
 			
 			//calculate the prize of player if there would not be any bombs left (current standing)
@@ -150,7 +151,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			
 			//calculate weighting factor
 			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
-			int CONST = 2; //can be modified
+			int CONST = 1; //can be modified
 			double weight = bombingPower / ((double)(CONST * AI.PLAYABLE_SQUARES));
 			if(weight > 1) 
 			{
@@ -159,6 +160,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			
 			//weighted evaluation
 			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
+
 			
 			
 		}

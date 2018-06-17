@@ -96,8 +96,11 @@ public class RelativeEvaluator implements Evaluator{
 			int bombingPower = 0;
 			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
 			{
-				//A bomb with radius x bombs a square with width (x+1) and height (x+1)
-				bombingPower += map.getPlayer(i).getBombs() * (bombStrength+1) * (bombStrength+1);
+				Player p = map.getPlayer(i);
+				if(!p.isDisqualified()) {
+					//A bomb with radius x bombs a square with width (x+1) and height (x+1)
+					bombingPower += p.getBombs() * (bombStrength+1) * (bombStrength+1);
+				}
 			}
 			
 			//calculate the prize of player if there would not be any bombs left (current standing)

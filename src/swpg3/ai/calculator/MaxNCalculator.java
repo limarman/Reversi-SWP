@@ -1,5 +1,7 @@
 package swpg3.ai.calculator;
 
+import static org.junit.jupiter.api.Assumptions.assumingThat;
+
 import java.util.HashSet;
 
 import swpg3.ai.Clockmaster;
@@ -79,8 +81,18 @@ public class MaxNCalculator implements Calculator{
 			Map nextMap = map.clone();
 			nextMap.applyMove(move);
 			
-			double value = maxPlayer(eval, nextPlayerNumber, depth, calcDeadLine, form, map, 0)[maxPlayerNumber-1];
-									
+			double[] values = maxPlayer(eval, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0);
+			
+			double value = values[maxPlayerNumber-1];
+			
+//			System.out.print("Move: " + move);
+//			System.out.print("Values: ");
+//			for(int i = 0; i<values.length; i++) 
+//			{
+//				System.out.print(values[i] + ", ");
+//			}
+//			System.out.println("");
+			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);
