@@ -114,6 +114,9 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
 			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
 			
+			//counting the holes
+			int holes = 0;
+			
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
 			{
@@ -123,6 +126,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					{
 						byte player = map.getTileAt(w, h).getStatus().value;
 						stoneCount[player-1]++;
+					}
+					else if(map.getTileAt(w, h).isHole())
+					{
+						holes++;
 					}
 				}	
 			}
@@ -151,8 +158,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			
 			//calculate weighting factor
 			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
-			int CONST = 1; //can be modified
-			double weight = bombingPower / ((double)(CONST * AI.PLAYABLE_SQUARES));
+			double CONST = 1; //can be modified - the bigger - the more the old function plays a role
+			double weight = bombingPower * CONST / ((double)(MapManager.getInstance().getHeight() * MapManager.getInstance().getWidth() - holes));
 			if(weight > 1) 
 			{
 				weight = 1; //should not be over 1

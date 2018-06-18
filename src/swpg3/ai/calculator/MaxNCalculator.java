@@ -1,7 +1,5 @@
 package swpg3.ai.calculator;
 
-import static org.junit.jupiter.api.Assumptions.assumingThat;
-
 import java.util.HashSet;
 
 import swpg3.ai.Clockmaster;

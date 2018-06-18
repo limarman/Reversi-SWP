@@ -17,102 +17,112 @@ class MaxNCalculatorTest {
 
 	@Test
 	void test() {
-		String mapString = "3\r\n" +
-				"0\r\n" +
-				"3 1\r\n" +
-				"17 20\r\n" +
-				"- - - 1 2 - - 2 1 1 2 - - - - - - - 0 0\r\n" +
-				"- - 2 1 2 1 2 3 1 1 2 3 - - - - - - 0 b\r\n" +
-				"1 3 3 3 3 2 2 3 1 1 3 3 1 - - 0 0 0 c 0\r\n" +
-				"1 2 1 2 x x x 3 - - 3 2 3 1 2 0 0 2 0 0\r\n" +
-				"- 3 2 3 1 1 1 2 - - 3 2 2 1 2 3 1 0 c 0\r\n" +
-				"- 2 2 3 1 2 3 2 - - 3 2 1 1 3 i 0 0 0 0\r\n" +
-				"- 3 1 3 2 x 2 1 - - 3 2 3 1 3 - - - 0 0\r\n" +
-				"1 2 2 1 3 3 3 3 2 x 3 2 1 1 2 - - - 0 c\r\n" +
-				"1 3 1 1 2 3 2 2 1 2 1 x x b 1 - - - 0 0\r\n" +
-				"1 2 1 1 1 x x 1 2 1 1 2 3 3 2 - - - 0 0\r\n" +
-				"- - - - 1 2 2 2 - - - 1 1 1 1 - - - 2 2\r\n" +
-				"- - - - 1 2 2 3 - - - 3 2 1 2 2 3 2 1 3\r\n" +
-				"- - - - 1 2 2 2 - - - i 1 1 2 2 3 2 1 2\r\n" +
-				"- - - - 1 2 2 1 - - - 3 2 x x x 2 3 2 2\r\n" +
-				"2 1 1 1 2 2 2 1 2 3 3 3 3 x x 3 1 2 2 2\r\n" +
-				"x x x x 3 2 2 1 2 3 3 3 3 1 1 2 3 x x x\r\n" +
-				"3 3 3 3 3 2 2 1 1 3 3 3 3 2 1 1 2 1 2 3\r\n";
 		
-		MapManager mm = MapManager.getInstance();
+		boolean doTest = true;
 		
-		mm.initializeMap(mapString);
-		mm.toggleGamePhase();
-		AI ai  = AI.getInstance();
-		ai.initialize();
-		
-		Evaluator eva = new InversionaryEvaluator();
-		Calculator max = new MaxNCalculator();
-		Calculator paranoid = new ParanoidCalculator();
-		
-		CalculatorForm form = new CalculatorForm();
-		
-		Map map = mm.getCurrentMap();	
-				
-		//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-		double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
-		
-		//iterating over map counting stones from each player
-		for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
-		{
-			for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
-			{
-				if(map.getTileAt(w, h).isOccupiedbyPlayer())
-				{
-					byte player = map.getTileAt(w, h).getStatus().value;
-					stoneCount[player-1]++;
-				}
-			}	
-		}
-		
-		System.out.println("Player 1: " + stoneCount[0]);
-		System.out.println("Player 2: " + stoneCount[1]);
-		System.out.println("Player 3: " + stoneCount[2]);
-//		
-//		System.out.println(eva.evaluatePosition(map, (byte) 1));
+		if(doTest) {
+			String mapString = "4\r\n" +
+			"0\r\n" +
+			"6 1\r\n" +
+			"20 20\r\n" +
+			"1 1 1 1 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"1 1 1 1 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"2 2 3 3 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4\r\n" +
+			"2 2 3 3 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4\r\n" +
+			"1 1 2 3 3 3 1 1 3 3 1 1 3 3 1 1 3 3 1 1\r\n" +
+			"1 1 1 2 3 3 1 1 3 3 1 1 3 3 1 1 3 3 1 1\r\n" +
+			"4 4 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4 2 2\r\n" +
+			"4 4 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4 2 2\r\n" +
+			"1 1 1 1 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"1 1 1 1 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4\r\n" +
+			"2 2 2 2 2 2 2 2 2 2 4 4 2 2 4 4 2 2 4 4\r\n" +
+			"3 3 2 1 3 2 3 1 3 3 1 1 3 3 1 1 3 3 1 1\r\n" +
+			"3 3 2 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3 1 1\r\n" +
+			"1 2 2 2 4 4 2 2 3 4 1 1 4 4 2 2 4 4 2 2\r\n" +
+			"2 2 2 2 4 4 2 2 3 1 1 1 4 4 2 2 4 4 2 2\r\n" +
+			"1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3 1 1 3 3\r\n" +
+			"2 2 4 2 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4\r\n" +
+			"2 2 2 2 2 2 4 4 2 2 4 4 2 2 4 4 2 2 4 4\r\n";
 
-//		logMap(LogLevel.INFO, m);
-//		
-//		map.applyMove(new Move(5,15,(byte) 0, (byte) 1));
-//				
-//		double [] stoneCount2 = new double[MapManager.getInstance().getNumberOfPlayers()];
-//		
-//		//iterating over map counting stones from each player
-//		for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
-//		{
-//			for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
-//			{
-//				if(map.getTileAt(w, h).isOccupiedbyPlayer())
-//				{
-//					byte player = map.getTileAt(w, h).getStatus().value;
-//					stoneCount2[player-1]++;
-//				}
-//			}	
-//		}
-//		
-//		System.out.println("Later:");
-//		System.out.println("Player 1: " + stoneCount2[0]);
-//		System.out.println("Player 2: " + stoneCount2[1]);
-//		System.out.println("Player 3: " + stoneCount2[2]);
-////		
-//		System.out.println(eva.evaluatePosition(map, (byte) 1));
-		
-//		logMap(LogLevel.INFO, m);
-//
-//		System.out.println(eva.evaluatePosition(mm.getCurrentMap(), (byte) 1));
-		
-		System.out.println(max.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
-		System.out.println(form.getBestMove());
-		
-		form.resetForm();
-		
-		System.out.println(paranoid.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
-		System.out.println(form.getBestMove());
+			
+			MapManager mm = MapManager.getInstance();
+			
+			mm.initializeMap(mapString);
+			mm.toggleGamePhase();
+			AI ai  = AI.getInstance();
+			ai.initialize();
+			
+			Evaluator eva = new InversionaryEvaluator();
+			Calculator max = new MaxNCalculator();
+			Calculator paranoid = new ParanoidCalculator();
+			
+			CalculatorForm form = new CalculatorForm();
+			
+			Map map = mm.getCurrentMap();	
+					
+			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
+			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
+			
+			//iterating over map counting stones from each player
+			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
+			{
+				for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
+				{
+					if(map.getTileAt(w, h).isOccupiedbyPlayer())
+					{
+						byte player = map.getTileAt(w, h).getStatus().value;
+						stoneCount[player-1]++;
+					}
+				}	
+			}
+			
+			System.out.println("Player 1: " + stoneCount[0]);
+			System.out.println("Player 2: " + stoneCount[1]);
+			System.out.println("Player 3: " + stoneCount[2]);
+			System.out.println("Player 4: " + stoneCount[3]);
+	//		
+	//		System.out.println(eva.evaluatePosition(map, (byte) 1));
+	
+	//		logMap(LogLevel.INFO, m);
+	//		
+	//		map.applyMove(new Move(5,15,(byte) 0, (byte) 1));
+	//				
+	//		double [] stoneCount2 = new double[MapManager.getInstance().getNumberOfPlayers()];
+	//		
+	//		//iterating over map counting stones from each player
+	//		for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
+	//		{
+	//			for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
+	//			{
+	//				if(map.getTileAt(w, h).isOccupiedbyPlayer())
+	//				{
+	//					byte player = map.getTileAt(w, h).getStatus().value;
+	//					stoneCount2[player-1]++;
+	//				}
+	//			}	
+	//		}
+	//		
+	//		System.out.println("Later:");
+	//		System.out.println("Player 1: " + stoneCount2[0]);
+	//		System.out.println("Player 2: " + stoneCount2[1]);
+	//		System.out.println("Player 3: " + stoneCount2[2]);
+	////		
+	//		System.out.println(eva.evaluatePosition(map, (byte) 1));
+			
+	//		logMap(LogLevel.INFO, m);
+	//
+	//		System.out.println(eva.evaluatePosition(mm.getCurrentMap(), (byte) 1));
+			
+			System.out.println(max.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
+			System.out.println(form.getBestMove());
+			
+			form.resetForm();
+			
+			System.out.println(paranoid.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
+			System.out.println(form.getBestMove());
+		}
 
 	}
 	
