@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
@@ -819,7 +820,7 @@ public class Map {
 		}
 		List<Vector2i> positionsToBomb = new LinkedList<>();
 		checkFieldsToBomb(radius, position.clone(), positionsToBomb, integerMap);
-
+		
 		for (Vector2i positionToBomb : positionsToBomb)
 		{
 			getTileAt(positionToBomb).setStatus(TileStatus.HOLE); // bombing the positionField
@@ -838,7 +839,9 @@ public class Map {
 	private void checkFieldsToBomb(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap)
 	{
 		if (radius < 0)
+		{
 			return; // no bombing
+		}
 
 		if (integerMap[position.x][position.y] == -1)
 		{
@@ -868,6 +871,56 @@ public class Map {
 				mw.setPosition(position.clone());
 			}
 		}
+	}
+	
+	/**
+	 * Breadth-First-Search (BFS) with IntegerMap to mark the visited squares with corresponding radius visited. 
+	 * @param radius
+	 * @param position
+	 * @param positionsToBomb
+	 * @param integerMap
+	 */
+	@SuppressWarnings("unused")
+	private void checkFieldsToBomb2(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap) 
+	{
+		if(radius < 0)
+		{
+			return; //no fields are bombed
+		}
+		MapWalker mw = new MapWalker(this);
+		LinkedList<Vector2i> positionQueue = new LinkedList<>();
+		positionQueue.add(position);
+		positionsToBomb.add(position);
+		integerMap[position.x][position.y] = radius;
+		while(!positionQueue.isEmpty()) 
+		{
+			Vector2i curPos = positionQueue.pollFirst(); //point of view in the iteration
+			int curRadius = integerMap[curPos.x][curPos.y];
+			if(curRadius > 0)
+			{
+				mw.setPosition(curPos.clone());
+				for(int i = 0; i<8; i++) 
+				{
+					mw.setDirection(Vector2i.mapDirToVector(i));
+					if (mw.canStep())
+					{ // adjacent Field is not a hole
+						mw.step();
+						Vector2i newPos = mw.getPosition(); //possibly new unseen field
+						if(integerMap[newPos.x][newPos.y] == -1) //if not visited yet
+						{
+							positionQueue.add(newPos);
+							positionsToBomb.add(newPos);
+							integerMap[newPos.x][newPos.y] = curRadius-1;
+						}
+						
+						mw.setPosition(curPos.clone()); //move back
+					}
+				}
+			}
+			
+		}
+		
+		
 	}
 	
 	/**

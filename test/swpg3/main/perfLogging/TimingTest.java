@@ -21,7 +21,7 @@ class TimingTest {
 	@Test
 	void getBestMoveTimingtest()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 10;
 		int depthLimit = 3;
 		GlobalSettings.ab_pruning = true;
@@ -279,6 +279,99 @@ class TimingTest {
 			
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime All   : %9dns/%6dus/%3dms", validTimeAll, validTimeAll/1000, validTimeAll/1000000));
 			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("validTime Single: %9dns/%6dus/%3dms", validTimeSingle, validTimeSingle/1000, validTimeSingle/1000000));
+		}
+	}
+	
+	@Test
+	void BombingPhaseApplyMoveTimingTest()
+	{
+		boolean doTest = true;
+		int numberOfRuns = 1000000;
+		
+		if(!doTest)
+		{
+			assertTrue(true);
+		}
+		else
+		{
+			String mapString = "8\r\n" +
+			"6\r\n" +
+			"2 240\r\n" +
+			"50 50\r\n" +
+			"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\r\n" +
+			"- - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x -                                        \r\n" +
+			"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\r\n" +
+			"- - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - \r\n" +
+			"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\r\n" +
+			"- x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x - x - x -\r\n" +
+			"- x 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 b 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 b x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 b x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 b b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 5 6 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 6 5 0 0 0 b 0 0 0 b x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 b 0 b b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 b b b b 0 0 0 0 0 0 1 2 3 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 4 3 0 0 0 0 0 0 0 0 0 5 6 7 8 0 0 0 0 0 0 0 b 0 0 0 b x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 3 4 2 1 0 b 0 0 0 0 0 0 0 6 5 8 7 0 0 0 0 0 0 0 0 0 0 b b x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 4 2 1 3 0 0 0 0 0 0 0 0 0 8 6 7 5 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 5 8 6 7 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 b 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 3 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 4 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 7 8 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 7 0 0 b 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 b x - - - - -\r\n" +
+			"- x 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 b 0 x - x - x -\r\n" +
+			"- x b 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b b 0 0 0 0 0 0 0 0 b x - - - - -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - x - x -\r\n" +
+			"- x 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 x - - - - -\r\n" +
+			"- x b 0 0 b 0 0 0 b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 b b b b 0 0 0 0 0 0 0 0 b x - x - x -\r\n" +
+			"- x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x - - - - -\r\n" +
+			"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\r\n";
+
+			
+			MapManager mm = MapManager.getInstance();
+			mm.toggleGamePhase();
+			
+			AI ai = AI.getInstance();
+			Logger.init(LogLevel.INFO);
+						
+			mm.initializeMap(mapString);
+			Map m = mm.getCurrentMap();
+			ai.initialize();
+						
+			long preTime = System.nanoTime();
+			double eval = 0;
+			
+			for(int i = 0; i < numberOfRuns; i++)
+			{
+				MapManager.getInstance().getCurrentMap().applyMove(new Move(30,30,(byte) 0, (byte)1));
+			}
+			long endTime = System.nanoTime();
+			
+			long evaTime = (endTime - preTime)/numberOfRuns;
+			
+			Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, String.format("EvaTime: %9dns/%6dus/%3dms", evaTime, evaTime/1000, evaTime/1000000));
 		}
 	}
 

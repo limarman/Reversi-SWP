@@ -9,8 +9,6 @@ import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
-import swpg3.main.logging.LogLevel;
-import swpg3.main.logging.Logger;
 
 /**
  * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
@@ -114,7 +112,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		else //Bombing Phase
 		{			
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-			double [] stoneCount = new double[numberOfPlayers];
+			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
+			
+			//counting the holes
+			int holes = 0;
 			
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
@@ -126,6 +127,10 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						byte player = map.getTileAt(w, h).getStatus().value;
 						stoneCount[player-1]++;
 					}
+					else if(map.getTileAt(w, h).isHole())
+					{
+						holes++;
+					}
 				}	
 			}
 			
@@ -133,7 +138,36 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			double[] probs = calculateProbabilities(playerNumber, stoneCount);
 			
 			//expected prize - according to probabilites
-			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			double stone_evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			
+			//calculate absolute bombingPower
+			int bombStrength = MapManager.getInstance().getBombStrength();
+			int bombingPower = 0;
+			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
+			{
+				Player p = map.getPlayer(i);
+				if(!p.isDisqualified()) {
+					//A bomb with radius x bombs a square with width (2x+1) and height (2x+1)
+					bombingPower += p.getBombs() * (2*bombStrength+1) * (2*bombStrength+1);
+				}
+			}
+			
+			//calculate the prize of player if there would not be any bombs left (current standing)
+			int currentPrize = calculateCurrentPrize(stoneCount, playerNumber);
+			
+			
+			//calculate weighting factor
+			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
+			double CONST = 1; //can be modified - the bigger - the more the old function plays a role
+			double weight = bombingPower * CONST / ((double)(MapManager.getInstance().getHeight() * MapManager.getInstance().getWidth() - holes));
+			if(weight > 1) 
+			{
+				weight = 1; //should not be over 1
+			}
+			
+			//weighted evaluation
+			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
+
 			
 			
 		}

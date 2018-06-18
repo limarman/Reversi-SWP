@@ -5,6 +5,7 @@ import java.util.HashSet;
 import swpg3.ai.calculator.Calculator;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.IterativeDeepeningCalculator;
+import swpg3.ai.calculator.MaxNCalculator;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
 import swpg3.ai.calculator.movesorter.BogoSorter;
@@ -56,7 +57,7 @@ public class AI {
 	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	public static double OVERRIDE_BONUS = 180;
+	public static double OVERRIDE_BONUS = 220;
 	public static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
@@ -112,11 +113,11 @@ public class AI {
 			if(GlobalSettings.ab_pruning) 
 			{
 				calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(
-						(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()));
+						(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()), new MaxNCalculator());
 			}
 			else 
 			{
-				calc = new IterativeDeepeningCalculator(new ParanoidCalculator());
+				calc = new IterativeDeepeningCalculator(new ParanoidCalculator(), new MaxNCalculator());
 			}
 		}
 		else
