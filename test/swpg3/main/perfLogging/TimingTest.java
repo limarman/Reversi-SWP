@@ -289,7 +289,7 @@ class TimingTest {
 	@Test
 	void alphaBetaMiniMaxTiming()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		
 		if(!doTest)
 		{

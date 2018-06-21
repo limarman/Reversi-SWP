@@ -3,6 +3,10 @@ package swpg3;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+/**
+ * A simple class to extract timing info out of logs and into a .tex table
+ * @author eric
+ */
 public class PerfAnalyser {
 
 	public static void main(String[] args)
