@@ -9,6 +9,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 
+import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.LogTag;
+import swpg3.main.logging.Logger;
+
 /**
  * Singleton class that Manages all Network transmissions
  * 
@@ -42,8 +46,8 @@ public final class NetworkManager {
 	}
 	
 	/**
-	 * @return the instance of NetworkManager
-	 * @throws InstantiationException If NetworkManager is not initialized
+	 * Returns the instance of the Network Manager
+	 * @return the instance of NetworkManager, if initialized; null, otherwise
 	 */
 	public static NetworkManager getInstance()
 	{
@@ -54,11 +58,10 @@ public final class NetworkManager {
 		return null;
 	}
 	/**
-	 * Initialize the NetworkManager
+	 * Initialize the NetworkManager, if not already initialized. Also connects the specified host and port
 	 * @param host hostname/IP to connect to
 	 * @param port portnumber to connect to
 	 * @return instance of the NetworkManager
-	 * @throws InstantiationException if NetworkManager is already initialized
 	 */
 	public static NetworkManager initialize(String host, int port)
 	{
@@ -67,7 +70,7 @@ public final class NetworkManager {
 			instance = new NetworkManager(host, port);
 			return instance;
 		}
-		return null;
+		return instance;
 	}
 
 	/**
@@ -139,6 +142,8 @@ public final class NetworkManager {
 		
 		data = new byte[length];
 		serverReader.readFully(data);
+		
+		Logger.log(LogLevel.DEBUG, LogTag.DEBUG ,String.format("%12d - Message Recieved Completly", System.nanoTime()));
 		
 		return new Message(MessageType.fromTypeNumber(typeNumber), length, data);
 	}
