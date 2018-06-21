@@ -13,6 +13,7 @@ import swpg3.ai.calculator.movesorter.NaturalSorter;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.BitMap;
+import swpg3.game.MathHelper;
 import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
@@ -136,6 +137,7 @@ public class AI {
 		eva = new InversionaryEvaluator();
 //		eva = new RelativeEvaluator();
 		anna.analyseMap();
+		MathHelper.initialize();
 		setParameters();
 	}
 	
