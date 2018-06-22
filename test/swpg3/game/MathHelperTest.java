@@ -96,6 +96,8 @@ class MathHelperTest {
 	@Test
 	void test() 
 	{
+		MathHelper.initialize();
+		
 		int[] bombCount = {2,2,3,1};
 		int [] stoneCount = {100, 300, 50 ,1000};
 		int playerNumber = 2;
@@ -128,6 +130,8 @@ class MathHelperTest {
 		{
 			System.out.println(rankings[i]);
 		}
+		
+		System.out.println("Playerrank: " + playerRank);
 		
 		//boundaries for approximate window, where our stone count at the end of bombing phase will be
 		double stoneCount_max = stoneCount[playerNumber-1];
@@ -164,11 +168,147 @@ class MathHelperTest {
 		
 		System.out.println("MIN: " + stoneCount_min);
 		System.out.println("MAX: " + stoneCount_max);
+		
+		//make sure we have no negative number of stones
+		if(stoneCount_max < 0) 
+		{
+			stoneCount_max = 0;
+		}
+		if(stoneCount_min < 0) 
+		{
+			stoneCount_min = 0;
+		}
+		
+		double evaluation = 0;
+		int playerBombPower = bombCount[playerNumber-1] * (2*bombradius+1) * (2*bombradius+1);
+		
+		//checking percentage to win for worst, best, average case and 0.25 and 0.75 percentile
+		for(int j = 0; j<5; j++) 
+		{
+			//the assumed stoneCount in this iteration in the interval [stoneCount_min, stoneCount_max]
+			double caseStoneCount = (j/4.) * stoneCount_max + (1-(j/4.)) * stoneCount_min;
+			
+			System.out.println("Case j=" + j + " casteStoneCount=" + caseStoneCount);
+			
+			double caseEvaluation = 0;
+			
+			double[] stonesToPlace = new double[4];
+			int currentPlace = 0;
+			for(int i = 0; i<stonesToPlace.length; i++)
+			{
+				//do not consider our old own stoneCount
+				if(i != playerRank) 
+				{
+					stonesToPlace[currentPlace] = stoneCount[rankings[i]-1] - caseStoneCount;
+					if(stonesToPlace[currentPlace] <= 0) 
+					{
+						break; //position found
+					}
+					currentPlace++;
+				}
+			}
+			
+			for (int i = 0; i<stonesToPlace.length; i++) {
+				System.out.print(stonesToPlace[i] + ", ");
+			}
+			System.out.println("");
+			System.out.println("currentPlace = " + currentPlace);
+			
+			if(playerBombPower != 0) { //we can actively change something in our ranking
+				while(currentPlace>=0) 
+				{
+					//determine the percentage we have to be able to use of our bombing power to become the place "currentPlace"
+					double minPerc, maxPerc;					
+
+					if(currentPlace == 0) 
+					{
+						minPerc = stonesToPlace[currentPlace] / playerBombPower;
+						maxPerc = 1;
+					}
+					else {
+						minPerc = stonesToPlace[currentPlace] / playerBombPower;
+						maxPerc = (stonesToPlace[currentPlace-1]-1) / playerBombPower;
+					}
+					
+					System.out.println("MaxPerc: " + maxPerc);
+					System.out.println("MinPerc: " + minPerc );
+					
+					if(minPerc > 1) 
+					{
+						//impossible to achieve a usage percentage of over 1. Probability is 0 as well as for the coming upper ranks.
+						//we can stop calculating here
+						System.out.println("Probability for Place curPlace <= " + currentPlace + ": 0");
+						break;
+					}else if(minPerc < 0) 
+					{
+						//stones to Rank were negative, as we are safe on this rank. So we have to bomb at least 0 squares to stay there.
+						minPerc = 0;
+					}
+					
+					if(maxPerc > 1) 
+					{
+						//there cannot be more used than 100 percent of bomb power
+						maxPerc = 1;
+					}else if(maxPerc < 0) 
+					{
+						maxPerc = 0; //very rare case, when our stoneCount is less than one stone away from opponent.
+					}
+
+					
+					System.out.println("Probability for place curPlace = " + currentPlace + ": "
+							+ MathHelper.probabilityInInterval(minPerc, maxPerc));
+					caseEvaluation += mapPlaceToPrize(currentPlace+1) * MathHelper.probabilityInInterval(minPerc, maxPerc);
+					
+					currentPlace--;
+				}
+			}
+			else 
+			{
+				caseEvaluation = mapPlaceToPrize(currentPlace+1);
+			}
+			
+			System.out.println("CaseEvaluation=" + caseEvaluation);
+			
+			//add caseEvaluation to Evaluation weighted with caseProbability which is 5% - 20% - 50% - 20% - 5% for the percentiles
+			switch(j) 
+			{
+			case 0: 
+				evaluation += caseEvaluation * 0.05;
+				break;
+			case 1:
+				evaluation += caseEvaluation * 0.2;
+				break;
+			case 2: 
+				evaluation += caseEvaluation * 0.5;
+				break;
+			case 3:
+				evaluation += caseEvaluation * 0.2;
+				break;
+			case 4:
+				evaluation += caseEvaluation * 0.05;
+				break;
+			}
+		}
 
 		
 //		for(int i = 0; i<rankings.length; i++) 
 //		{
 //			System.out.print(rankings[i] + ", ");
 //		}
+	}
+	
+	private int mapPlaceToPrize(int place) 
+	{
+		switch(place) 
+		{
+		
+		case 1: return 250;
+		case 2: return 110;
+		case 3: return 50;
+		case 4: return 20;
+		case 5: return 10;
+		default : return 0;
+		
+		}
 	}
 }

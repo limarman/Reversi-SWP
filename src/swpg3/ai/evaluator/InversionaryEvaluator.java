@@ -288,7 +288,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					//do not consider our old own stoneCount
 					if(i != playerRank) 
 					{
-						stonesToPlace[currentPlace] = stoneCount[rankings[currentPlace]-1] - caseStoneCount;
+						stonesToPlace[currentPlace] = stoneCount[rankings[i]-1] - caseStoneCount;
 						if(stonesToPlace[currentPlace] <= 0) 
 						{
 							break; //position found
