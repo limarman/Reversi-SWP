@@ -240,23 +240,33 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				int rankDifference = Math.abs(rank - playerRank);
 				if(rankDifference == 1) 
 				{
-					//neighbor is bombing - factor 0.4 to 0.6
-					stoneCount_max -= bombpower * 0.4;
-					stoneCount_min -= bombpower * 0.6;
+					//neighbor is bombing
+					if(rank - playerRank > 0) //lower neighbour, bombing more likely
+					{
+						stoneCount_max -= bombpower * 0.5;
+						stoneCount_min -= bombpower * 0.7;
+					}
+					else
+					{
+						stoneCount_max -= bombpower * 0.2;
+						stoneCount_min -= bombpower * 0.4;
+					}
+					
 				}
 				else if(rankDifference == 2) 
 				{
-					//indirect neighbor is bombing - factor 0.2 to 0.4
-					stoneCount_max -= bombpower * 0.1;
-					stoneCount_min -= bombpower * 0.3;
+					//indirect neighbor is bombing - factor 0.1 to 0.3
+					stoneCount_max -= bombpower * 0.0;
+					stoneCount_min -= bombpower * 0.2;
 				}
 				else if(rankDifference == 3) 
 				{
-					//others are bombing - factor 0.0 to 0.2
+					//indirect indirect neighbor - factor 0.0 to 0.1
 					stoneCount_min -= bombpower * 0.1;
 				}
 				else if(rankDifference == 4) 
 				{
+					//others are bombing - factor 0.0 to 0.05
 					stoneCount_min -= bombpower * 0.05;
 				}
 			}
