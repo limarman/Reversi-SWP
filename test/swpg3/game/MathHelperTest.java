@@ -98,8 +98,8 @@ class MathHelperTest {
 	{
 		MathHelper.initialize();
 		
-		int[] bombCount = {2,2,3,1};
-		int [] stoneCount = {100, 300, 50 ,1000};
+		int[] bombCount = {2,2,1,1};
+		int [] stoneCount = {150, 120, 110 ,200};
 		int playerNumber = 2;
 		
 		//mapping the ranks (0 to #players-1) to the playerNumbers
@@ -149,20 +149,28 @@ class MathHelperTest {
 			int rankDifference = Math.abs(rank - playerRank);
 			if(rankDifference == 1) 
 			{
-				//neighbor is bombing - factor 0.6 to 0.8
-				stoneCount_max -= bombpower * 0.6;
-				stoneCount_min -= bombpower * 0.8;
+				//neighbor is bombing
+				if(rank - playerRank > 0) //lower neighbour, bombing more likely
+				{
+					stoneCount_max -= bombpower * 0.5;
+					stoneCount_min -= bombpower * 0.7;
+				}
+				else
+				{
+					stoneCount_max -= bombpower * 0.2;
+					stoneCount_min -= bombpower * 0.4;
+				}
 			}
 			else if(rankDifference == 2) 
 			{
 				//indirect neighbor is bombing - factor 0.2 to 0.4
-				stoneCount_max -= bombpower * 0.2;
-				stoneCount_min -= bombpower * 0.4;
+				stoneCount_max -= bombpower * 0.1;
+				stoneCount_min -= bombpower * 0.3;
 			}
 			else if(rankDifference >= 3) 
 			{
 				//others are bombing - factor 0.0 to 0.2
-				stoneCount_min -= bombpower * 0.2;
+				stoneCount_min -= bombpower * 0.1;
 			}
 		}
 		
@@ -289,6 +297,8 @@ class MathHelperTest {
 				break;
 			}
 		}
+		
+		System.out.println("Evaluation: " + evaluation);
 
 		
 //		for(int i = 0; i<rankings.length; i++) 
