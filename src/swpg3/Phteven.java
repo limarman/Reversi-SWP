@@ -298,6 +298,9 @@ public class Phteven{
 				Logger.log(LogLevel.INFO, "In Percent of Calculations: " +
 						IterativeDeepeningCalculator.aspirationWindowFails /
 						((double) IterativeDeepeningCalculator.totalCalculations));
+				Logger.log(LogLevel.INFO, "Timeout percent: " +
+						IterativeDeepeningCalculator.timeouts /
+						((double) IterativeDeepeningCalculator.totalCalculations));
 			}
 		}
 		else if(m.getType() == MessageType.CURRENT_GAME_STATE) // MessageType 10

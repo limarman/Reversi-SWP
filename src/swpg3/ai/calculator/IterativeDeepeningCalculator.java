@@ -14,6 +14,7 @@ public class IterativeDeepeningCalculator implements Calculator{
 	//used for statistics
 	public static int aspirationWindowFails = 0;
 	public static int totalCalculations = 0;
+	public static int timeouts = 0;
 	
 	private Calculator usedCalcBuilding;
 	private Calculator usedCalcBombing;
@@ -81,6 +82,8 @@ public class IterativeDeepeningCalculator implements Calculator{
 			
 			if(evaluationCurDepth == Clockmaster.TIME_OUT) 
 			{
+				timeouts++;
+				
 				//only update best move if there is no move found yet (sad happening)
 				//equivalent to timing out with depth 1
 				if(curDepth == 1) 
@@ -114,13 +117,18 @@ public class IterativeDeepeningCalculator implements Calculator{
 					{
 						//correct value is lower (or maybe just equal) than lower bound of window
 						//initiate re-search in interval (-inf, curAlpha + e), where e is a small positive number
+						curBeta = curAlpha + 0.01;
+						curAlpha = Double.NEGATIVE_INFINITY;
 						currentConditions.setAspirationWindow(Double.NEGATIVE_INFINITY, curAlpha + 0.01);
 						
 					}else if(evaluationCurDepth >= curBeta) 
 					{
-						//correct value is higher (or maybe just equal) than lower bound of window
+						//correct value is higher (or maybe just equal) than upper bound of window
 						//initiate re-search in interval (curBeta - e, +inf), where e is a small positive number
-						currentConditions.setAspirationWindow(curBeta - 0.01, Double.POSITIVE_INFINITY);
+						curAlpha = curBeta - 0.01;
+						curBeta = Double.POSITIVE_INFINITY;
+						currentConditions.setAspirationWindow(curAlpha, curBeta);
+
 					}
 					
 					//estimate the time needed for the re-search (taking the same time needed for this iteration)
