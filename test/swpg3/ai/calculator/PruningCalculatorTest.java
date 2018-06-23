@@ -12,7 +12,6 @@ import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
-import swpg3.game.move.Move;
 
 class PruningCalculatorTest {
 
@@ -50,14 +49,16 @@ class PruningCalculatorTest {
 		
 		Evaluator eva = new InversionaryEvaluator();
 		
+		CalculatorConditions conditions = new CalculatorConditions();
+		
 		Calculator ab_calc = new PruningParanoidCalculator(new NaturalSorter());
 		Calculator mini_calc = new ParanoidCalculator();
 		
 		CalculatorForm ab_form = new CalculatorForm();
 		CalculatorForm mini_form = new CalculatorForm();
 		
-		double ab_eval = ab_calc.calculateBestMove(eva, (byte)1, 3, Clockmaster.getTimeDeadLine(15000), ab_form);
-		double mini_eval = mini_calc.calculateBestMove(eva, (byte) 1, 3, Clockmaster.getTimeDeadLine(15000), mini_form);
+		double ab_eval = ab_calc.calculateBestMove(eva, (byte)1, 3, Clockmaster.getTimeDeadLine(15000), ab_form, conditions);
+		double mini_eval = mini_calc.calculateBestMove(eva, (byte) 1, 3, Clockmaster.getTimeDeadLine(15000), mini_form, conditions);
 		
 		assertEquals(mini_eval, ab_eval, "Evaluation mismatch!");
 		assertEquals(mini_form.getBestMove(), ab_form.getBestMove(), "Move choice mismatch!");
@@ -97,6 +98,8 @@ class PruningCalculatorTest {
 		
 		Evaluator eva = new InversionaryEvaluator();
 		
+		CalculatorConditions conditions = new CalculatorConditions();
+		
 		Calculator it_calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(new NaturalSorter()), new MaxNCalculator());
 		Calculator ab_calc = new PruningParanoidCalculator();
 		Calculator mini_calc = new ParanoidCalculator();
@@ -107,9 +110,9 @@ class PruningCalculatorTest {
 		mini_form.setCalculatedToEnd(true);
 		CalculatorForm it_form = new CalculatorForm();
 		
-		double ab_eval = ab_calc.calculateBestMove(eva, (byte)1, 6, Clockmaster.getTimeDeadLine(15000), ab_form);
-		double mini_eval = mini_calc.calculateBestMove(eva, (byte) 1, 6, Clockmaster.getTimeDeadLine(15000), mini_form);
-		double it_eval = it_calc.calculateBestMove(eva, (byte) 1, 0, Clockmaster.getTimeDeadLine(1000-100), it_form);
+		double ab_eval = ab_calc.calculateBestMove(eva, (byte)1, 6, Clockmaster.getTimeDeadLine(15000), ab_form, conditions);
+		double mini_eval = mini_calc.calculateBestMove(eva, (byte) 1, 6, Clockmaster.getTimeDeadLine(15000), mini_form, conditions);
+		double it_eval = it_calc.calculateBestMove(eva, (byte) 1, 0, Clockmaster.getTimeDeadLine(1000-100), it_form, conditions);
 				
 		assertEquals(mini_form.hasCalculatedToEnd(), ab_form.hasCalculatedToEnd(), "Calculation to the end mismatch!");
 		assertEquals(mini_eval, ab_eval, "Evaluation mismatch!");

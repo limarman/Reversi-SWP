@@ -11,8 +11,10 @@ public interface Calculator {
 	 * @param depth - wished depth to calculate
 	 * @param calcDeadLine - Deadline till when the move has to be calculated
 	 * @param form - form to fill out by the calculator during the process of calculating
+	 * @param conditions - conditions which are set for the Calculator to follow
 	 * @return the evaluation
 	 */
-	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form);
+	double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
+			CalculatorConditions conditions);
 	
 }

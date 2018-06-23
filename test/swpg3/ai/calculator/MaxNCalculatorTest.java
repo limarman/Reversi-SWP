@@ -59,6 +59,7 @@ class MaxNCalculatorTest {
 			Calculator paranoid = new ParanoidCalculator();
 			
 			CalculatorForm form = new CalculatorForm();
+			CalculatorConditions conditions = new CalculatorConditions();
 			
 			Map map = mm.getCurrentMap();	
 					
@@ -115,12 +116,12 @@ class MaxNCalculatorTest {
 	//
 	//		System.out.println(eva.evaluatePosition(mm.getCurrentMap(), (byte) 1));
 			
-			System.out.println(max.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
+			System.out.println(max.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form, conditions));
 			System.out.println(form.getBestMove());
 			
 			form.resetForm();
 			
-			System.out.println(paranoid.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form));
+			System.out.println(paranoid.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form, conditions));
 			System.out.println(form.getBestMove());
 		}
 
