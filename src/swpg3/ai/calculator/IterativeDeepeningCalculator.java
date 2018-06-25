@@ -14,6 +14,8 @@ public class IterativeDeepeningCalculator implements Calculator{
 	//used for statistics
 	public static int aspirationWindowFails = 0;
 	public static int totalCalculations = 0;
+	public static int depthsCalculated = 0;
+	public static int movesAsked = 0;
 	public static int timeouts = 0;
 	
 	private Calculator usedCalcBuilding;
@@ -40,6 +42,8 @@ public class IterativeDeepeningCalculator implements Calculator{
 	@Override
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
 			CalculatorConditions conditions) {
+		
+		movesAsked++;
 		
 		double evaluation  = 0;
 		
@@ -141,6 +145,9 @@ public class IterativeDeepeningCalculator implements Calculator{
 					}
 				}
 				else { //aspiration window has not lead to an search error or calculator does not considered it
+					
+					depthsCalculated++;
+					
 					//fill out the form
 					form.setBestMove(currentForm.getBestMove()); //actualize the best move
 					form.setMaxBranchingFactor(currentForm.getMaxBranchingFactor());

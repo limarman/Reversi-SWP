@@ -301,6 +301,11 @@ public class Phteven{
 				Logger.log(LogLevel.INFO, "Timeout percent: " +
 						IterativeDeepeningCalculator.timeouts /
 						((double) IterativeDeepeningCalculator.totalCalculations));
+				Logger.log(LogLevel.INFO, "Average Depth Reached: " +
+						IterativeDeepeningCalculator.depthsCalculated /
+						((double) IterativeDeepeningCalculator.movesAsked));
+				Logger.log(LogLevel.INFO, "Moves Played: " +
+						IterativeDeepeningCalculator.movesAsked);
 			}
 		}
 		else if(m.getType() == MessageType.CURRENT_GAME_STATE) // MessageType 10
