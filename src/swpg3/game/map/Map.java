@@ -4,9 +4,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import sun.net.www.protocol.http.spnego.NegotiateCallbackHandler;
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
+import swpg3.game.map.blocks.Block;
+import swpg3.game.map.blocks.BlockOrientation;
 import swpg3.game.move.Move;
 import swpg3.game.move.MoveType;
 
@@ -27,7 +31,10 @@ public class Map {
 
 	private Tile[]		grid;
 	private Player[]	playerInfo;
-	private byte		nextPlayerTurn;	
+	private byte		nextPlayerTurn;
+	private Block[]		blocks;
+	private int			numberOfBlocks;
+
 	/**
 	 * Creates a Map from fieldArray and playerInfo
 	 * 
@@ -37,16 +44,16 @@ public class Map {
 	 *            Array of players
 	 * 
 	 */
-	public Map(Tile[] field, Player[] playerInfo, byte nextPlayerTurn)
+	public Map(Tile[] field, Player[] playerInfo, byte nextPlayerTurn, Block[] blocks)
 	{
 		this.grid = field;
 		this.playerInfo = playerInfo;
 		this.nextPlayerTurn = nextPlayerTurn;
+		this.blocks = blocks; // Worst Case -Scenario
 	}
 
 	/**
 	 * Tests if a given move is valid for current gamestate
-	 * TODO: There is a bug with tiles which have a transition into themselves
 	 * 
 	 * @param move
 	 *            move to test
@@ -94,8 +101,8 @@ public class Map {
 				if (walker[i].step())
 				{
 					Tile t = walker[i].getCurrentTile();
-					if (t.isOccupied() && t.getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()) &&
-							!walker[i].getPosition().equals(move.getCoordinates()))
+					if (t.isOccupied() && t.getStatus() != Player.mapPlayerNumberToTileStatus(move.getPlayerNumber())
+							&& !walker[i].getPosition().equals(move.getCoordinates()))
 						hasAdjacentTile = true;
 					else
 						walker[i].stopMoving(); // Disable Walker
@@ -137,9 +144,13 @@ public class Map {
 	}
 
 	/**
-	 * Returns a boolean array with one boolean per player, indicating whether a move on the square (x,y) is possible for the player
-	 * @param x - x coordinate of the field
-	 * @param y - y coordinate of the field
+	 * Returns a boolean array with one boolean per player, indicating whether a
+	 * move on the square (x,y) is possible for the player
+	 * 
+	 * @param x
+	 *            - x coordinate of the field
+	 * @param y
+	 *            - y coordinate of the field
 	 * @return boolean array with length = numberOfPlayers
 	 */
 	public boolean[] isMoveValidAllPlayers(int x, int y)
@@ -156,9 +167,9 @@ public class Map {
 		}
 
 		Tile movePos = getTileAt(x, y);
-		
-		//basic checking
-		if (movePos.isHole()) //stone cannot be placed on a hole
+
+		// basic checking
+		if (movePos.isHole()) // stone cannot be placed on a hole
 		{
 			for (int i = 0; i < noPlayers; i++)
 			{
@@ -167,7 +178,7 @@ public class Map {
 			}
 			return valids;
 		}
-		if (movePos.isOccupied()) //if no overrideStones avail - stone cannot be placed
+		if (movePos.isOccupied()) // if no overrideStones avail - stone cannot be placed
 		{
 			for (int i = 0; i < noPlayers; i++)
 			{
@@ -175,10 +186,10 @@ public class Map {
 				{
 					valids[i] = false;
 					set[i] = true;
-				}
-				else
+				} else
 				{
-					//otherwise - if overrideStones are avail and stone is expansion stone -> move is valid
+					// otherwise - if overrideStones are avail and stone is expansion stone -> move
+					// is valid
 					if (movePos.getStatus() == TileStatus.EXPANSION)
 					{
 						if (!set[i])
@@ -193,17 +204,17 @@ public class Map {
 
 		MapWalker[] walker = new MapWalker[8];
 		boolean[] hasAdjacent = new boolean[noPlayers];
-		
-		//initializing hasAdjacent-array
-		for(int i = 0; i<hasAdjacent.length; i++)
+
+		// initializing hasAdjacent-array
+		for (int i = 0; i < hasAdjacent.length; i++)
 		{
 			hasAdjacent[i] = false;
 		}
-		
+
 		boolean[][] dirOk = new boolean[noPlayers][8];
-		for(int p = 0; p < noPlayers; p++)
+		for (int p = 0; p < noPlayers; p++)
 		{
-			for(int d = 0; d < 8; d++)
+			for (int d = 0; d < 8; d++)
 			{
 				dirOk[p][d] = false;
 			}
@@ -291,13 +302,11 @@ public class Map {
 									}
 								}
 							}
-						} 
-						else
+						} else
 						{
 							walker[i].stopMoving();
 						}
-					} 
-					else
+					} else
 					{
 						walker[i].stopMoving(); // Disable Walker
 					}
@@ -320,7 +329,8 @@ public class Map {
 	}
 
 	/**
-	 * Giving all the possible moves the player with specified playernumber can make.
+	 * Giving all the possible moves the player with specified playernumber can
+	 * make.
 	 * 
 	 * @param playerNumber
 	 * 
@@ -514,17 +524,17 @@ public class Map {
 								// adjacent field is empty or already owned or next field is empty
 								continue; // no enclosing of stones possible
 							}
-							
-							Vector2i neighbourPos = mw.getPosition().clone(); //remember the direct neighbour tile
+
+							Vector2i neighbourPos = mw.getPosition().clone(); // remember the direct neighbour tile
 							Vector2i lastDirection;
 							mw.step(); // making sure that direct adjacent fields are not valid moves
-							
-							// if the neighbour tile had a transition into itsself - enclosing is not possible
-							if(mw.getPosition().equals(neighbourPos))
+
+							// if the neighbour tile had a transition into itsself - enclosing is not
+							// possible
+							if (mw.getPosition().equals(neighbourPos))
 							{
 								continue;
 							}
-							
 
 							// iterate till a hole, an empty field or an own stone is found
 							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
@@ -537,13 +547,15 @@ public class Map {
 											MoveType.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
-								//remembering from where the MapWalker came from and which direction he walked
+								// remembering from where the MapWalker came from and which direction he walked
 								neighbourPos = mw.getPosition().clone();
 								lastDirection = mw.getDirection().clone();
 								mw.step();
-								
-								//if the walk made a loop over transition - there will be no (valid) new moves found
-								if(mw.getPosition().equals(neighbourPos) && Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection)) 
+
+								// if the walk made a loop over transition - there will be no (valid) new moves
+								// found
+								if (mw.getPosition().equals(neighbourPos)
+										&& Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection))
 								{
 									break;
 								}
@@ -642,7 +654,7 @@ public class Map {
 
 		return possibleMoves;
 	}
-	
+
 	/**
 	 * Giving all the possible moves the player with specified playernumber can
 	 * make.
@@ -692,17 +704,17 @@ public class Map {
 								// adjacent field is empty or already owned or next field is empty
 								continue; // no enclosing of stones possible
 							}
-							
-							Vector2i neighbourPos = mw.getPosition().clone(); //remember the direct neighbour tile
+
+							Vector2i neighbourPos = mw.getPosition().clone(); // remember the direct neighbour tile
 							Vector2i lastDirection;
 							mw.step(); // making sure that direct adjacent fields are not valid moves
-							
-							// if the neighbour tile had a transition into itsself - enclosing is not possible
-							if(mw.getPosition().equals(neighbourPos))
+
+							// if the neighbour tile had a transition into itsself - enclosing is not
+							// possible
+							if (mw.getPosition().equals(neighbourPos))
 							{
 								continue;
 							}
-							
 
 							// iterate till a hole, an empty field or an own stone is found
 							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
@@ -715,13 +727,15 @@ public class Map {
 											MoveType.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
-								//remembering from where the MapWalker came from and which direction he walked
+								// remembering from where the MapWalker came from and which direction he walked
 								neighbourPos = mw.getPosition().clone();
 								lastDirection = mw.getDirection().clone();
 								mw.step();
-								
-								//if the walk made a loop over transition - there will be no (valid) new moves found
-								if(mw.getPosition().equals(neighbourPos) && Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection)) 
+
+								// if the walk made a loop over transition - there will be no (valid) new moves
+								// found
+								if (mw.getPosition().equals(neighbourPos)
+										&& Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection))
 								{
 									break;
 								}
@@ -845,8 +859,85 @@ public class Map {
 
 			// flip set stone
 			// actualizing the map
-			getTileAt(move.getCoordinates()).setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
+			t.setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
 			// flipStone(move.getCoordinates().clone(), move.getPlayerNumber());
+
+			// May create new Blocks or merge two together
+			for (BlockOrientation ori : BlockOrientation.values())
+			{
+				Vector2i neighborAPos = Vector2i.sum(move.getCoordinates(), ori.dir);
+				Vector2i neighborBPos = Vector2i.sum(move.getCoordinates(), Vector2i.scaled(ori.dir, -1));
+				Tile neighborA = getTileAt(neighborAPos);
+				Tile neighborB = getTileAt(neighborBPos);
+
+				// has no neighbor Block
+				if (neighborA.getBlockID(ori) == 0 && neighborB.getBlockID(ori) == 0)
+				{
+					numberOfBlocks++;
+					blocks[numberOfBlocks] = new Block();
+					if (neighborA.isEmpty())
+					{
+						blocks[numberOfBlocks].setBorderA(move.getCoordinates());
+						blocks[numberOfBlocks].setNonBorderA(neighborAPos);
+					} else
+					{
+						blocks[numberOfBlocks].setBorderA(null);
+					}
+					if (neighborB.isEmpty())
+					{
+						blocks[numberOfBlocks].setBorderB(move.getCoordinates());
+						blocks[numberOfBlocks].setNonBorderB(neighborBPos);
+					} else
+					{
+						blocks[numberOfBlocks].setBorderB(null);
+					}
+
+					t.setBlockID(ori, numberOfBlocks);
+
+					blocks[numberOfBlocks].addStone(move.getPlayerNumber());
+				}
+				// has one block nearby
+				else if(neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) == 0)
+				{
+					int id = getRootBlockId(neighborA.getBlockID(ori));
+					t.setBlockID(ori, id);
+					blocks[id].addStone(move.getPlayerNumber());
+					// Adjust Borders:
+					if(blocks[id].getNonBorderA().equals(move.getCoordinates()))
+					{
+						blocks[id].setBorderA(move.getCoordinates());
+						blocks[id].setNonBorderA(neighborBPos);
+					}
+					else
+					{
+						blocks[id].setBorderB(move.getCoordinates());
+						blocks[id].setNonBorderB(neighborBPos);
+					}
+				}
+				else if(neighborA.getBlockID(ori) == 0 && neighborB.getBlockID(ori) != 0)
+				{
+					int id = getRootBlockId(neighborB.getBlockID(ori));
+					t.setBlockID(ori, id);
+					getRootBlock(blocks[id]).addStone(move.getPlayerNumber());
+					// Adjust Borders:
+					if(getRootBlock(blocks[id]).getNonBorderA().equals(move.getCoordinates()))
+					{
+						blocks[id].setBorderA(move.getCoordinates());
+						blocks[id].setNonBorderA(neighborAPos);
+					}
+					else
+					{
+						blocks[id].setBorderB(move.getCoordinates());
+						blocks[id].setNonBorderB(neighborAPos);
+					}
+				}
+				
+				// has two Blocks nearby
+				else if(neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) != 0)
+				{
+					// TODO: merge blocks
+				}
+			}
 
 			// temporary saving the tiles to flip - direct flipping brings bugs
 			List<Tile> tilesToFlip = new LinkedList<>();
@@ -877,7 +968,7 @@ public class Map {
 						// saving which stones have to be flipped
 						tilesToFlip.add(getTileAt(mw.getPosition()));
 						mw.step();
-						//Logger.log(LogLevel.DEBUG, "On Move: " + move + "Coordinates: " + mw.getPosition() + "Direction: " + mw.getDirection());
+
 					}
 				}
 			}
@@ -885,6 +976,13 @@ public class Map {
 			// actualizing the map
 			for (Tile tile : tilesToFlip)
 			{
+				// Adjust amount of stones in Blocks
+				for (BlockOrientation ori : BlockOrientation.values())
+				{
+					getRootBlock(blocks[tile.getBlockID(ori)])
+							.removeStone(Player.tileStatusToPlayerNumber(tile.getStatus()));
+					getRootBlock(blocks[tile.getBlockID(ori)]).addStone(move.getPlayerNumber());
+				}
 				tile.setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
 			}
 
@@ -985,14 +1083,13 @@ public class Map {
 	 */
 	private void bombField(int radius, Vector2i position)
 	{
-		int[][] integerMap = new int[MapManager.getInstance().getWidth()]
-				[MapManager.getInstance().getHeight()];
-		
-		for(int w = 0; w<MapManager.getInstance().getWidth(); w++) 
+		int[][] integerMap = new int[MapManager.getInstance().getWidth()][MapManager.getInstance().getHeight()];
+
+		for (int w = 0; w < MapManager.getInstance().getWidth(); w++)
 		{
-			for(int h = 0; h<MapManager.getInstance().getHeight(); h++) 
+			for (int h = 0; h < MapManager.getInstance().getHeight(); h++)
 			{
-				integerMap[w][h] = -1; //mark not visited
+				integerMap[w][h] = -1; // mark not visited
 			}
 		}
 		List<Vector2i> positionsToBomb = new LinkedList<>();
@@ -1027,13 +1124,14 @@ public class Map {
 			return; // No need for further recursion as all reachable tiles were already reached
 		} else // Tile has already been visited, but with smaller radius
 		{
-			integerMap[position.x][position.y] = radius; // actualize the radius the tile was visited for coming visitors
+			integerMap[position.x][position.y] = radius; // actualize the radius the tile was visited for coming
+															// visitors
 		}
 
 		if (radius == 0) // only current position has to be bombed
 			return; // usual recursion end
 
-		MapWalker mw = new MapWalker(this); // TODO: might be possible to work with just 1 MapWalker
+		MapWalker mw = new MapWalker(this);
 		mw.setPosition(position.clone());
 
 		for (int i = 0; i < 8; i++)
@@ -1047,7 +1145,7 @@ public class Map {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get a reference to a Tile
 	 * 
@@ -1084,6 +1182,7 @@ public class Map {
 	{
 		Player[] playerInfoClone = new Player[playerInfo.length];
 		Tile[] gridClone = new Tile[grid.length];
+		Block[] blocksClone = new Block[blocks.length];
 
 		for (int i = 0; i < playerInfo.length; i++)
 		{
@@ -1095,9 +1194,173 @@ public class Map {
 			gridClone[i] = grid[i].clone();
 		}
 
-		return new Map(gridClone, playerInfoClone, nextPlayerTurn);
+		for (int i = 0; i < blocks.length; i++)
+		{
+			if (blocks[i] != null)
+			{
+				blocksClone[i] = blocks[i].clone();
+			} else
+			{
+				blocksClone[i] = null;
+			}
+		}
+
+		return new Map(gridClone, playerInfoClone, nextPlayerTurn, blocks);
 	}
 
+	// --------------------------------------------------
+	// Block related Methods:
+	// --------------------------------------------------
+
+	/**
+	 * Traverses up the chain of superblocks to the top and returns the root.
+	 * 
+	 * @return the superblock that is the farthest one at the top
+	 */
+	private Block getRootBlock(Block start)
+	{
+		Block ret = start;
+		while (ret.getSuperblock() != 0)
+		{
+			ret = blocks[ret.getSuperblock()];
+		}
+		return ret;
+	}
+	private int getRootBlockId(int start)
+	{
+		int ret = start;
+		while(blocks[ret].getSuperblock() != 0)
+		{
+			ret = blocks[ret].getSuperblock();
+		}
+		return ret;
+	}
+
+	public int mobilityByBlocks(int playernumber)
+	{
+		int possMoves = 0;
+		BitMap doubles = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
+
+		for (int i = 1; i <= numberOfBlocks; i++)
+		{
+			if (blocks[i].isActive()) // only look at superblocks and Active blocks
+			{
+				// Look that all criterea are met:
+				// The Player has Stones in the Block
+				if (blocks[i].getStoneAmount(playernumber) > 0)
+				{
+					TileStatus stat = TileStatus.getStateByPlayerNumber((byte) playernumber);
+					if (blocks[i].getBorderA() != null && getTileAt(blocks[i].getBorderA()).getStatus() != stat)
+					{
+						if (!doubles.get(blocks[i].getNonBorderA().x, blocks[i].getNonBorderA().y))
+						{
+							possMoves++;
+							doubles.set(blocks[i].getNonBorderA().x, blocks[i].getNonBorderA().y, true);
+						}
+
+					}
+					if (blocks[i].getBorderB() != null && getTileAt(blocks[i].getBorderB()).getStatus() != stat)
+					{
+						if (!doubles.get(blocks[i].getNonBorderB().x, blocks[i].getNonBorderB().y))
+						{
+							possMoves++;
+							doubles.set(blocks[i].getNonBorderB().x, blocks[i].getNonBorderB().y, true);
+						}
+					}
+				}
+			}
+		}
+
+		return possMoves;
+	}
+
+	/**
+	 * Divides the map in to blocks
+	 */
+	public void blockify()
+	{
+		// Reset All Blocks
+		for (Tile t : grid)
+		{
+			for (BlockOrientation o : BlockOrientation.values())
+			{
+				t.setBlockID(o, 0);
+			}
+		}
+
+		int blocksID = 1;
+		for (int y = 0; y < MapManager.getInstance().getHeight(); y++)
+		{
+			for (int x = 0; x < MapManager.getInstance().getWidth(); x++)
+			{
+				for (BlockOrientation o : BlockOrientation.values())
+				{
+					if (getTileAt(x, y).getBlockID(o) == 0)
+					{
+						blocks[blocksID] = new Block();
+						getTileAt(x, y).setBlockID(o, blocksID);
+						blocks[blocksID].addStone(Player.tileStatusToPlayerNumber(getTileAt(x, y).getStatus()));
+						MapWalker mw = new MapWalker(this, new Vector2i(x, y), o.dir);
+						while (mw.canStep() && mw.getCurrentTile().isOccupied())
+						{
+							mw.step();
+							// has passed Transistion? TODO: find out if MapWalker has passed a transition
+							if (mw.getCurrentTile().isOccupied())
+							{
+								mw.getCurrentTile().setBlockID(o, blocksID);
+								blocks[blocksID]
+										.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+							}
+						}
+						if (mw.getCurrentTile().isEmpty())
+						{
+							blocks[blocksID].setNonBorderA(mw.getPosition());
+							blocks[blocksID]
+									.setBorderA(Vector2i.sum(mw.getPosition(), Vector2i.scaled(mw.getDirection(), -1)));
+						} else
+						{
+							blocks[blocksID].setBorderA(null);
+						}
+
+						mw.setPosition(new Vector2i(x, y));
+						mw.setDirection(Vector2i.scaled(o.dir, -1));
+						while (mw.canStep() && mw.getCurrentTile().isOccupied())
+						{
+							mw.step();
+							if (mw.getCurrentTile().isOccupied())
+							{
+								mw.getCurrentTile().setBlockID(o, blocksID);
+								blocks[blocksID]
+										.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+							}
+						}
+						if (mw.getCurrentTile().isEmpty())
+						{
+							blocks[blocksID].setNonBorderB(mw.getPosition());
+							blocks[blocksID]
+									.setBorderB(Vector2i.sum(mw.getPosition(), Vector2i.scaled(mw.getDirection(), -1)));
+						} else
+						{
+							blocks[blocksID].setBorderB(null);
+						}
+
+						blocksID++;
+					}
+				}
+
+			}
+		}
+
+		numberOfBlocks = blocksID;
+	}
+
+	// --------------------------------------------------
+	// Other/Debug stuff:
+	// --------------------------------------------------
+	/**
+	 * Prints the map with the added padding around it. Should only be used for
+	 * debugging
+	 */
 	public void print()
 	{
 		MapManager mm = MapManager.getInstance();

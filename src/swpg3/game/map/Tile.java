@@ -4,6 +4,7 @@
 package swpg3.game.map;
 
 import swpg3.game.Vector2i;
+import swpg3.game.map.blocks.BlockOrientation;
 
 /**
  * A Class to represent Tiles with their current status/occupation and arbitrary
@@ -18,6 +19,7 @@ public class Tile {
 	 * Pseudo 2D-Array to house Transitions. Can be indexed with directions
 	 */
 	private Transition[]	arbitraryTransitions;
+	private int[]			blocksIndexes;
 
 	/**
 	 * Initializes Tile as empty with no Transitions
@@ -30,16 +32,19 @@ public class Tile {
 		{
 			arbitraryTransitions[i] = null;
 		}
+		blocksIndexes = new int[4];
 	}
-	
+
 	/**
 	 * private constructor - for clone method
+	 * 
 	 * @param status
 	 */
-	private Tile(TileStatus status, Transition[] arbitraryTransitions) 
+	private Tile(TileStatus status, Transition[] arbitraryTransitions)
 	{
 		this.status = status;
 		this.arbitraryTransitions = arbitraryTransitions;
+		blocksIndexes = new int[4];
 	}
 
 	/**
@@ -55,6 +60,7 @@ public class Tile {
 		{
 			arbitraryTransitions[i] = null;
 		}
+		blocksIndexes = new int[4];
 	}
 
 	/**
@@ -77,16 +83,14 @@ public class Tile {
 	{
 		if (!hasTransitionTo(leavingDirection))
 		{
-			if(!leavingDirection.isZero())
+			if (!leavingDirection.isZero())
 			{
 				arbitraryTransitions[(leavingDirection.x + 1) + (leavingDirection.y + 1) * 3] = tran;
-			}
-			else
+			} else
 			{
 				throw new IllegalArgumentException("Zero-Dir:" + leavingDirection); // might be overkill
 			}
-		}
-		else
+		} else
 		{
 			throw new IllegalArgumentException("double Transition!" + leavingDirection); // might be overkill
 		}
@@ -156,15 +160,41 @@ public class Tile {
 	{
 		return (status.value >= 1 && status.value <= 8);
 	}
-	
-	public boolean isEmpty() 
+
+	/**
+	 * Checks if a Tile is empty. Empty means there is no stone on it. Neither a Player nor an expansion stone.
+	 * Holes are not considered empty.
+	 * @return true, if the Tile is Empty; false, otherwise
+	 */
+	public boolean isEmpty()
 	{
 		return status == TileStatus.EMPTY || status == TileStatus.CHOICE || status == TileStatus.BONUS
 				|| status == TileStatus.INVERSION;
 	}
 	
+	/**
+	 * Get the Index of the Block with the given Orientation
+	 * @param orientation
+	 * @return
+	 */
+	public int getBlockID(BlockOrientation orientation)
+	{
+		return blocksIndexes[orientation.val];
+	}
+	
+	/**
+	 * Sets the Index of a Block in the field for the block of the given orientation
+	 * @param orientation
+	 * @param index
+	 */
+	public void setBlockID(BlockOrientation orientation, int index)
+	{
+		blocksIndexes[orientation.val] = index;
+	}
+
 	@Override
-	public Tile clone() {
+	public Tile clone()
+	{
 		return new Tile(status, arbitraryTransitions);
 	}
 }
