@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import swpg3.ai.AI;
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.CalculatorConditions;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
@@ -321,11 +322,12 @@ class TimingTest {
 			Evaluator eva = new InversionaryEvaluator();
 			Calculator minCalc = new ParanoidCalculator();
 			CalculatorForm form = new CalculatorForm();
+			CalculatorConditions conditions = new CalculatorConditions();
 			
 			long pre_time_sum = System.nanoTime();
 			
 			for(int i = 0; i<100; i++) {
-				minCalc.calculateBestMove(eva, (byte)1, 4, Long.MAX_VALUE, form);
+				minCalc.calculateBestMove(eva, (byte)1, 4, Long.MAX_VALUE, form, conditions);
 			}
 			
 			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/100000.);

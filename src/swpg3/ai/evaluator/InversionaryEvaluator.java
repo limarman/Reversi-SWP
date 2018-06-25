@@ -26,7 +26,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	// EV - End Value
 	// I - Importance
 	private double INV_SV_I = 0;
-	private double INV_TV_I = 0.4;
+	private double INV_TV_I = 0.5;
 	private double INV_EV_I = 0.9;
 	private double INV_TP_I = 0.6;
 	
@@ -244,30 +244,24 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					//neighbor is bombing
 					if(rank - playerRank > 0) //lower neighbour, bombing more likely
 					{
-						stoneCount_max -= bombpower * 0.6;
-						stoneCount_min -= bombpower * 0.8;
+						stoneCount_max -= bombpower * 0.4;
+						stoneCount_min -= bombpower * 1;
 					}
 					else
 					{
 						stoneCount_max -= bombpower * 0.2;
-						stoneCount_min -= bombpower * 0.4;
+						stoneCount_min -= bombpower * 0.6;
 					}
 					
 				}
 				else if(rankDifference == 2) 
 				{
 					//indirect neighbor is bombing - factor 0.1 to 0.3
-					stoneCount_max -= bombpower * 0.0;
-					stoneCount_min -= bombpower * 0.2;
+					stoneCount_min -= bombpower * 0.1;
 				}
 				else if(rankDifference == 3) 
 				{
 					//indirect indirect neighbor - factor 0.0 to 0.1
-					stoneCount_min -= bombpower * 0.1;
-				}
-				else if(rankDifference == 4) 
-				{
-					//others are bombing - factor 0.0 to 0.05
 					stoneCount_min -= bombpower * 0.05;
 				}
 			}

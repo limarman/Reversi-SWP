@@ -72,7 +72,7 @@ public class AI {
 	public static double PP_SV_I = 1;
 	public static double PP_TV_I = 0.7;
 	public static double PP_EV_I = 0;
-	public static double PP_TP_I = 0.6;
+	public static double PP_TP_I = 0.65;
 		
 	//tools
 	private Analyser anna;
@@ -167,7 +167,7 @@ public class AI {
 			return;
 		}
 		
-		int movesToEnd = 3;
+		int movesToEnd = 10;
 		double turnPoint = (PLAYABLE_SQUARES - (numberOfPlayers * movesToEnd))/((double)PLAYABLE_SQUARES);
 		
 		//setting the turningPoints
