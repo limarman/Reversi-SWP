@@ -707,7 +707,7 @@ public class Map {
 								{
 									// a new Move is found
 									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE);
+											MoveTypeValue.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
 								//remembering from where the MapWalker came from and which direction he walked
@@ -730,7 +730,7 @@ public class Map {
 								if (!mw.getPosition().equals(pos) && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.SELF_OVERRIDE_USE));
+											MoveTypeValue.SELF_OVERRIDE_USE));
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
@@ -740,27 +740,27 @@ public class Map {
 									case EMPTY:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.NORMAL_BUILDING));
+												MoveTypeValue.NORMAL_BUILDING));
 										break;
 									case CHOICE:
 										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
 										{
 											// there are #player possible ways to switch players
 											possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber,
-													MoveType.CHOICE));
+													MoveTypeValue.CHOICE));
 										}
 										break;
 									case INVERSION:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.INVERSION));
+												MoveTypeValue.INVERSION));
 										break;
 									case BONUS:
 										// There is a choice between an extra bomb and an extra override stone
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE,
-												playerNumber, MoveType.BONUS_BOMB));
+												playerNumber, MoveTypeValue.BONUS_BOMB));
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
-												playerNumber, MoveType.BONUS_OVERRIDE));
+												playerNumber, MoveTypeValue.BONUS_OVERRIDE));
 										break;
 									default:
 										// cannot be the case
@@ -773,13 +773,13 @@ public class Map {
 								if (overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE));
+											MoveTypeValue.OVERRIDE_USE));
 								}
 							}
 						}
 					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveType.OVERRIDE_USE));
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
 				}
 			}
@@ -799,12 +799,12 @@ public class Map {
 							// bombing an own stone in the first place
 							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.SELF_BOMB));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.SELF_BOMB));
 							}
 							// not bombing an own stone - most liekly a wiser choice
 							else
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.NORMAL_BOMBING));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.NORMAL_BOMBING));
 							}
 						}
 					}
