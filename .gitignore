@@ -11,3 +11,5 @@
 *.log
 *.class
 *.jar
+*.snm
+*.nav

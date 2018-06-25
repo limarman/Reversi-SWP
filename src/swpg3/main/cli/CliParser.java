@@ -17,7 +17,8 @@ public class CliParser {
 		options.add(opt);
 	}
 
-	public void addOption(char shortName, String longName, boolean mandatory, CliOptionType type, String defaultParam, String description)
+	public void addOption(char shortName, String longName, boolean mandatory, CliOptionType type, String defaultParam,
+			String description)
 	{
 		options.add(new CliOption(shortName, longName, mandatory, type, defaultParam, description));
 	}
@@ -42,7 +43,7 @@ public class CliParser {
 			}
 			if (curCli.charAt(1) != '-') // shortoption
 			{
-				if(curCli.length() != 2)
+				if (curCli.length() != 2)
 				{
 					System.out.println("Invalid Syntax in: " + curCli + "\nExpected only one option!");
 					printHelp();
@@ -50,36 +51,36 @@ public class CliParser {
 				}
 				char sname = curCli.charAt(1);
 				boolean set = false;
-				for(CliOption opt : options)
+				for (CliOption opt : options)
 				{
-					if(opt.getShortName() != ' ' && opt.getShortName() == sname)
+					if (opt.getShortName() != ' ' && opt.getShortName() == sname)
 					{
-						switch(opt.getType())
+						switch (opt.getType())
 						{
 							case FLAG:
 								set = true;
 								opt.set();
 								break;
 							case STRINGPARAM:
-								if(args.length <= i+1)
+								if (args.length <= i + 1)
 								{
 									System.out.println("Expected parameter after: " + curCli);
 									printHelp();
 									return false;
 								}
 								set = true;
-								opt.setParam(args[i+1]);
+								opt.setParam(args[i + 1]);
 								i++;
 								break;
 							case INTPARAM:
-								if(args.length <= i+1)
+								if (args.length <= i + 1)
 								{
 									System.out.println("Expected parameter after: " + curCli);
 									printHelp();
 									return false;
 								}
 								set = true;
-								if(!opt.setParam(args[i+1]))
+								if (!opt.setParam(args[i + 1]))
 								{
 									System.out.println("Expected number after: " + curCli);
 									printHelp();
@@ -90,7 +91,7 @@ public class CliParser {
 						}
 					}
 				}
-				if(!set)
+				if (!set)
 				{
 					System.out.println("Unknown Parameter: " + curCli);
 					printHelp();
@@ -102,34 +103,34 @@ public class CliParser {
 				boolean set = false;
 				for (CliOption opt : options)
 				{
-					if(!opt.getLongName().equals("") && opt.getLongName().equals(lname))
+					if (!opt.getLongName().equals("") && opt.getLongName().equals(lname))
 					{
-						switch(opt.getType())
+						switch (opt.getType())
 						{
 							case FLAG:
 								set = true;
 								opt.set();
 								break;
 							case STRINGPARAM:
-								if(args.length <= i+1)
+								if (args.length <= i + 1)
 								{
 									System.out.println("Expected parameter after: " + curCli);
 									printHelp();
 									return false;
 								}
 								set = true;
-								opt.setParam(args[i+1]);
+								opt.setParam(args[i + 1]);
 								i++;
 								break;
 							case INTPARAM:
-								if(args.length <= i+1)
+								if (args.length <= i + 1)
 								{
 									System.out.println("Expected parameter after: " + curCli);
 									printHelp();
 									return false;
 								}
 								set = true;
-								if(!opt.setParam(args[i+1]))
+								if (!opt.setParam(args[i + 1]))
 								{
 									System.out.println("Expected number after: " + curCli);
 									printHelp();
@@ -140,7 +141,7 @@ public class CliParser {
 						}
 					}
 				}
-				if(!set)
+				if (!set)
 				{
 					System.out.println("Unknown Parameter: " + curCli);
 					printHelp();
@@ -150,19 +151,21 @@ public class CliParser {
 			i++;
 		}
 		boolean allMand = true;
-		for(CliOption opt : options)
+		boolean helpSet = getOption('h').isSet();
+		// If help - FLAG not specified, check if all mandatory arguments are given
+		for (CliOption opt : options)
 		{
-			if(opt.isMandatory() && !(opt.isSet() || opt.isGiven()))
+			if (opt.isMandatory() && !(opt.isSet() || opt.isGiven()))
 			{
-				System.out.println("PARSE-ERROR: Mandatory parameter " + opt.shortString() + " is missing!");
+				if (!helpSet)
+				{
+					System.out.println("PARSE-ERROR: Mandatory parameter " + opt.shortString() + " is missing!");
+				}
 				allMand = false;
 			}
 		}
-		if(!allMand)
-		{
-			printHelp();
-		}
-		if(getOption('h').isSet())
+
+		if (!allMand || helpSet)
 		{
 			printHelp();
 		}
@@ -173,24 +176,24 @@ public class CliParser {
 	{
 		System.out.println("\nCall with these mandatory Arguements:");
 		System.out.format(" %-6s %-17s %-8s %s\n", "short", "long", "prmType", "description");
-		for(CliOption opt: options)
+		for (CliOption opt : options)
 		{
-			if(opt.isMandatory())
+			if (opt.isMandatory())
 			{
 				System.out.println(opt);
 			}
 		}
-		
+
 		System.out.println("\nAnd these optional Arguements:");
 		System.out.format(" %-6s %-17s %-8s %s\n", "short", "long", "prmType", "description");
-		for(CliOption opt: options)
+		for (CliOption opt : options)
 		{
-			if(!opt.isMandatory())
+			if (!opt.isMandatory())
 			{
 				System.out.println(opt);
 			}
 		}
-		
+
 	}
 
 	public CliOption getOption(char shortname)
