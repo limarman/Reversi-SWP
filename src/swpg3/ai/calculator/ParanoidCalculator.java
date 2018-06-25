@@ -20,7 +20,8 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class ParanoidCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form, 
+			CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
@@ -81,6 +82,8 @@ public class ParanoidCalculator implements Calculator{
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0);
 									
+			//System.out.println("Move: " + move + " Value: " + value);
+			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);

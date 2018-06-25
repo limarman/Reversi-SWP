@@ -3,8 +3,10 @@ package swpg3.ai;
 import java.util.HashSet;
 
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.CalculatorConditions;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.IterativeDeepeningCalculator;
+import swpg3.ai.calculator.MaxNCalculator;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
 import swpg3.ai.calculator.movesorter.BogoSorter;
@@ -12,6 +14,7 @@ import swpg3.ai.calculator.movesorter.NaturalSorter;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.BitMap;
+import swpg3.game.MathHelper;
 import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
@@ -44,7 +47,7 @@ public class AI {
 	public static double SC_TP_I;
 	
 	//Mobility parameter
-	public static double MOBILITY_BONUS = 15;
+	public static double MOBILITY_BONUS = 20;
 	
 	public static double M_SV;
 	public static double M_MV;
@@ -69,7 +72,7 @@ public class AI {
 	public static double PP_SV_I = 1;
 	public static double PP_TV_I = 0.7;
 	public static double PP_EV_I = 0;
-	public static double PP_TP_I;
+	public static double PP_TP_I = 0.6;
 		
 	//tools
 	private Analyser anna;
@@ -112,11 +115,11 @@ public class AI {
 			if(GlobalSettings.ab_pruning) 
 			{
 				calc = new IterativeDeepeningCalculator(new PruningParanoidCalculator(
-						(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()));
+						(GlobalSettings.move_sorting) ? new NaturalSorter() : new BogoSorter()), new MaxNCalculator());
 			}
 			else 
 			{
-				calc = new IterativeDeepeningCalculator(new ParanoidCalculator());
+				calc = new IterativeDeepeningCalculator(new ParanoidCalculator(), new MaxNCalculator());
 			}
 		}
 		else
@@ -135,6 +138,7 @@ public class AI {
 		eva = new InversionaryEvaluator();
 //		eva = new RelativeEvaluator();
 		anna.analyseMap();
+		MathHelper.initialize();
 		setParameters();
 	}
 	
@@ -145,8 +149,9 @@ public class AI {
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
 		CalculatorForm form = new CalculatorForm();
+		CalculatorConditions conditions = new CalculatorConditions();
 		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit,
-				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form);
+				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form, conditions);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 //		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
 		return form.getBestMove();
@@ -168,7 +173,7 @@ public class AI {
 		//setting the turningPoints
 		SC_TP_I = turnPoint;
 		SC_TP = turnPoint;
-		PP_TP_I = turnPoint;
+		//PP_TP_I = turnPoint;
 		
 		//setting the rest of StoneCount
 		SC_SV = 1/((double)numberOfPlayers);

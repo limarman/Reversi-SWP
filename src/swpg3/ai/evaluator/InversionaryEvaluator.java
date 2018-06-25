@@ -4,13 +4,12 @@ import swpg3.ai.AI;
 import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.IntegerWrapper;
+import swpg3.game.MathHelper;
 import swpg3.game.Player;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
-import swpg3.main.logging.LogLevel;
-import swpg3.main.logging.Logger;
 
 /**
  * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
@@ -113,9 +112,73 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		}
 		else //Bombing Phase
 		{			
-			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-			double [] stoneCount = new double[numberOfPlayers];
+//			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
+//			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
+//			
+//			//counting the holes
+//			int holes = 0;
+//			
+//			//iterating over map counting stones from each player
+//			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
+//			{
+//				for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
+//				{
+//					if(map.getTileAt(w, h).isOccupiedbyPlayer())
+//					{
+//						byte player = map.getTileAt(w, h).getStatus().value;
+//						stoneCount[player-1]++;
+//					}
+//					else if(map.getTileAt(w, h).isHole())
+//					{
+//						holes++;
+//					}
+//				}	
+//			}
+//			
+//			
+//			double[] probs = calculateProbabilities(playerNumber, stoneCount);
+//			
+//			//expected prize - according to probabilites
+//			double stone_evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+//			
+//			//calculate absolute bombingPower
+//			int bombStrength = MapManager.getInstance().getBombStrength();
+//			int bombingPower = 0;
+//			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
+//			{
+//				Player p = map.getPlayer(i);
+//				if(!p.isDisqualified()) {
+//					//A bomb with radius x bombs a square with width (2x+1) and height (2x+1)
+//					bombingPower += p.getBombs() * (2*bombStrength+1) * (2*bombStrength+1);
+//				}
+//			}
+//			
+//			//calculate the prize of player if there would not be any bombs left (current standing)
+//			int currentPrize = calculateCurrentPrize(stoneCount, playerNumber);
+//			
+//			
+//			//calculate weighting factor
+//			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
+//			double CONST = 1; //can be modified - the bigger - the more the old function plays a role
+//			int playableSquares = (MapManager.getInstance().getHeight() * MapManager.getInstance().getWidth() - holes);
+//			double weight;
+//			if(playableSquares > 0) {
+//				weight = bombingPower * CONST / ((double)playableSquares);
+//				if(weight > 1) 
+//				{
+//					weight = 1; //should not be over 1
+//				}
+//			}else 
+//			{
+//				weight = 1;
+//			}
+//			
+//			//weighted evaluation
+//			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
 			
+			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
+			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
+						
 			//iterating over map counting stones from each player
 			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
 			{
@@ -129,11 +192,189 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				}	
 			}
 			
+			//mapping the ranks (0 to #players-1) to the playerNumbers
+			int[] rankings = new int[MapManager.getInstance().getNumberOfPlayers()];
+			int playerRank = 0;
 			
-			double[] probs = calculateProbabilities(playerNumber, stoneCount);
+			for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
+			{
+				int rank = 0;
+				for(int j = 0; j<stoneCount.length; j++) 
+				{
+					//player with more stones
+					if(stoneCount[j] > stoneCount[i]) 
+					{
+						rank++;
+					}
+				}
+				//playerNumber is playerIndex+1
+				while(rankings[rank] != 0) 
+				{
+					rank++; //make sure that players with the same stoneCount wont get the same rank
+				}
+				rankings[rank] = i+1;
+				//saving the rank of player with playerNumber
+				if(i == playerNumber-1) 
+				{
+					playerRank = rank;
+				}
+			}
 			
-			//expected prize - according to probabilites
-			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			//boundaries for approximate window, where our stone count at the end of bombing phase will be
+			double stoneCount_max = stoneCount[playerNumber-1];
+			double stoneCount_min = stoneCount[playerNumber-1];
+			
+			//iterating over the ranks, making approximations of min and max bombing of our stones
+			//direct neighbors use 0.4 to 0.6 * bombpower
+			//indirect neighbours use 0.1 to 0.3 * bombpower
+			//every other player uses 0.0 to 0.1 * bombpower
+			int bombradius = MapManager.getInstance().getBombStrength();
+			for(int rank = 0; rank<rankings.length; rank++) 
+			{
+				//bombpower  = #bombs * (2*bombradius + 1)^2
+				if(map.getPlayer(rankings[rank]) == null) 
+				{
+					System.out.println("rank = " + rank + " rankings[rank] = " + rankings[rank]);
+				}
+				int bombpower = map.getPlayer(rankings[rank]).getBombs() * (2*bombradius+1) * (2*bombradius+1);
+				int rankDifference = Math.abs(rank - playerRank);
+				//TODO: look why the function generates silly moves in bad starting positions
+				if(rankDifference == 1) 
+				{
+					//neighbor is bombing
+					if(rank - playerRank > 0) //lower neighbour, bombing more likely
+					{
+						stoneCount_max -= bombpower * 0.6;
+						stoneCount_min -= bombpower * 0.8;
+					}
+					else
+					{
+						stoneCount_max -= bombpower * 0.2;
+						stoneCount_min -= bombpower * 0.4;
+					}
+					
+				}
+				else if(rankDifference == 2) 
+				{
+					//indirect neighbor is bombing - factor 0.1 to 0.3
+					stoneCount_max -= bombpower * 0.0;
+					stoneCount_min -= bombpower * 0.2;
+				}
+				else if(rankDifference == 3) 
+				{
+					//indirect indirect neighbor - factor 0.0 to 0.1
+					stoneCount_min -= bombpower * 0.1;
+				}
+				else if(rankDifference == 4) 
+				{
+					//others are bombing - factor 0.0 to 0.05
+					stoneCount_min -= bombpower * 0.05;
+				}
+			}
+			
+			//make sure we have no negative number of stones
+			if(stoneCount_max < 0) 
+			{
+				stoneCount_max = 0;
+			}
+			if(stoneCount_min < 0) 
+			{
+				stoneCount_min = 0;
+			}
+			
+			evaluation = 0;
+			int playerBombPower = map.getPlayer(playerNumber).getBombs() * (2*bombradius+1) * (2*bombradius+1);
+			
+			//checking percentage to win for worst, best, average case and 0.25 and 0.75 percentile
+			for(int j = 0; j<5; j++) 
+			{
+				//the assumed stoneCount in this iteration in the interval [stoneCount_min, stoneCount_max]
+				double caseStoneCount = (j/4.) * stoneCount_max + (1-(j/4.)) * stoneCount_min;
+				double caseEvaluation = 0;
+				
+				double[] stonesToPlace = new double[MapManager.getInstance().getNumberOfPlayers()];
+				int currentPlace = 0;
+				for(int i = 0; i<stonesToPlace.length; i++)
+				{
+					//do not consider our old own stoneCount
+					if(i != playerRank) 
+					{
+						stonesToPlace[currentPlace] = stoneCount[rankings[i]-1] - caseStoneCount;
+						if(stonesToPlace[currentPlace] <= 0) 
+						{
+							break; //position found
+						}
+						currentPlace++;
+					}
+				}				
+				if(playerBombPower != 0) { //we can actively change something in our ranking
+					while(currentPlace>=0) 
+					{
+						//determine the percentage we have to be able to use of our bombing power to become the place "currentPlace"
+						double minPerc, maxPerc;					
+	
+						if(currentPlace == 0) 
+						{
+							minPerc = stonesToPlace[currentPlace] / playerBombPower;
+							maxPerc = 1;
+						}
+						else {
+							minPerc = stonesToPlace[currentPlace] / playerBombPower;
+							maxPerc = (stonesToPlace[currentPlace-1]-1) / playerBombPower;
+						}
+						
+						if(minPerc > 1) 
+						{
+							//impossible to achieve a usage percentage of over 1. Probability is 0 as well as for the coming upper ranks.
+							//we can stop calculating here
+							break;
+						}else if(minPerc < 0) 
+						{
+							//stones to Rank were negative, as we are safe on this rank. So we have to bomb at least 0 squares to stay there.
+							minPerc = 0;
+						}
+						
+						if(maxPerc > 1) 
+						{
+							//there cannot be more used than 100 percent of bomb power
+							maxPerc = 1;
+						}else if(maxPerc < 0) 
+						{
+							maxPerc = 0; //very rare case, when our stoneCount is less than one stone away from opponent.
+						}
+						
+						caseEvaluation += mapPlaceToPrize(currentPlace+1) * MathHelper.probabilityInInterval(minPerc, maxPerc);
+						
+						currentPlace--;
+					}
+				}
+				else 
+				{
+					caseEvaluation = mapPlaceToPrize(currentPlace+1);
+				}
+				
+				//add caseEvaluation to Evaluation weighted with caseProbability which is 5% - 20% - 50% - 20% - 5% for the percentiles
+				switch(j) 
+				{
+				case 0: 
+					evaluation += caseEvaluation * 0.05;
+					break;
+				case 1:
+					evaluation += caseEvaluation * 0.2;
+					break;
+				case 2: 
+					evaluation += caseEvaluation * 0.5;
+					break;
+				case 3:
+					evaluation += caseEvaluation * 0.2;
+					break;
+				case 4:
+					evaluation += caseEvaluation * 0.05;
+					break;
+				}
+			}
+			
+			
 			
 			
 		}
@@ -305,6 +546,21 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 
 	}
 	
+	private int mapPlaceToPrize(int place) 
+	{
+		switch(place) 
+		{
+		
+		case 1: return FIRST_PRIZE;
+		case 2: return SECOND_PRIZE;
+		case 3: return THIRD_PRIZE;
+		case 4: return FOURTH_PRIZE;
+		case 5: return FIFTH_PRIZE;
+		default : return 0;
+		
+		}
+	}
+	
 	/**
 	 * Calculates the importance factor according to Inversion parameters.
 	 * @param totalFieldControl - percentage of the total field control
@@ -348,7 +604,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		
 		return playerIndex-1; //conversion back to index
 	}
-		
+			
 	/**
 	 * Iterates horizontally in direction east over the map and finds the free valid moves. Dismisses the Transitions.
 	 * @param map

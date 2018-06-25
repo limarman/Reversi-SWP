@@ -287,9 +287,10 @@ class TimingTest {
 	}
 	
 	@Test
-	void alphaBetaMiniMaxTiming()
+	void BombingPhaseApplyMoveTimingTest()
 	{
-		boolean doTest = false;
+		boolean doTest = true;
+		int numberOfRuns = 1000000;
 		
 		if(!doTest)
 		{

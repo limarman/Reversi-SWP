@@ -272,7 +272,7 @@ public class MapManager {
 	}
 
 	/**
-	 * @return the actualMap
+	 * @return copy of the actualMap
 	 */
 	public Map getCurrentMap() {
 		return currentMap.clone();

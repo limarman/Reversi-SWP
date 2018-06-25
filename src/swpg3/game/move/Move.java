@@ -17,7 +17,7 @@ public class Move implements Comparable<Move>{
 	private Vector2i coordinates;
 	private byte specialFieldInfo;
 	private byte playerNumber;
-	private MoveType type; //used to make a natural ordering of moves
+	private int moveValue;
 	
 	
 	/**
@@ -35,15 +35,15 @@ public class Move implements Comparable<Move>{
 		this.coordinates = coordinates;
 		this.specialFieldInfo = specialFieldInfo;
 		this.playerNumber = playerNumber;
-		this.type = MoveType.NORMAL_BUILDING;
+		this.moveValue = MoveTypeValue.NORMAL_BUILDING;
 	}
 	
-	public Move(Vector2i coordinates, byte specialFieldInfo, byte playerNumber, MoveType type) 
+	public Move(Vector2i coordinates, byte specialFieldInfo, byte playerNumber, int moveValue) 
 	{
 		this.coordinates = coordinates;
 		this.specialFieldInfo = specialFieldInfo;
 		this.playerNumber = playerNumber;
-		this.type = type;
+		this.moveValue = moveValue;
 	}
 
 	/**
@@ -136,16 +136,16 @@ public class Move implements Comparable<Move>{
 	@Override
 	public int compareTo(Move m) {
 
-		return type.moveValue - m.type.moveValue;
+		return moveValue - m.moveValue;
 	}
 	
 	/**
 	 * 
 	 * @return Type of move
 	 */
-	public MoveType getMoveType() 
+	public int getMoveValue() 
 	{
-		return type;
+		return moveValue;
 	}
 	
 
