@@ -1,0 +1,10 @@
+\section{Task 2}
+Wir verwenden die Suchfenster innerhalb des Deepeners (Iterative Deepening Calculator).
+Nach der ersten Suche mit Tiefe 1 \textbf{ohne} Fenster, also mit Grenzen $+\infty$ und $-\infty$ haben wir einen Richtwert für den Stellungswert $val_1$. Für weitere Tiefen $t$, zentrieren wir ein Suchfenster mit Breite $b$ um den zuvor gefundenen Stellungswert herum und suchen den neuen Stellungswert in dem Intervall $[val_{t-1} - b, val_{t-1} + b]$ in der Hoffnung, dass der gesuchte Wert tatsächlich in dem gegebenen Intervall liegt und von Anfang an mehr Teilbäume abgeschnitten werden können. Leider kann es passieren, dass dies nicht der Fall ist und die Einschränkung zu stark war. Der Alpha-Beta Algorithmus liefert in dem Fall entweder einen Wert kleiner-gleich der unteren Schranke $val_t <= val_{t-1} - b$ oder einen Wert größer-gleich der oberen Schranke $val_t >= val_{t-1} + b$. Jedoch ist der berechnete Stellungswert nicht aussagekräftig, da der optimale Pfad beschnitten worden sein könnte. Also ist eine Neusuche notwendig:
+\begin{enumerate}
+\item[•] \textbf{Fall 1: untere Schranke wird unterschritten.}\\
+Dann liegt der tatsächliche Stellungswert unterhalb der unteren Schranke. Wenn also das Intervall $[\alpha,\beta]$ war, dann erfolgt die Neusuche im Intervall $[-\infty, \alpha]$.
+\item[•] \textbf{Fall 2: obere Schranke wird überschritten.}\\
+Analog zum ersten Fall muss oberhalb der oberen Schranke neu gesucht werden. Also im Intervall $[\beta, +\infty]$.
+\end{enumerate}
+In der Implementierung wird das jeweilige Fenster dem Calculator über einen Parameter gegeben von der Klasse $CalculatorConditions$. Diese enthält Vorgaben, welche der jeweilige Calculator zu erfüllen hat. Zum Beispiel gehört eine maximale Tiefe und ein Zeitlimit auch dazu.

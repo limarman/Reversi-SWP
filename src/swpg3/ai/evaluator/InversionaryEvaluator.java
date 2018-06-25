@@ -238,13 +238,14 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 				}
 				int bombpower = map.getPlayer(rankings[rank]).getBombs() * (2*bombradius+1) * (2*bombradius+1);
 				int rankDifference = Math.abs(rank - playerRank);
+				//TODO: look why the function generates silly moves in bad starting positions
 				if(rankDifference == 1) 
 				{
 					//neighbor is bombing
 					if(rank - playerRank > 0) //lower neighbour, bombing more likely
 					{
-						stoneCount_max -= bombpower * 0.5;
-						stoneCount_min -= bombpower * 0.7;
+						stoneCount_max -= bombpower * 0.6;
+						stoneCount_min -= bombpower * 0.8;
 					}
 					else
 					{

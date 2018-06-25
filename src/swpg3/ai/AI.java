@@ -3,6 +3,7 @@ package swpg3.ai;
 import java.util.HashSet;
 
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.CalculatorConditions;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.IterativeDeepeningCalculator;
 import swpg3.ai.calculator.MaxNCalculator;
@@ -71,7 +72,7 @@ public class AI {
 	public static double PP_SV_I = 1;
 	public static double PP_TV_I = 0.7;
 	public static double PP_EV_I = 0;
-	public static double PP_TP_I;
+	public static double PP_TP_I = 0.6;
 		
 	//tools
 	private Analyser anna;
@@ -148,8 +149,9 @@ public class AI {
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
 		CalculatorForm form = new CalculatorForm();
+		CalculatorConditions conditions = new CalculatorConditions();
 		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit,
-				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form);
+				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form, conditions);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 //		Logger.log(LogLevel.DETAIL, "Time needed (s): " + (SystimeAfter - SystimeBefore) / 1000);
 		return form.getBestMove();
@@ -171,7 +173,7 @@ public class AI {
 		//setting the turningPoints
 		SC_TP_I = turnPoint;
 		SC_TP = turnPoint;
-		PP_TP_I = turnPoint;
+		//PP_TP_I = turnPoint;
 		
 		//setting the rest of StoneCount
 		SC_SV = 1/((double)numberOfPlayers);

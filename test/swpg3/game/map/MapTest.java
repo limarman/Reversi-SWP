@@ -374,7 +374,7 @@ class MapTest {
 		Arrays.sort(sorted);
 		for(int i = 0; i<sorted.length; i++) 
 		{
-			System.out.println(sorted[i] + "Type: " + sorted[i].getMoveType());
+			System.out.println(sorted[i] + "MoveValue: " + sorted[i].getMoveValue());
 		}
 		
 		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);

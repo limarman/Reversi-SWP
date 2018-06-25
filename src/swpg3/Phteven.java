@@ -6,6 +6,7 @@ package swpg3;
 import java.io.IOException;
 
 import swpg3.ai.AI;
+import swpg3.ai.calculator.IterativeDeepeningCalculator;
 import swpg3.game.map.MapManager;
 import swpg3.game.move.Move;
 import swpg3.main.GlobalSettings;
@@ -290,6 +291,22 @@ public class Phteven{
 			// Exit Program
 			shouldClose = true;
 			Logger.log(LogLevel.INFO, "Game has ended!");
+			if(GlobalSettings.iterative_deepening) 
+			{
+				Logger.log(LogLevel.INFO, "Total Aspiration-Window Fails: "
+						+ IterativeDeepeningCalculator.aspirationWindowFails);
+				Logger.log(LogLevel.INFO, "In Percent of Calculations: " +
+						IterativeDeepeningCalculator.aspirationWindowFails /
+						((double) IterativeDeepeningCalculator.totalCalculations));
+				Logger.log(LogLevel.INFO, "Timeout percent: " +
+						IterativeDeepeningCalculator.timeouts /
+						((double) IterativeDeepeningCalculator.totalCalculations));
+				Logger.log(LogLevel.INFO, "Average Depth Reached: " +
+						IterativeDeepeningCalculator.depthsCalculated /
+						((double) IterativeDeepeningCalculator.movesAsked));
+				Logger.log(LogLevel.INFO, "Moves Played: " +
+						IterativeDeepeningCalculator.movesAsked);
+			}
 		}
 		else if(m.getType() == MessageType.CURRENT_GAME_STATE) // MessageType 10
 		{

@@ -20,7 +20,8 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class MaxNCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
+			CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
