@@ -66,6 +66,7 @@ public class Phteven{
 	private NetworkManager net;
 	private MapManager mapMan;
 	private AI ai;
+	private long calculatedTime=0;
 	
 	/**
 	 * Initializes Phteven by connecting to the server and transmitting the group number Message.
@@ -211,9 +212,12 @@ public class Phteven{
 				PerfLogger.getInst().startTotal();
 			}
 			
-			
+			long start = System.currentTimeMillis();
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
+			
+			calculatedTime += (System.currentTimeMillis()-start);
+			
 			Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Move calulated", System.nanoTime()));
 			if(GlobalSettings.log_performance)
 			{
@@ -302,12 +306,15 @@ public class Phteven{
 				Logger.log(LogLevel.INFO, "In Percent of Calculations: " +
 						IterativeDeepeningCalculator.aspirationWindowFails /
 						((double) IterativeDeepeningCalculator.totalCalculations));
-				Logger.log(LogLevel.INFO, "Timeout percent: " +
-						IterativeDeepeningCalculator.timeouts /
-						((double) IterativeDeepeningCalculator.totalCalculations));
 				Logger.log(LogLevel.INFO, "Average Depth Reached: " +
 						IterativeDeepeningCalculator.depthsCalculated /
 						((double) IterativeDeepeningCalculator.movesAsked));
+				Logger.log(LogLevel.INFO, "Average Time per Move: " +
+						calculatedTime /
+						IterativeDeepeningCalculator.movesAsked);
+				Logger.log(LogLevel.INFO, "Timeout percent: " +
+						IterativeDeepeningCalculator.timeouts /
+						((double) IterativeDeepeningCalculator.totalCalculations));
 				Logger.log(LogLevel.INFO, "Moves Played: " +
 						IterativeDeepeningCalculator.movesAsked);
 			}
