@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="Deepener-classdiagram.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="-1327.6947"
+     inkscape:cy="1036.6142"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g920"
+       transform="translate(-218.62648,-98.355189)">
+      <rect
+         y="81.493477"
+         x="-348.84155"
+         height="2.2678571"
+         width="153.45833"
+         id="rect827-7"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1" />
+      <rect
+         y="195.38324"
+         x="14.512608"
+         height="2.3763249"
+         width="69.248703"
+         id="rect837-0"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.18193579;stroke-opacity:1"
+         transform="rotate(90)" />
+      <rect
+         transform="rotate(-90)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.17456193;stroke-opacity:1"
+         id="rect829-3"
+         width="66.9692"
+         height="2.2620654"
+         x="-81.532776"
+         y="-348.88303" />
+      <rect
+         transform="scale(-1)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+         id="rect835-3"
+         width="153.45833"
+         height="2.2678571"
+         x="195.43747"
+         y="-16.601761" />
+      <rect
+         transform="scale(-1)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+         id="rect835-2-2"
+         width="153.45833"
+         height="2.2678571"
+         x="195.44414"
+         y="-42.341957" />
+      <rect
+         y="-46.046127"
+         x="195.44414"
+         height="2.2678571"
+         width="153.45833"
+         id="rect864-2"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+         transform="scale(-1)" />
+      <flowRoot
+         transform="matrix(0.26458333,0,0,0.26458333,11.146302,-138.23084)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot927"
+         xml:space="preserve"><flowRegion
+           id="flowRegion929"><rect
+             y="619.66254"
+             x="-1174.2858"
+             height="62.857143"
+             width="504.28571"
+             id="rect931" /></flowRegion><flowPara
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'"
+           id="flowPara933">Calculator</flowPara></flowRoot>      <flowRoot
+         transform="matrix(0.26458333,0,0,0.26458333,-139.85051,-50.389171)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot958"
+         xml:space="preserve"><flowRegion
+           id="flowRegion960"><rect
+             y="249.66254"
+             x="-604.28571"
+             height="54.285713"
+             width="327.14285"
+             id="rect962" /></flowRegion><flowPara
+           style="font-size:26.66666794px"
+           id="flowPara964">&lt;&lt;interface&gt;&gt;</flowPara></flowRoot>      <flowRoot
+         xml:space="preserve"
+         id="flowRoot866-5"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         transform="matrix(0.26458333,0,0,0.26458333,-62.24743,-22.985484)"><flowRegion
+           id="flowRegion868-0"><rect
+             id="rect870-2"
+             width="808.6853"
+             height="55.218479"
+             x="-1051.4286"
+             y="302.51968" /></flowRegion><flowPara
+           id="flowPara872-4"
+           style="font-size:29.33333397px">+ calculateBestMove(...) : double</flowPara></flowRoot>    </g>
+    <g
+       id="g1025"
+       transform="translate(0,-1.5290628)">
+      <flowRoot
+         transform="matrix(0.26458333,0,0,0.26458333,-60.893864,-124.17517)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot819"
+         xml:space="preserve"><flowRegion
+           id="flowRegion821"><rect
+             y="188.23396"
+             x="-1071.4286"
+             height="53.615395"
+             width="655.77795"
+             id="rect823" /></flowRegion><flowPara
+           id="flowPara825">IterativeDeepeningCalculator</flowPara></flowRoot>      <rect
+         y="-17.697756"
+         x="-355.71768"
+         height="2.2470741"
+         width="180.16451"
+         id="rect827"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.2853663;stroke-opacity:1" />
+      <rect
+         transform="rotate(-90)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.16877036;stroke-opacity:1"
+         id="rect829"
+         width="62.439274"
+         height="2.2678571"
+         x="17.665934"
+         y="-355.77246" />
+      <rect
+         transform="scale(-1)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.28760505;stroke-opacity:1"
+         id="rect835"
+         width="181.32535"
+         height="2.2678571"
+         x="174.45697"
+         y="77.837357" />
+      <rect
+         y="173.69514"
+         x="-80.159447"
+         height="2.3763249"
+         width="64.719139"
+         id="rect837"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.17588495;stroke-opacity:1"
+         transform="rotate(90)" />
+      <rect
+         transform="scale(-1)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.28625593;stroke-opacity:1"
+         id="rect835-2"
+         width="179.6282"
+         height="2.2678571"
+         x="176.16078"
+         y="56.859665" />
+      <rect
+         y="53.155495"
+         x="176.63005"
+         height="2.2678571"
+         width="179.15894"
+         id="rect864"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.28588179;stroke-opacity:1"
+         transform="scale(-1)" />
+      <flowRoot
+         transform="matrix(0.26458333,0,0,0.26458333,-68.346594,-121.27281)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot866"
+         xml:space="preserve"><flowRegion
+           id="flowRegion868"><rect
+             y="302.51968"
+             x="-1051.4286"
+             height="60.000008"
+             width="515.71429"
+             id="rect870" /></flowRegion><flowPara
+           style="font-size:29.33333397px"
+           id="flowPara872">- usedCalculator : Calculator</flowPara></flowRoot>    </g>
+    <rect
+       y="493.39804"
+       x="-12.758112"
+       height="2.3205338"
+       width="25.164398"
+       id="rect835-2-1-9-3-6"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.10837936;stroke-opacity:1"
+       transform="rotate(90)" />
+    <g
+       transform="rotate(-90,-315.576,195.33276)"
+       id="g1305-8">
+      <rect
+         transform="rotate(-150)"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0954792;stroke-opacity:1"
+         id="rect835-2-1-9-3-8-3"
+         width="19.98403"
+         height="2.2678571"
+         x="82.571587"
+         y="-67.919434" />
+      <rect
+         y="37.288658"
+         x="98.94693"
+         height="2.2678571"
+         width="19.98403"
+         id="rect1301-0"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0954792;stroke-opacity:1"
+         transform="rotate(150)" />
+    </g>
+    <g
+       id="g1046"
+       transform="rotate(-90,-471.25638,-71.651858)">
+      <g
+         id="g1372-5"
+         transform="rotate(-90,-314.69156,194.61665)">
+        <rect
+           y="-67.919434"
+           x="82.571587"
+           height="2.2678571"
+           width="19.98403"
+           id="rect835-2-1-9-3-8-6"
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0954792;stroke-opacity:1"
+           transform="rotate(-150)" />
+        <rect
+           transform="rotate(150)"
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0954792;stroke-opacity:1"
+           id="rect1301-3"
+           width="19.98403"
+           height="2.2678571"
+           x="98.94693"
+           y="37.288658" />
+        <rect
+           y="-123.87602"
+           x="-27.194344"
+           height="2.3306692"
+           width="21.61727"
+           id="rect835-2-1-9-3-8-7-9"
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.10067002;stroke-opacity:1"
+           transform="rotate(-90)" />
+      </g>
+      <rect
+         y="491.95981"
+         x="1.9786897"
+         height="2.2678571"
+         width="8.8882589"
+         id="rect1436-5"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.06367597;stroke-opacity:1"
+         transform="rotate(90)" />
+    </g>
+    <rect
+       y="48.776546"
+       x="-380.70062"
+       height="2.2678571"
+       width="8.8882589"
+       id="rect1504"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.06367597;stroke-opacity:1"
+       transform="scale(1,-1)" />
+    <rect
+       transform="scale(1,-1)"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.06367597;stroke-opacity:1"
+       id="rect1054"
+       width="8.8882589"
+       height="2.2678571"
+       x="-364.2962"
+       y="48.776546" />
+    <rect
+       y="10.183317"
+       x="-493.30048"
+       height="2.1254034"
+       width="215.46927"
+       id="rect835-2-1-9-3-6-2"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.30350977;stroke-opacity:1" />
+    <rect
+       y="-280.04837"
+       x="-12.400495"
+       height="2.3089478"
+       width="30.9869"
+       id="rect835-2-1-9-3-6-2-2"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.11996525;stroke-opacity:1"
+       transform="rotate(-90)" />
+  </g>
+</svg>

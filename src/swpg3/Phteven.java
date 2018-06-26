@@ -199,6 +199,7 @@ public class Phteven{
 		}
 		else if(m.getType() == MessageType.MOVE_REQUEST) // MessageType 4
 		{
+			Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Handling started", System.nanoTime()));
 			// Retrieve limits
 			int timeLimit = m.retrieveTimeLimit();
 			int depthLimit = m.retrieveDepthLimit();
@@ -213,7 +214,7 @@ public class Phteven{
 			
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
-			
+			Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Move calulated", System.nanoTime()));
 			if(GlobalSettings.log_performance)
 			{
 				PerfLogger.getInst().stopTotal();
@@ -228,6 +229,7 @@ public class Phteven{
 			{
 				net.sendMessage(Message.newMoveReply(bestMove));
 				Logger.log(LogLevel.INFO, "Replied with Move: " + bestMove);
+				Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Move sent", System.nanoTime()));
 			} catch (IOException e)
 			{
 			}
