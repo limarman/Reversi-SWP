@@ -99,7 +99,7 @@ class MathHelperTest {
 		MathHelper.initialize();
 		
 		int[] bombCount = {2,2,1,1};
-		int [] stoneCount = {150, 120, 110 ,200};
+		int [] stoneCount = {150, 120, 50 ,200};
 		int playerNumber = 2;
 		
 		//mapping the ranks (0 to #players-1) to the playerNumbers
@@ -126,11 +126,6 @@ class MathHelperTest {
 			}
 		}
 		
-		for(int i = 0; i< rankings.length; i++) 
-		{
-			System.out.println(rankings[i]);
-		}
-		
 		System.out.println("Playerrank: " + playerRank);
 		
 		//boundaries for approximate window, where our stone count at the end of bombing phase will be
@@ -152,25 +147,25 @@ class MathHelperTest {
 				//neighbor is bombing
 				if(rank - playerRank > 0) //lower neighbour, bombing more likely
 				{
-					stoneCount_max -= bombpower * 0.5;
-					stoneCount_min -= bombpower * 0.7;
+					stoneCount_max -= bombpower * 0.4;
+					stoneCount_min -= bombpower * 1;
 				}
 				else
 				{
 					stoneCount_max -= bombpower * 0.2;
-					stoneCount_min -= bombpower * 0.4;
+					stoneCount_min -= bombpower * 0.6;
 				}
+				
 			}
 			else if(rankDifference == 2) 
 			{
-				//indirect neighbor is bombing - factor 0.2 to 0.4
-				stoneCount_max -= bombpower * 0.1;
-				stoneCount_min -= bombpower * 0.3;
-			}
-			else if(rankDifference >= 3) 
-			{
-				//others are bombing - factor 0.0 to 0.2
+				//indirect neighbor is bombing - factor 0.1 to 0.3
 				stoneCount_min -= bombpower * 0.1;
+			}
+			else if(rankDifference == 3) 
+			{
+				//indirect indirect neighbor - factor 0.0 to 0.1
+				stoneCount_min -= bombpower * 0.05;
 			}
 		}
 		
@@ -196,7 +191,7 @@ class MathHelperTest {
 			//the assumed stoneCount in this iteration in the interval [stoneCount_min, stoneCount_max]
 			double caseStoneCount = (j/4.) * stoneCount_max + (1-(j/4.)) * stoneCount_min;
 			
-			System.out.println("Case j=" + j + " casteStoneCount=" + caseStoneCount);
+			System.out.println("Case j=" + j + " caseStoneCount=" + caseStoneCount);
 			
 			double caseEvaluation = 0;
 			
@@ -216,15 +211,17 @@ class MathHelperTest {
 				}
 			}
 			
+			System.out.print("Stones to Place: ");
 			for (int i = 0; i<stonesToPlace.length; i++) {
 				System.out.print(stonesToPlace[i] + ", ");
 			}
 			System.out.println("");
-			System.out.println("currentPlace = " + currentPlace);
 			
 			if(playerBombPower != 0) { //we can actively change something in our ranking
 				while(currentPlace>=0) 
 				{
+					System.out.println("currentPlace = " + currentPlace);
+
 					//determine the percentage we have to be able to use of our bombing power to become the place "currentPlace"
 					double minPerc, maxPerc;					
 
@@ -238,8 +235,8 @@ class MathHelperTest {
 						maxPerc = (stonesToPlace[currentPlace-1]-1) / playerBombPower;
 					}
 					
-					System.out.println("MaxPerc: " + maxPerc);
-					System.out.println("MinPerc: " + minPerc );
+					System.out.println("We can use maximal (percentage of bombPower): " + maxPerc);
+					System.out.println("We have to use minimal (percentage of bombPower): " + minPerc);
 					
 					if(minPerc > 1) 
 					{

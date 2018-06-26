@@ -7,7 +7,8 @@ package swpg3.main.logging;
 public enum LogTag {
 	NONE        ("   "),
 	MAP         ("{M}"),
-	PERFORMANCE ("{P}");
+	PERFORMANCE ("{P}"),
+	DEBUG       ("{D}");
 
 	public final String msg;
 

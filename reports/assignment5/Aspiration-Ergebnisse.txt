@@ -1,0 +1,155 @@
+###############################################
+       Map: standard_map.txt
+###############################################
+[  INFO  ]   : Aspiration-Window Size: 50.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 40.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 30.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 20.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 15.0
+[  INFO  ]   : Total Aspiration-Window Fails: 3
+[  INFO  ]   : In Percent of Calculations: 0.012605042016806723
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 10.0
+[  INFO  ]   : Total Aspiration-Window Fails: 20
+[  INFO  ]   : In Percent of Calculations: 0.07874015748031496
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 5.0
+[  INFO  ]   : Total Aspiration-Window Fails: 49
+[  INFO  ]   : In Percent of Calculations: 0.15654952076677317
+-----------------------------------------------
+###############################################
+       Map: 005_g5_map2.txt
+###############################################
+[  INFO  ]   : Aspiration-Window Size: 50.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 40.0
+[  INFO  ]   : Total Aspiration-Window Fails: 2
+[  INFO  ]   : In Percent of Calculations: 0.009433962264150943
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 30.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 20.0
+[  INFO  ]   : Total Aspiration-Window Fails: 1
+[  INFO  ]   : In Percent of Calculations: 0.004629629629629629
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 15.0
+[  INFO  ]   : Total Aspiration-Window Fails: 9
+[  INFO  ]   : In Percent of Calculations: 0.02313624678663239
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 10.0
+[  INFO  ]   : Total Aspiration-Window Fails: 5
+[  INFO  ]   : In Percent of Calculations: 0.016778523489932886
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 5.0
+[  INFO  ]   : Total Aspiration-Window Fails: 22
+[  INFO  ]   : In Percent of Calculations: 0.0707395498392283
+-----------------------------------------------
+###############################################
+       Map: 006_g6_question_mark.map
+###############################################
+[  INFO  ]   : Aspiration-Window Size: 50.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 40.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 30.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 20.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 15.0
+[  INFO  ]   : Total Aspiration-Window Fails: 2
+[  INFO  ]   : In Percent of Calculations: 0.00554016620498615
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 10.0
+[  INFO  ]   : Total Aspiration-Window Fails: 2
+[  INFO  ]   : In Percent of Calculations: 0.0031397174254317113
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 5.0
+[  INFO  ]   : Total Aspiration-Window Fails: 38
+[  INFO  ]   : In Percent of Calculations: 0.06690140845070422
+-----------------------------------------------
+###############################################
+       Map: 009_g7_Map_Pirate_Heist
+###############################################
+[  INFO  ]   : Aspiration-Window Size: 50.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 40.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 30.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 20.0
+[  INFO  ]   : Total Aspiration-Window Fails: 6
+[  INFO  ]   : In Percent of Calculations: 0.008379888268156424
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 15.0
+[  INFO  ]   : Total Aspiration-Window Fails: 10
+[  INFO  ]   : In Percent of Calculations: 0.014970059880239521
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 10.0
+[  INFO  ]   : Total Aspiration-Window Fails: 24
+[  INFO  ]   : In Percent of Calculations: 0.0326530612244898
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 5.0
+[  INFO  ]   : Total Aspiration-Window Fails: 95
+[  INFO  ]   : In Percent of Calculations: 0.12907608695652173
+-----------------------------------------------
+###############################################
+       Map: 011_g3_Map1.txt
+###############################################
+[  INFO  ]   : Aspiration-Window Size: 50.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 40.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 30.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 20.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 15.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 10.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------
+[  INFO  ]   : Aspiration-Window Size: 5.0
+[  INFO  ]   : Total Aspiration-Window Fails: 0
+[  INFO  ]   : In Percent of Calculations: 0.0
+-----------------------------------------------

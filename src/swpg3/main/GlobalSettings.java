@@ -8,7 +8,7 @@ public final class GlobalSettings {
 	
 	//0 means aspiration window is not used
 	//window size x means the estimated value will be searched in interval [lasVal-x,lastVal+x]
-	public static double aspirationWindowSize = 20; 
+	public static double aspirationWindowSize = 5; 
 	
 	public static boolean iterative_deepening;
 	public static boolean log_performance;
