@@ -59,7 +59,7 @@ public class AI {
 	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	public static double OVERRIDE_BONUS = 250;
+	public static double OVERRIDE_BONUS = 270;
 	public static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
