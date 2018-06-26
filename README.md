@@ -33,6 +33,7 @@ This is a list of all commandline arguments:
 |            | `--disable-ab`|FLAG   |no           |               | Disables Alpha-Beta-Pruning               |
 |            | `--disable-sort`|FLAg|no            |               | Disables move-sorting                    |
 |            | `--disable-itDeep`|FLAg|no            |               | Disables iterative deepening            |
+|            | `--asp-window`  | INT  | no          | 15            | Set the aspiration Window size. 0 disables Aspiration Windows |
     
 Arguments with either a STRING or INT option require an additional option after them.
 
