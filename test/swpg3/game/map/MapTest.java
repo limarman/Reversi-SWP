@@ -341,12 +341,12 @@ class MapTest {
 	void testGetPossibleMovesOrdered()
 	{
 		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n"
-				+ "000100\r\n"
-				+ "000120\r\n"
-				+ "0c-100\r\n"
-				+ "0031i0\r\n"
-				+ "000200\r\n"
-				+ "0000xx";
+				+ "0 0 0 1 0 0\r\n"
+				+ "0 0 0 1 2 0\r\n"
+				+ "0 c - 1 0 0\r\n"
+				+ "0 0 3 1 i 0\r\n"
+				+ "0 0 0 2 0 0\r\n"
+				+ "0 0 0 0 x x";
 		
 		MapManager mm = MapManager.getInstance();
 		
@@ -361,7 +361,7 @@ class MapTest {
 		
 		//testing the building phase
 		
-		HashSet<Move> possibleMovesTest = map.getPossibleMovesOrderable((byte)3);
+		HashSet<Move> possibleMovesTest = map.getPossibleMovesOrderable((byte)3, true);
 				
 //		possibleMovesTest.forEach(System.out::println);
 		
@@ -377,16 +377,17 @@ class MapTest {
 			System.out.println(sorted[i] + "MoveValue: " + sorted[i].getMoveValue());
 		}
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1, true);
 		
 		//asserting that every added move was legal
 		for(Move m : possibleMovesTest)
 		{
+			System.out.println("MoveFound: " + m);
 			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
 		}
 		assertTrue(possibleMovesTest.size() == 8, "not every possible move was discovered!");
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 2);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 2, true);
 		
 		//asserting that every added move was legal
 		for(Move m : possibleMovesTest)
@@ -399,7 +400,7 @@ class MapTest {
 		//testing the bombing phase
 		mm.toggleGamePhase();
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1, true);
 		
 		for(Move m : possibleMovesTest)
 		{
@@ -570,7 +571,7 @@ class MapTest {
 		Map map = mm.getCurrentMap();
 		
 		assertFalse(map.isMoveValid(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
-		assertFalse(map.getPossibleMovesOrderable((byte)1).contains(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
+		assertFalse(map.getPossibleMovesOrderable((byte)1, true).contains(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
 	}
 	
 	
@@ -884,7 +885,7 @@ class MapTest {
 				
 				//another interesting bug
 				//as well in the getPossibleMoves, isMoveValid fails to verify that the move is illegal
-				assertFalse(m.getPossibleMovesOrderable((byte) 1).contains(new Move(18,9,(byte)0,(byte)1)));
+				assertFalse(m.getPossibleMovesOrderable((byte) 1, true).contains(new Move(18,9,(byte)0,(byte)1)));
 				assertFalse(m.isMoveValid(new Move(new Vector2i(18,9), (byte) 0 , (byte) 1)));
 	}
 	
