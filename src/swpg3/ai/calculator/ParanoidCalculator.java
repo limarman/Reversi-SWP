@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
@@ -55,7 +56,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -124,7 +125,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -221,7 +222,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{

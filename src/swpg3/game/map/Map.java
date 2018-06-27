@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
@@ -463,11 +464,12 @@ public class Map {
 	 * make.
 	 * 
 	 * @param playerNumber
+	 * @param considerOverrides - whether override moves should even be considered
 	 * 
 	 * @return Possible Moves - HashSet of all possible Moves with extra info to
 	 *         make an order by calling any sort method
 	 */
-	public HashSet<Move> getPossibleMovesOrderable(byte playerNumber)
+	public HashSet<Move> getPossibleMovesOrderable(byte playerNumber, boolean considerOverrides)
 	{
 		MapManager mm = MapManager.getInstance();
 		HashSet<Move> possibleMoves = new HashSet<>();
@@ -500,7 +502,6 @@ public class Map {
 								continue; // there is no possible move in this direction
 							}
 							mw.step();
-							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 							if (mw.getCurrentTile().isEmpty() || !mw.canStep() || mw.getCurrentTile()
 									.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
@@ -523,7 +524,7 @@ public class Map {
 							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
 									.getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								if (overridePossible)
+								if (considerOverrides && overridePossible)
 								{
 									// a new Move is found
 									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
@@ -541,20 +542,19 @@ public class Map {
 									break;
 								}
 							}
-
 							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
 								// stopped on an owned stone
 
 								// if not the starting stone
-								if (!mw.getPosition().equals(pos) && overridePossible)
+								if (!mw.getPosition().equals(pos) && considerOverrides && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
 											MoveTypeValue.SELF_OVERRIDE_USE));
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
-								//find out how many ampty adjacent squares for move sorting
+								//find out how many empty adjacent squares for move sorting
 								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
@@ -592,14 +592,14 @@ public class Map {
 							{
 								// no further step possible
 								// field is not empty (and not own stone)
-								if (overridePossible)
+								if (considerOverrides && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
 											MoveTypeValue.OVERRIDE_USE));
 								}
 							}
 						}
-					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides && overridePossible)
 					{
 						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
@@ -734,6 +734,9 @@ public class Map {
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
+								//find out how many empty adjacent squares for move sorting
+								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
+								
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
 								{

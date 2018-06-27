@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.BogoSorter;
@@ -77,7 +78,7 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -156,7 +157,7 @@ public class PruningParanoidCalculator implements Calculator{
 			
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -260,7 +261,7 @@ public class PruningParanoidCalculator implements Calculator{
 			return evalErg;
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
