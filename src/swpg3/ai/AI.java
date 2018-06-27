@@ -68,7 +68,7 @@ public class AI {
 	public static double BONUS_WEAK_SQUARE_BONUS = -3;
 	public static double CHOICE_WEAK_SQUARE_BONUS = -5;
 	
-	//StoneCount parameter for importance function
+	//PositionalPlay parameters for importance function
 	public static double PP_SV_I = 1;
 	public static double PP_TV_I = 0.7;
 	public static double PP_EV_I = 0;

@@ -66,6 +66,7 @@ public class Phteven{
 	private NetworkManager net;
 	private MapManager mapMan;
 	private AI ai;
+	private long calculatedTime=0;
 	
 	/**
 	 * Initializes Phteven by connecting to the server and transmitting the group number Message.
@@ -211,9 +212,12 @@ public class Phteven{
 				PerfLogger.getInst().startTotal();
 			}
 			
-			
+			long start = System.currentTimeMillis();
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
+			
+			calculatedTime += (System.currentTimeMillis()-start);
+			
 			Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Move calulated", System.nanoTime()));
 			if(GlobalSettings.log_performance)
 			{
@@ -295,17 +299,22 @@ public class Phteven{
 			Logger.log(LogLevel.INFO, "Game has ended!");
 			if(GlobalSettings.iterative_deepening) 
 			{
+				Logger.log(LogLevel.INFO, "Aspiration-Window Size: "
+						+ GlobalSettings.aspirationWindowSize);
 				Logger.log(LogLevel.INFO, "Total Aspiration-Window Fails: "
 						+ IterativeDeepeningCalculator.aspirationWindowFails);
 				Logger.log(LogLevel.INFO, "In Percent of Calculations: " +
 						IterativeDeepeningCalculator.aspirationWindowFails /
 						((double) IterativeDeepeningCalculator.totalCalculations));
-				Logger.log(LogLevel.INFO, "Timeout percent: " +
-						IterativeDeepeningCalculator.timeouts /
-						((double) IterativeDeepeningCalculator.totalCalculations));
 				Logger.log(LogLevel.INFO, "Average Depth Reached: " +
 						IterativeDeepeningCalculator.depthsCalculated /
 						((double) IterativeDeepeningCalculator.movesAsked));
+				Logger.log(LogLevel.INFO, "Average Time per Move: " +
+						calculatedTime /
+						IterativeDeepeningCalculator.movesAsked);
+				Logger.log(LogLevel.INFO, "Timeout percent: " +
+						IterativeDeepeningCalculator.timeouts /
+						((double) IterativeDeepeningCalculator.totalCalculations));
 				Logger.log(LogLevel.INFO, "Moves Played: " +
 						IterativeDeepeningCalculator.movesAsked);
 			}
@@ -353,6 +362,8 @@ public class Phteven{
 				new CliOption(' ', "disable-sort", false, CliOptionType.FLAG, "false", "Disable move sorting");
 		CliOption disable_itDeep =
 				new CliOption(' ', "disable-itDeep", false, CliOptionType.FLAG, "false", "Disable Iterative deepening");
+		CliOption asp_window_size = 
+				new CliOption(' ', "asp-window", false, CliOptionType.INTPARAM, "3", "Set the aspiration Window size. 0 disables Aspiration Windows");
 		
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
@@ -363,6 +374,7 @@ public class Phteven{
 		parser.addOption(disable_ab);
 		parser.addOption(dis_sorting);
 		parser.addOption(disable_itDeep);
+		parser.addOption(asp_window_size);
 		
 		//actual parsing:
 		if(!parser.parse(args))
@@ -400,6 +412,8 @@ public class Phteven{
 		GlobalSettings.move_sorting = !dis_sorting.isSet();
 		GlobalSettings.log_performance = log_perfomance.isSet();
 		GlobalSettings.iterative_deepening = !disable_itDeep.isSet();
+		GlobalSettings.aspirationWindowSize = asp_window_size.getInt();
+		
 		if(log_ext_perf.isSet())
 		{
 			GlobalSettings.log_ext_perf = true;
@@ -411,6 +425,7 @@ public class Phteven{
 		Logger.log(LogLevel.DEBUG, "Iterative deepening set to:   " + GlobalSettings.iterative_deepening);
 		Logger.log(LogLevel.DEBUG, "Perfomance logging set to:    " + GlobalSettings.log_performance);
 		Logger.log(LogLevel.DEBUG, "Extended Perf logging set to: " + GlobalSettings.log_ext_perf);
+		Logger.log(LogLevel.DEBUG, "Aspiration Window Size: " + GlobalSettings.aspirationWindowSize);
 		
 		
 		// In piece may he rest
