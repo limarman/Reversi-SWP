@@ -47,7 +47,7 @@ public class AI {
 	public static double SC_TP_I;
 	
 	//Mobility parameter
-	public static double MOBILITY_BONUS = 20;
+	public static double MOBILITY_BONUS = 18;
 	
 	public static double M_SV;
 	public static double M_MV;
@@ -59,11 +59,11 @@ public class AI {
 	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	public static double OVERRIDE_BONUS = 270;
+	public static double OVERRIDE_BONUS = 260;
 	public static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
-	public static double SOLID_SQUARE_BONUS = 10;
+	public static double SOLID_SQUARE_BONUS = 9;
 	public static double WEAK_SQUARE_BONUS = -5;
 	public static double BONUS_WEAK_SQUARE_BONUS = -3;
 	public static double CHOICE_WEAK_SQUARE_BONUS = -5;
