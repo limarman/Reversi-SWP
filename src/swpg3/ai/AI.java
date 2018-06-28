@@ -59,7 +59,7 @@ public class AI {
 	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
-	public static double OVERRIDE_BONUS = 255;
+	public static double OVERRIDE_BONUS = 250;
 	public static double OVERRIDE_IMPORTANCE = 1;
 	
 	//PositionalPlay parameters
@@ -167,7 +167,7 @@ public class AI {
 			return;
 		}
 		
-		int movesToEnd = 7;
+		int movesToEnd = 3;
 		double turnPoint = (PLAYABLE_SQUARES - (numberOfPlayers * movesToEnd))/((double)PLAYABLE_SQUARES);
 		
 		//setting the turningPoints
