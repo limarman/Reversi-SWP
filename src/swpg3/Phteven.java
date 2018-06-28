@@ -363,7 +363,7 @@ public class Phteven{
 		CliOption disable_itDeep =
 				new CliOption(' ', "disable-itDeep", false, CliOptionType.FLAG, "false", "Disable Iterative deepening");
 		CliOption asp_window_size = 
-				new CliOption(' ', "asp-window", false, CliOptionType.INTPARAM, "3", "Set the aspiration Window size. 0 disables Aspiration Windows");
+				new CliOption(' ', "asp-window", false, CliOptionType.INTPARAM, "0", "Set the aspiration Window size. 0 disables Aspiration Windows");
 		
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
