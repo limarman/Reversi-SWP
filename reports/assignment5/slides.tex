@@ -17,6 +17,7 @@
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \usepackage{hyperref} % For Table of Content in PDF
+\usepackage{multirow}
 
 
 
@@ -100,7 +101,7 @@ $\rightarrow$ Neusuche notwendig!\\
 Hoffnung: Festgesetztes Intervall hilft mehr Teilbäume abzuschneiden.
 \end{frame}
 
-\end{document} 
+
 
 %------------------------------------------------
 \section{Task 3}
@@ -108,7 +109,49 @@ Hoffnung: Festgesetztes Intervall hilft mehr Teilbäume abzuschneiden.
 
 \begin{frame}
 \frametitle{Suchfenster Statistiken}
+  \begin{figure}
+    \includegraphics[scale=0.18]{figures/aspFails}
+  \end{figure}
+\end{frame}
 
+\begin{frame}
+\frametitle{Suchfenster Statistiken}
+  \begin{figure}
+    \includegraphics[scale=0.35]{figures/avgDepth}
+  \end{figure}
+\end{frame}
+
+\appendix
+\backupbegin
+
+\begin{frame}
+\frametitle{The Stig ablösen?}
+  \begin{tabular}{l|l|l|l}
+    Game & Ki & Punkte & Duell\\
+    \hline
+    \multirow{ 2}{*}{2018-06-28\_00:05:01} & Group 3 & 2,150 & \multirow{ 2}{*}{28 : 25}\\
+                                         & The Stig & 2,093 \\
+     \hline
+     \multirow{ 2}{*}{2018-06-27\_18:05:01} & Group 3 & 2,080 & \multirow{ 2}{*}{23 : 32}\\
+                                         & The Stig & 2,061 \\
+     \hline
+     \multirow{ 2}{*}{2018-06-27\_12:05:01} & The Stig & 2,175 & \multirow{ 2}{*}{26 : 21}\\
+                                         & Group 3 & 2,101 \\
+     \hline
+     \multirow{ 2}{*}{2018-06-27\_06:05:01} & Group 3 & 2,133 & \multirow{ 2}{*}{31 : 29}\\
+                                         & The Stig & 2,126 \\
+     \hline
+  
+  \end{tabular}
+\end{frame}
+
+\begin{frame}
+\frametitle{Name}
+\begin{huge}
+\begin{center}
+\textbf{Phteven}
+\end{center}
+\end{huge}
 \end{frame}
 
 \end{document} 
