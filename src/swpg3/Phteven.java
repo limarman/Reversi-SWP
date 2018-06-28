@@ -314,7 +314,7 @@ public class Phteven{
 						IterativeDeepeningCalculator.movesAsked);
 				Logger.log(LogLevel.INFO, "Timeout percent: " +
 						IterativeDeepeningCalculator.timeouts /
-						((double) IterativeDeepeningCalculator.totalCalculations));
+						((double) IterativeDeepeningCalculator.movesAsked));
 				Logger.log(LogLevel.INFO, "Moves Played: " +
 						IterativeDeepeningCalculator.movesAsked);
 			}
@@ -363,7 +363,7 @@ public class Phteven{
 		CliOption disable_itDeep =
 				new CliOption(' ', "disable-itDeep", false, CliOptionType.FLAG, "false", "Disable Iterative deepening");
 		CliOption asp_window_size = 
-				new CliOption(' ', "asp-window", false, CliOptionType.INTPARAM, "1", "Set the aspiration Window size. 0 disables Aspiration Windows");
+				new CliOption(' ', "asp-window", false, CliOptionType.INTPARAM, "3", "Set the aspiration Window size. 0 disables Aspiration Windows");
 		
 		parser.addOption(serverOpt);
 		parser.addOption(portOpt);
