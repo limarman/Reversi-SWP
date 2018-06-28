@@ -64,6 +64,10 @@ public class PruningParanoidCalculator implements Calculator{
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form,
 			CalculatorConditions conditions) 
 	{	
+		
+		//another node has been reached
+		form.incrementReachedNodes();
+		
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
@@ -135,9 +139,13 @@ public class PruningParanoidCalculator implements Calculator{
 	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
+				
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+			
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 
@@ -193,6 +201,11 @@ public class PruningParanoidCalculator implements Calculator{
 				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
 			} 
 		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
+		}
 		
 		double minValue = beta;
 		Move[] sortedMoves = sorter.moveSort(eval, possibleMovesOrderable, map, currentPlayerNumber);
@@ -241,9 +254,13 @@ public class PruningParanoidCalculator implements Calculator{
 	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
+		
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 			
@@ -286,6 +303,11 @@ public class PruningParanoidCalculator implements Calculator{
 			
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		double maxValue = alpha;
