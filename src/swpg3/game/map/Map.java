@@ -838,6 +838,8 @@ public class Map {
 	/**
 	 * Expecting the move to be valid
 	 * 
+	 * Applies the Move to the map.
+	 * 
 	 * @param move
 	 *            to be applied to the map
 	 */
@@ -935,7 +937,53 @@ public class Map {
 				// has two Blocks nearby
 				else if(neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) != 0)
 				{
-					// TODO: merge blocks
+					// Create new Blocks
+					numberOfBlocks++;
+					blocks[numberOfBlocks] = new Block();
+					Block newBlock = blocks[numberOfBlocks];
+
+					// joining the blocks:
+					Block a = blocks[neighborA.getBlockID(ori)];
+					Block b = blocks[neighborB.getBlockID(ori)];
+					
+					if(a.getNonBorderA().equals(b.getNonBorderA()))
+					{
+						newBlock.setBorderA(a.getBorderB());
+						newBlock.setNonBorderA(a.getNonBorderB());
+						
+						newBlock.setBorderB(b.getBorderB());
+						newBlock.setNonBorderB(b.getNonBorderB());
+					} else if(a.getNonBorderA().equals(b.getNonBorderB()))
+					{
+						newBlock.setBorderA(a.getBorderB());
+						newBlock.setNonBorderA(a.getNonBorderB());
+						
+						newBlock.setBorderB(b.getBorderA());
+						newBlock.setNonBorderB(b.getNonBorderA());
+					} else if(a.getNonBorderB().equals(b.getNonBorderA()))
+					{
+						newBlock.setBorderA(a.getBorderA());
+						newBlock.setNonBorderA(a.getNonBorderA());
+						
+						newBlock.setBorderB(b.getBorderB());
+						newBlock.setNonBorderB(b.getNonBorderB());
+					} else if(a.getNonBorderB().equals(b.getNonBorderB()))
+					{
+						newBlock.setBorderA(a.getBorderA());
+						newBlock.setNonBorderA(a.getNonBorderA());
+						
+						newBlock.setBorderB(b.getBorderA());
+						newBlock.setNonBorderB(b.getNonBorderA());
+					}
+					
+					// add Stone Numbers
+					for(int i = 0; i < mm.getNumberOfPlayers(); i++)
+					{
+						newBlock.setStoneAmount(i, a.getStoneAmount(i)+b.getStoneAmount(i));
+					}
+					// mark as the Superblock
+					a.setSuperblock(numberOfBlocks);
+					b.setSuperblock(numberOfBlocks);
 				}
 			}
 
@@ -1215,6 +1263,7 @@ public class Map {
 	/**
 	 * Traverses up the chain of superblocks to the top and returns the root.
 	 * 
+	 * @param start The Block to start from
 	 * @return the superblock that is the farthest one at the top
 	 */
 	private Block getRootBlock(Block start)
@@ -1226,6 +1275,13 @@ public class Map {
 		}
 		return ret;
 	}
+	
+	/**
+	 * Traverses up the chain of superblocks to the top and returns the index of the root.
+	 * 
+	 * @param start The Block to start from
+	 * @return Index of root superblock
+	 */
 	private int getRootBlockId(int start)
 	{
 		int ret = start;
@@ -1235,7 +1291,33 @@ public class Map {
 		}
 		return ret;
 	}
+	
+	/**
+	 * @param index
+	 * @return
+	 */
+	public Block getBlock(int index)
+	{
+		return blocks[index];
+	}
+	
+	/**
+	 * @param index
+	 * @return
+	 */
+	public Block getRootBlock(int index)
+	{
+		return blocks[getRootBlockId(index)];
+	}
 
+	/**
+	 * @return number of blocks in use
+	 */
+	public int getBlockCount()
+	{
+		return numberOfBlocks;
+	}
+	
 	public int mobilityByBlocks(int playernumber)
 	{
 		int possMoves = 0;
@@ -1304,7 +1386,11 @@ public class Map {
 						while (mw.canStep() && mw.getCurrentTile().isOccupied())
 						{
 							mw.step();
-							// has passed Transistion? TODO: find out if MapWalker has passed a transition
+							// has passed Transistion? 
+							if(mw.hasPassedTransition())
+							{
+								o = BlockOrientation.fromDir(mw.getDirection());
+							}
 							if (mw.getCurrentTile().isOccupied())
 							{
 								mw.getCurrentTile().setBlockID(o, blocksID);

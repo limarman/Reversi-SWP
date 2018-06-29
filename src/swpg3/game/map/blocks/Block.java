@@ -70,6 +70,11 @@ public class Block {
 	{
 		return playerStoneCounts[playernumber];
 	}
+	
+	public void setStoneAmount(int playernumber, int stones)
+	{
+		playerStoneCounts[playernumber] = stones;
+	}
 
 	/**
 	 * @return the nonBorderA
@@ -149,7 +154,7 @@ public class Block {
 
 	/**
 	 * @param superblock
-	 *            the superblock to set
+	 *            the id of superblock to set
 	 */
 	public void setSuperblock(int superblock)
 	{
