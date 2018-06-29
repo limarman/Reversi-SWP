@@ -68,12 +68,12 @@ public class Block {
 	 */
 	public int getStoneAmount(int playernumber)
 	{
-		return playerStoneCounts[playernumber];
+		return playerStoneCounts[playernumber-1];
 	}
-	
+
 	public void setStoneAmount(int playernumber, int stones)
 	{
-		playerStoneCounts[playernumber] = stones;
+		playerStoneCounts[playernumber-1] = stones;
 	}
 
 	/**
@@ -90,7 +90,13 @@ public class Block {
 	 */
 	public void setNonBorderA(Vector2i nonBorderA)
 	{
-		this.nonBorderA = nonBorderA.clone();
+		if (nonBorderA != null)
+		{
+			this.nonBorderA = nonBorderA.clone();
+		} else
+		{
+			this.nonBorderA = null;
+		}
 	}
 
 	/**
@@ -107,7 +113,14 @@ public class Block {
 	 */
 	public void setBorderA(Vector2i borderA)
 	{
-		this.borderA = borderA.clone();
+		if (borderA != null)
+		{
+			this.borderA = borderA.clone();
+		} else
+		{
+			this.borderA = null;
+
+		}
 	}
 
 	/**
@@ -124,7 +137,14 @@ public class Block {
 	 */
 	public void setBorderB(Vector2i borderB)
 	{
-		this.borderB = borderB.clone();
+		if (borderB != null)
+		{
+			this.borderB = borderB.clone();
+		} else
+		{
+			this.borderB = null;
+
+		}
 	}
 
 	/**
@@ -141,7 +161,13 @@ public class Block {
 	 */
 	public void setNonBorderB(Vector2i nonBorderB)
 	{
-		this.nonBorderB = nonBorderB.clone();
+		if (nonBorderB != null)
+		{
+			this.nonBorderB = nonBorderB.clone();
+		} else
+		{
+			this.nonBorderB = null;
+		}
 	}
 
 	/**
@@ -162,13 +188,15 @@ public class Block {
 	}
 
 	/**
-	 * Checks whether this Block has a SuperBlock and if there is at least one active Border.
+	 * Checks whether this Block has a SuperBlock and if there is at least one
+	 * active Border.
 	 * 
-	 * @return true, if there is at least one active Border and there is no superblock; false, otherwise
+	 * @return true, if there is at least one active Border and there is no
+	 *         superblock; false, otherwise
 	 */
 	public boolean isActive()
 	{
-		return (superblock != 0) && !((borderA != null) && (borderB != null));
+		return (superblock == 0) && !((borderA == null) && (borderB == null));
 	}
 
 	/*
@@ -181,10 +209,10 @@ public class Block {
 	{
 		Block blockClone = new Block();
 
-		blockClone.setBorderA(borderA.clone());
-		blockClone.setBorderB(borderB.clone());
-		blockClone.setNonBorderA(nonBorderA.clone());
-		blockClone.setNonBorderB(nonBorderB.clone());
+		blockClone.setBorderA(borderA != null ? borderA.clone() : null);
+		blockClone.setBorderB(borderB != null ? borderB.clone() : null);
+		blockClone.setNonBorderA(nonBorderA != null ? nonBorderA.clone() : null);
+		blockClone.setNonBorderB(nonBorderB != null ? nonBorderB.clone() : null);
 		blockClone.setSuperblock(superblock);
 
 		blockClone.playerStoneCounts = playerStoneCounts.clone();

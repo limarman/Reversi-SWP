@@ -203,6 +203,8 @@ public class MapManager {
 			transitionCount++;
 		}
 		scan.close();
+		
+		currentMap.blockify();
 	}
 
 	/**

@@ -195,6 +195,8 @@ public class Tile {
 	@Override
 	public Tile clone()
 	{
-		return new Tile(status, arbitraryTransitions);
+		Tile t = new Tile(status, arbitraryTransitions);
+		t.blocksIndexes = blocksIndexes.clone();
+		return t;
 	}
 }

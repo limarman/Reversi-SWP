@@ -899,43 +899,42 @@ public class Map {
 					blocks[numberOfBlocks].addStone(move.getPlayerNumber());
 				}
 				// has one block nearby
-				else if(neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) == 0)
+				else if (neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) == 0)
 				{
 					int id = getRootBlockId(neighborA.getBlockID(ori));
+					Block sb = blocks[id];
 					t.setBlockID(ori, id);
-					blocks[id].addStone(move.getPlayerNumber());
+					sb.addStone(move.getPlayerNumber());
 					// Adjust Borders:
-					if(blocks[id].getNonBorderA().equals(move.getCoordinates()))
+					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						blocks[id].setBorderA(move.getCoordinates());
-						blocks[id].setNonBorderA(neighborBPos);
-					}
-					else
+						sb.setBorderA(move.getCoordinates());
+						sb.setNonBorderA(neighborBPos);
+					} else
 					{
-						blocks[id].setBorderB(move.getCoordinates());
-						blocks[id].setNonBorderB(neighborBPos);
+						sb.setBorderB(move.getCoordinates());
+						sb.setNonBorderB(neighborBPos);
 					}
-				}
-				else if(neighborA.getBlockID(ori) == 0 && neighborB.getBlockID(ori) != 0)
+				} else if (neighborA.getBlockID(ori) == 0 && neighborB.getBlockID(ori) != 0)
 				{
 					int id = getRootBlockId(neighborB.getBlockID(ori));
+					Block sb = blocks[id];
 					t.setBlockID(ori, id);
-					getRootBlock(blocks[id]).addStone(move.getPlayerNumber());
+					sb.addStone(move.getPlayerNumber());
 					// Adjust Borders:
-					if(getRootBlock(blocks[id]).getNonBorderA().equals(move.getCoordinates()))
+					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						blocks[id].setBorderA(move.getCoordinates());
-						blocks[id].setNonBorderA(neighborAPos);
-					}
-					else
+						sb.setBorderA(move.getCoordinates());
+						sb.setNonBorderA(neighborAPos);
+					} else
 					{
-						blocks[id].setBorderB(move.getCoordinates());
-						blocks[id].setNonBorderB(neighborAPos);
+						sb.setBorderB(move.getCoordinates());
+						sb.setNonBorderB(neighborAPos);
 					}
 				}
-				
+
 				// has two Blocks nearby
-				else if(neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) != 0)
+				else if (neighborA.getBlockID(ori) != 0 && neighborB.getBlockID(ori) != 0)
 				{
 					// Create new Blocks
 					numberOfBlocks++;
@@ -945,45 +944,46 @@ public class Map {
 					// joining the blocks:
 					Block a = blocks[neighborA.getBlockID(ori)];
 					Block b = blocks[neighborB.getBlockID(ori)];
-					
-					if(a.getNonBorderA().equals(b.getNonBorderA()))
+
+					if (a.getNonBorderA() != null && a.getNonBorderA().equals(b.getNonBorderA()))
 					{
 						newBlock.setBorderA(a.getBorderB());
 						newBlock.setNonBorderA(a.getNonBorderB());
-						
+
 						newBlock.setBorderB(b.getBorderB());
 						newBlock.setNonBorderB(b.getNonBorderB());
-					} else if(a.getNonBorderA().equals(b.getNonBorderB()))
+					} else if (a.getNonBorderA() != null && a.getNonBorderA().equals(b.getNonBorderB()))
 					{
 						newBlock.setBorderA(a.getBorderB());
 						newBlock.setNonBorderA(a.getNonBorderB());
-						
+
 						newBlock.setBorderB(b.getBorderA());
 						newBlock.setNonBorderB(b.getNonBorderA());
-					} else if(a.getNonBorderB().equals(b.getNonBorderA()))
+					} else if (a.getNonBorderB() != null && a.getNonBorderB().equals(b.getNonBorderA()))
 					{
 						newBlock.setBorderA(a.getBorderA());
 						newBlock.setNonBorderA(a.getNonBorderA());
-						
+
 						newBlock.setBorderB(b.getBorderB());
 						newBlock.setNonBorderB(b.getNonBorderB());
-					} else if(a.getNonBorderB().equals(b.getNonBorderB()))
+					} else if (a.getNonBorderB() != null && a.getNonBorderB().equals(b.getNonBorderB()))
 					{
 						newBlock.setBorderA(a.getBorderA());
 						newBlock.setNonBorderA(a.getNonBorderA());
-						
+
 						newBlock.setBorderB(b.getBorderA());
 						newBlock.setNonBorderB(b.getNonBorderA());
 					}
-					
+
 					// add Stone Numbers
-					for(int i = 0; i < mm.getNumberOfPlayers(); i++)
+					for (int i = 1; i <= mm.getNumberOfPlayers(); i++)
 					{
-						newBlock.setStoneAmount(i, a.getStoneAmount(i)+b.getStoneAmount(i));
+						newBlock.setStoneAmount(i, a.getStoneAmount(i) + b.getStoneAmount(i));
 					}
 					// mark as the Superblock
 					a.setSuperblock(numberOfBlocks);
 					b.setSuperblock(numberOfBlocks);
+					t.setBlockID(ori, numberOfBlocks);
 				}
 			}
 
@@ -1253,7 +1253,9 @@ public class Map {
 			}
 		}
 
-		return new Map(gridClone, playerInfoClone, nextPlayerTurn, blocks);
+		Map newMap = new Map(gridClone, playerInfoClone, nextPlayerTurn, blocksClone);
+		newMap.numberOfBlocks = numberOfBlocks;
+		return newMap;
 	}
 
 	// --------------------------------------------------
@@ -1263,7 +1265,8 @@ public class Map {
 	/**
 	 * Traverses up the chain of superblocks to the top and returns the root.
 	 * 
-	 * @param start The Block to start from
+	 * @param start
+	 *            The Block to start from
 	 * @return the superblock that is the farthest one at the top
 	 */
 	private Block getRootBlock(Block start)
@@ -1275,23 +1278,25 @@ public class Map {
 		}
 		return ret;
 	}
-	
+
 	/**
-	 * Traverses up the chain of superblocks to the top and returns the index of the root.
+	 * Traverses up the chain of superblocks to the top and returns the index of the
+	 * root.
 	 * 
-	 * @param start The Block to start from
+	 * @param start
+	 *            The Block to start from
 	 * @return Index of root superblock
 	 */
 	private int getRootBlockId(int start)
 	{
 		int ret = start;
-		while(blocks[ret].getSuperblock() != 0)
+		while (blocks[ret] != null && blocks[ret].getSuperblock() != 0)
 		{
 			ret = blocks[ret].getSuperblock();
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * @param index
 	 * @return
@@ -1300,7 +1305,7 @@ public class Map {
 	{
 		return blocks[index];
 	}
-	
+
 	/**
 	 * @param index
 	 * @return
@@ -1317,7 +1322,7 @@ public class Map {
 	{
 		return numberOfBlocks;
 	}
-	
+
 	public int mobilityByBlocks(int playernumber)
 	{
 		int possMoves = 0;
@@ -1375,27 +1380,34 @@ public class Map {
 		{
 			for (int x = 0; x < MapManager.getInstance().getWidth(); x++)
 			{
+				Tile curTile = getTileAt(x, y);
 				for (BlockOrientation o : BlockOrientation.values())
 				{
-					if (getTileAt(x, y).getBlockID(o) == 0)
+					if (curTile.getBlockID(o) == 0 && getTileAt(x, y).isOccupied())
 					{
 						blocks[blocksID] = new Block();
-						getTileAt(x, y).setBlockID(o, blocksID);
-						blocks[blocksID].addStone(Player.tileStatusToPlayerNumber(getTileAt(x, y).getStatus()));
+						curTile.setBlockID(o, blocksID);
+						if (curTile.getStatus() != TileStatus.EXPANSION)
+						{
+							blocks[blocksID].addStone(Player.tileStatusToPlayerNumber(curTile.getStatus()));
+						}
 						MapWalker mw = new MapWalker(this, new Vector2i(x, y), o.dir);
 						while (mw.canStep() && mw.getCurrentTile().isOccupied())
 						{
 							mw.step();
-							// has passed Transistion? 
-							if(mw.hasPassedTransition())
+							// has passed Transistion?
+							if (mw.hasPassedTransition())
 							{
 								o = BlockOrientation.fromDir(mw.getDirection());
 							}
 							if (mw.getCurrentTile().isOccupied())
 							{
 								mw.getCurrentTile().setBlockID(o, blocksID);
-								blocks[blocksID]
-										.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+								if (mw.getCurrentTile().getStatus() != TileStatus.EXPANSION)
+								{
+									blocks[blocksID]
+											.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+								}
 							}
 						}
 						if (mw.getCurrentTile().isEmpty())
@@ -1416,8 +1428,11 @@ public class Map {
 							if (mw.getCurrentTile().isOccupied())
 							{
 								mw.getCurrentTile().setBlockID(o, blocksID);
-								blocks[blocksID]
-										.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+								if (mw.getCurrentTile().getStatus() != TileStatus.EXPANSION)
+								{
+									blocks[blocksID]
+											.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+								}
 							}
 						}
 						if (mw.getCurrentTile().isEmpty())
@@ -1437,7 +1452,7 @@ public class Map {
 			}
 		}
 
-		numberOfBlocks = blocksID;
+		numberOfBlocks = blocksID - 1;
 	}
 
 	// --------------------------------------------------
