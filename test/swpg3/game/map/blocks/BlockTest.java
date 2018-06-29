@@ -166,6 +166,52 @@ class BlockTest {
 
 	}
 	
+	@Test
+	void testReBlockify()
+	{
+		String mapString = "3\n" + "0\n" + "0 1\n" + "5 5\n" + 
+				"2 0 0 0 0\n" + 
+				"0 0 1 2 0\n" + 
+				"0 0 1 0 0\n" + 
+				"0 0 0 0 0\n" + 
+				"1 0 1 0 0\n" + 
+				"0 4 4 <-> 0 0 6";
+
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
+		
+		Tile t22 = map.getTileAt(2, 2);
+		Tile t13 = map.getTileAt(1, 3);
+		Tile t04 = map.getTileAt(0, 4);
+
+		int blocksPrevious = map.getBlockCount();
+		
+		map.applyMove(new Move(1, 3, (byte) 0, (byte) 2));
+		
+		assertEquals(blocksPrevious + 3, map.getBlockCount(), "Block amount missmatch after move was aplied!");
+		assertFalse(map.getBlock(t22.getBlockID(BlockOrientation.DIAGONAL_UP)).isActive());
+		assertFalse(map.getBlock(t04.getBlockID(BlockOrientation.DIAGONAL_UP)).isActive());
+		
+		Block t13sb = map.getRootBlock(t13.getBlockID(BlockOrientation.DIAGONAL_UP));
+		
+		assertEquals(t13sb, map.getRootBlock(t22.getBlockID(BlockOrientation.DIAGONAL_UP)));
+		assertEquals(t13sb, map.getRootBlock(t04.getBlockID(BlockOrientation.DIAGONAL_UP)));
+		
+		blocksPrevious = map.getBlockCount();
+		
+		
+		// Defrag
+		map.blockify();
+		
+		assertEquals(blocksPrevious - 2, map.getBlockCount(), "Block amount dismatch after defrag!");
+		
+		assertEquals(t13.getBlockID(BlockOrientation.DIAGONAL_UP), t22.getBlockID(BlockOrientation.DIAGONAL_UP));
+		assertEquals(t13.getBlockID(BlockOrientation.DIAGONAL_UP), t04.getBlockID(BlockOrientation.DIAGONAL_UP));
+		
+		assertEquals(0, map.getBlock(t13.getBlockID(BlockOrientation.DIAGONAL_UP)).getSuperblock());
+	}
+	
 	/**
 	 * Test method for {@link swpg3.game.map.Map#getBlockCount()}.
 	 */
