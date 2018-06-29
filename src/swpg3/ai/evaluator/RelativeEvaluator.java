@@ -58,7 +58,8 @@ public class RelativeEvaluator implements Evaluator{
 				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
 				if(AI.numberOfSolidSquares != 0) 
 				{
-					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 
+							occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
@@ -371,15 +372,11 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param totalFieldControl
 	 * @return scaled positional evaluation according to parameters in AI class
 	 */
-	protected double evaluatePositionalFactors(double solidSquareRatio, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
-			, double totalFieldControl)
+	protected double evaluatePositionalFactors(double solidSquareRatio, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
 		evaluation += AI.SOLID_SQUARE_BONUS * solidSquareRatio * 100;
-		evaluation += AI.WEAK_SQUARE_BONUS * weakSquares;
-		evaluation += AI.BONUS_WEAK_SQUARE_BONUS * bonusWeakSquares;
-		evaluation += AI.CHOICE_WEAK_SQUARE_BONUS * choiceWeakSquares;
 		
 		//resize according to importance func
 		if(totalFieldControl < AI.PP_TP_I)
