@@ -82,7 +82,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				if(AI.numberOfSolidSquares != 0) 
 				{
-					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 
+							occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
