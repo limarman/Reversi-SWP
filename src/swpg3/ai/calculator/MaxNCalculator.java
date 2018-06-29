@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
@@ -40,6 +41,9 @@ public class MaxNCalculator implements Calculator{
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
 	{
+		//another node has been reached
+		form.incrementReachedNodes();
+		
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
@@ -55,7 +59,7 @@ public class MaxNCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -111,9 +115,13 @@ public class MaxNCalculator implements Calculator{
 	private double[] maxPlayer(Evaluator eval, byte currentPlayerNumber, int depth, long calcDeadLine, 
 			CalculatorForm form, Map map, int passesInRow) 
 	{
+		
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+			
 			double[] evals = new double[MapManager.getInstance().getNumberOfPlayers()];
 			
 			for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
@@ -138,7 +146,7 @@ public class MaxNCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -146,7 +154,7 @@ public class MaxNCalculator implements Calculator{
 		}
 		
 		//Player has no moves - next player cannot be maxPlayer, player cannot be disqualified
-		if(posMoves.isEmpty()) 
+		if(posMoves.isEmpty() || map.getPlayer(currentPlayerNumber).isDisqualified()) 
 		{
 			//There is no possible move (in this gamephase)
 			if(passesInRow >= MapManager.getInstance().getNumberOfPlayers()) 
@@ -167,6 +175,11 @@ public class MaxNCalculator implements Calculator{
 			}
 			
 			return maxPlayer(eval, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1);
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		if(GlobalSettings.log_performance)

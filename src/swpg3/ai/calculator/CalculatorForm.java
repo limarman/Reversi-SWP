@@ -8,6 +8,7 @@ import swpg3.game.move.Move;
  * - bestMove
  * - maxBranchingFactor
  * - calculatedToEnd
+ * - nodesReached
  * @author Ramil
  *
  */
@@ -16,11 +17,13 @@ public class CalculatorForm {
 	private Move bestMove;
 	private int maxBranchingFactor;
 	private boolean calculatedToEnd;
+	private int nodesReached;
 	
 	public CalculatorForm() {
 		bestMove = new Move();
 		maxBranchingFactor = -1;
 		calculatedToEnd = false;
+		nodesReached = 0;
 	}
 	
 	public Move getBestMove() 
@@ -38,6 +41,16 @@ public class CalculatorForm {
 		return calculatedToEnd;
 	}
 	
+	public int getReachedNodesCount()
+	{
+		return nodesReached;
+	}
+	
+	public void incrementReachedNodes() 
+	{
+		nodesReached++;
+	}
+	
 	/**
 	 * Copys the move parameters into the the variable "bestMove". No pass by reference.
 	 * @param m
@@ -45,6 +58,11 @@ public class CalculatorForm {
 	public void setBestMove(Move m) 
 	{
 		bestMove.copyFrom(m);
+	}
+	
+	public void setReachedNodesCount(int nodeCount) 
+	{
+		this.nodesReached = nodeCount;
 	}
 	
 	public void setMaxBranchingFactor(int maxBranchingFactor) 
@@ -62,5 +80,6 @@ public class CalculatorForm {
 		bestMove = new Move();
 		maxBranchingFactor = -1;
 		calculatedToEnd = false;
+		nodesReached = 0;
 	}
 }

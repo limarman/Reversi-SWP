@@ -26,7 +26,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	// EV - End Value
 	// I - Importance
 	private double INV_SV_I = 0;
-	private double INV_TV_I = 0.5;
+	private double INV_TV_I = 0.4;
 	private double INV_EV_I = 0.9;
 	private double INV_TP_I = 0.6;
 	
@@ -82,7 +82,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 						occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				if(AI.numberOfSolidSquares != 0) 
 				{
-					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					inversable_evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 
+							occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			

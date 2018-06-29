@@ -105,8 +105,7 @@ public class EgocentricEvaluator implements Evaluator {
 			evaluation += evaluateStoneCount(occupiedSquares/((double)stoneCount),
 					occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 			evaluation += evaluateOverrideCount(map.getPlayer(playerNumber).getNumberOfOverrideStones());
-			evaluation += evaluatePositionalFactors(solidSquareCount, 0, 0, 0,
-					occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+			evaluation += evaluatePositionalFactors(solidSquareCount, occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 		}
 		else //Bombing Phase
 		{
@@ -245,15 +244,11 @@ public class EgocentricEvaluator implements Evaluator {
 		return numberOfOverrides * AI.OVERRIDE_BONUS * AI.OVERRIDE_IMPORTANCE;
 	}
 	
-	private double evaluatePositionalFactors(int solidSquares, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
-			, double totalFieldControl)
+	private double evaluatePositionalFactors(int solidSquares , double totalFieldControl)
 	{
 		double evaluation = 0;
 		
 		evaluation += AI.SOLID_SQUARE_BONUS * solidSquares;
-		evaluation += AI.WEAK_SQUARE_BONUS * weakSquares;
-		evaluation += AI.BONUS_WEAK_SQUARE_BONUS * bonusWeakSquares;
-		evaluation += AI.CHOICE_WEAK_SQUARE_BONUS * choiceWeakSquares;
 		
 		//resize according to importance func
 		if(totalFieldControl < AI.PP_TP_I)

@@ -290,7 +290,7 @@ class TimingTest {
 	@Test
 	void BombingPhaseApplyMoveTimingTest()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)
@@ -331,6 +331,55 @@ class TimingTest {
 			}
 			
 			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/100000.);
+		}
+	}
+	
+	@Test
+	void GenerateMovesTiming()
+	{
+		boolean doTest = true;
+		int numberOfRuns = 1000000;
+		
+		if(!doTest)
+		{
+			assertTrue(true);
+		}
+		else
+		{
+			String mapString = "2\n"
+					+ "0\n"
+					+ "0 1\n"
+					+ "14 14\n"
+					+ "0 0 0 1 1 1 1 2 0 0 0 0 0 0\n"
+					+ "0 0 2 2 2 2 2 2 1 0 0 0 0 0\n"
+					+ "0 0 1 1 2 2 2 2 2 0 0 0 0 0\n"
+					+ "0 2 1 2 1 2 1 1 1 0 0 0 0 0\n"
+					+ "0 0 1 2 2 2 1 0 1 1 2 1 2 2\n"
+					+ "0 0 0 0 2 2 2 2 2 2 1 2 1 2\n"
+					+ "0 0 0 0 0 2 1 1 2 1 2 2 2 2\n"
+					+ "0 0 0 0 0 0 2 1 1 1 1 2 1 1\n"
+					+ "0 0 0 1 1 1 1 2 0 0 0 0 0 0\n"
+					+ "0 0 2 2 2 2 2 2 1 0 0 0 0 0\n"
+					+ "0 0 1 1 2 2 2 2 2 0 0 0 0 0\n"
+					+ "0 2 1 2 1 2 1 1 1 0 0 0 0 0\n"
+					+ "0 0 1 2 2 2 1 0 1 1 2 1 2 2\n"
+					+ "0 0 0 0 2 2 2 2 2 2 1 2 1 2\n";	
+			
+			MapManager mm = MapManager.getInstance();
+			AI ai = AI.getInstance();
+			Logger.init(LogLevel.INFO);
+			
+			mm.initializeMap(mapString);
+			Map m = mm.getCurrentMap();
+			ai.initialize();
+			
+			long pre_time_sum = System.nanoTime();
+			
+			for(int i = 0; i<numberOfRuns; i++) {
+				m.getPossibleMovesOrderable((byte)1, true);
+			}
+			
+			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/(1000. * numberOfRuns));
 		}
 	}
 

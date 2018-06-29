@@ -18,6 +18,12 @@ public class IterativeDeepeningCalculator implements Calculator{
 	public static int movesAsked = 0;
 	public static int timeouts = 0;
 	
+	//parameter
+	/**
+	 * value in the interval [0,1] where 0 is maximum branching factor and 1 is average branching factor
+	 */
+	double branching_factor_estimation = 0;
+	
 	private Calculator usedCalcBuilding;
 	private Calculator usedCalcBombing;
 	
@@ -95,6 +101,7 @@ public class IterativeDeepeningCalculator implements Calculator{
 					//fill out the form
 					form.setBestMove(currentForm.getBestMove());
 					form.setMaxBranchingFactor(currentForm.getMaxBranchingFactor());
+					form.setReachedNodesCount(currentForm.getReachedNodesCount());
 					form.setCalculatedToEnd(false);
 					evaluation = evaluationCurDepth;
 				}
@@ -151,10 +158,12 @@ public class IterativeDeepeningCalculator implements Calculator{
 					//fill out the form
 					form.setBestMove(currentForm.getBestMove()); //actualize the best move
 					form.setMaxBranchingFactor(currentForm.getMaxBranchingFactor());
+					form.setReachedNodesCount(currentForm.getReachedNodesCount());
 					evaluation = evaluationCurDepth; 
 					
 					//estimate the time needed for next depth
-					if(Clockmaster.exceedsDeadline(calcDeadLine, takenTime * currentForm.getMaxBranchingFactor())) 
+					if(Clockmaster.exceedsDeadline(calcDeadLine, (long) (takenTime *
+							estimateTimeFactorNextDepth(currentForm, curDepth)))) 
 					{
 						form.setCalculatedToEnd(false);
 						Logger.log(LogLevel.INFO, "Aborted with Depth: " + curDepth);
@@ -184,13 +193,33 @@ public class IterativeDeepeningCalculator implements Calculator{
 		
 		//called when there is a upper bound for the depth
 		//or the calculator has calculated to the end
-		if(!currentForm.hasCalculatedToEnd()) 
+		if(currentForm.hasCalculatedToEnd()) 
 		{
 			form.setCalculatedToEnd(false);
 			Logger.log(LogLevel.INFO, "Calculated to the end.");
 		}
-		Logger.log(LogLevel.INFO, "Calculated to given depth.");
+		else {
+			Logger.log(LogLevel.INFO, "Calculated to given depth.");
+		}
 		return evaluation;
+	}
+	
+	private double estimateTimeFactorNextDepth(CalculatorForm form, int depth) 
+	{		
+		//taking the maximal branchfactor
+		double maxfactor = form.getMaxBranchingFactor();
+		
+		// calculating the average branchingfactor
+		// if a tree has a branching factor v and a depth of d then there are in total (1-v^{d+1})/(1-v) nodes in a tree
+		// if v gets big, there are about v^d nodes in a tree.
+		// to calculate the average branching factor we just take the d-root of the number of stonesVisited
+		// TODO: There might be a miscalculation if players had no moves.
+		// TODO: Then it might be the case that the depth is a lot higher.
+		double avgfactor = Math.pow(form.getReachedNodesCount(), 1/((double)depth));
+		
+		double factor = branching_factor_estimation * avgfactor + (1-branching_factor_estimation) * maxfactor;
+		
+		return factor;
 	}
 
 }
