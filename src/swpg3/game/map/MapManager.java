@@ -290,4 +290,12 @@ public class MapManager {
 		currentMap.applyMove(m);
 	}
 	
+	/**
+	 * This method cleans up all the blocks in the map. 
+	 * There should be less Blocks after the defragmentation if there were blocks merged together.
+	 */
+	public void defragmentMapBlocks()
+	{
+		currentMap.blockify();
+	}
 }
