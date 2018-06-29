@@ -82,7 +82,16 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -165,7 +174,16 @@ public class PruningParanoidCalculator implements Calculator{
 			
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -278,7 +296,16 @@ public class PruningParanoidCalculator implements Calculator{
 			return evalErg;
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
