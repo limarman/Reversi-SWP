@@ -77,7 +77,7 @@ public class AI {
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
 	 * at the turning point of the game (filling degree turning point)
 	 */
-	public static double SC_TV_I = 0.5;
+	public static double SC_TV_I = 0.4;
 	/**
 	 * Stone Count Parameter - Importance Function:
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
@@ -173,7 +173,7 @@ public class AI {
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
 	 * at the turning point of the game
 	 */
-	public static double PP_TV_I = 0.65;
+	public static double PP_TV_I = 0.7;
 	
 	/**
 	 * Positional Play Parameter - Importance Function:
@@ -313,7 +313,7 @@ public class AI {
 			return;
 		}
 		
-		int movesToEnd = 5;
+		int movesToEnd = 3;
 		double turnPoint = (PLAYABLE_SQUARES - (numberOfPlayers * movesToEnd))/((double)PLAYABLE_SQUARES);
 		
 		//setting the turningPoints
