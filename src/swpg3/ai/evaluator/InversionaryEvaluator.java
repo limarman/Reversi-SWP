@@ -12,8 +12,8 @@ import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
 
 /**
- * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
- * is most likely inevitable
+ * A Evaluator which has the same basic idea as the Relative Evaluator but is keeping an eye on the number of inversion stones
+ * left and the player with whom the stone change is most likely inevitable
  * @author Ramil
  *
  */

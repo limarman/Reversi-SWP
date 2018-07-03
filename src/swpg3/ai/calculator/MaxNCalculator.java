@@ -1,7 +1,6 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
@@ -14,8 +13,8 @@ import swpg3.main.logging.Logger;
 import swpg3.main.perfLogging.PerfLogger;
 
 /**
- * Simple Calculator 
- * using Minimax algorithm and following the paranoid search
+ * Max^n Calculator implementation. Calculates the evaluation for every player in the leafs of the variation-tree.
+ * And calculates the best move assuming that every player is going to maximize their own value.
  * @author Ramil
  *
  */
@@ -88,14 +87,6 @@ public class MaxNCalculator implements Calculator{
 			
 			double value = values[maxPlayerNumber-1];
 			
-//			System.out.print("Move: " + move);
-//			System.out.print("Values: ");
-//			for(int i = 0; i<values.length; i++) 
-//			{
-//				System.out.print(values[i] + ", ");
-//			}
-//			System.out.println("");
-			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);
@@ -142,7 +133,6 @@ public class MaxNCalculator implements Calculator{
 			}
 			
 			return evals;
-			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);

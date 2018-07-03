@@ -337,7 +337,7 @@ class TimingTest {
 	@Test
 	void GenerateMovesTiming()
 	{
-		boolean doTest = true;
+		boolean doTest = false;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)

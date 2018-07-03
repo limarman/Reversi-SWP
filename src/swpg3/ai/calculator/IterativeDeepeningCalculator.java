@@ -20,30 +20,41 @@ public class IterativeDeepeningCalculator implements Calculator{
 	
 	//parameter
 	/**
-	 * value in the interval [0,1] where 0 is maximum branching factor and 1 is average branching factor
+	 * weight in the interval [0,1] where 0 forcec maximum branching factor and 1 forces average branching factor.
 	 */
 	double branching_factor_estimation = 0;
 	
-	private Calculator usedCalcBuilding;
-	private Calculator usedCalcBombing;
-	
-	//TODO: implement clever move-sorting
-	
 	/**
-	 * Default constructor uses AlphaBeta Pruning with natural move sorting
+	 * The Calculator which is used during the building-phase of the game.
+	 */
+	private Calculator usedCalcBuilding;
+	/**
+	 * The Calculator which is used during the bombing-phase of the game.
+	 */
+	private Calculator usedCalcBombing;
+		
+	/**
+	 * Default constructor which sets AlphaBeta Pruning with natural move sorting as Calculator during the building phase
+	 * and the Max^n Tree Search during the bombing phase
 	 */
 	public IterativeDeepeningCalculator() {
 		this.usedCalcBuilding = new PruningParanoidCalculator(new NaturalSorter());
 		this.usedCalcBombing = new MaxNCalculator();
 	}
 	
+	/**
+	 * Constructor, setting the calculator during the building an bombing phase of the game.
+	 * @param calcBuilding - Calculator which should be used during building phase.
+	 * @param calcBombing - Calculator which should be used during the bombing phase.
+	 */
 	public IterativeDeepeningCalculator(Calculator calcBuilding, Calculator calcBombing) {
 		this.usedCalcBuilding = calcBuilding;
 		this.usedCalcBombing = calcBombing;
 	}
 	
 	/**
-	 * Does not fill out the Calculatorform completely yet. Because it is not needed.
+	 * Sticks to the given conditions as time deadline and depthLimit are followed.
+	 * The aspiration window condition is followed in the first iteration.
 	 */
 	@Override
 	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
@@ -204,6 +215,14 @@ public class IterativeDeepeningCalculator implements Calculator{
 		return evaluation;
 	}
 	
+	/**
+	 * private method which is estimating by which factor the time needed for the next depth is going to rise.
+	 * Factor is the weighted sum of maximal branching branching factor and average branching factor.
+	 * The branching_factor_estimation attribute is determining these weights.
+	 * @param form - the CalculatorForm where the necessary information is in.
+	 * @param depth - the depth calculated last. depth+1 is the next depth to be calculated.
+	 * @return
+	 */
 	private double estimateTimeFactorNextDepth(CalculatorForm form, int depth) 
 	{		
 		//taking the maximal branchfactor
@@ -213,8 +232,6 @@ public class IterativeDeepeningCalculator implements Calculator{
 		// if a tree has a branching factor v and a depth of d then there are in total (1-v^{d+1})/(1-v) nodes in a tree
 		// if v gets big, there are about v^d nodes in a tree.
 		// to calculate the average branching factor we just take the d-root of the number of stonesVisited
-		// TODO: There might be a miscalculation if players had no moves.
-		// TODO: Then it might be the case that the depth is a lot higher.
 		double avgfactor = Math.pow(form.getReachedNodesCount(), 1/((double)depth));
 		
 		double factor = branching_factor_estimation * avgfactor + (1-branching_factor_estimation) * maxfactor;
