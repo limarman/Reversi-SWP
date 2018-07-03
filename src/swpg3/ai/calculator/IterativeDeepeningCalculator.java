@@ -57,10 +57,13 @@ public class IterativeDeepeningCalculator implements Calculator{
 	 * The aspiration window condition is followed in the first iteration.
 	 */
 	@Override
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
-			CalculatorConditions conditions) {
+	public double calculateBestMove(Evaluator eval, byte playerNumber, CalculatorForm form, CalculatorConditions conditions) {
 		
 		movesAsked++;
+		
+		//reading the conditions
+		int depth = conditions.getMaxDepth();
+		long calcDeadLine = conditions.getTimeDeadline();
 		
 		double evaluation  = 0;
 		
@@ -85,18 +88,20 @@ public class IterativeDeepeningCalculator implements Calculator{
 			currentForm.resetForm();
 			currentForm.setCalculatedToEnd(true); //staying true if no min-max Player argues
 			
+			//setting the conditions for the next depth - maxdepth and calcDeadline
+			currentConditions.setMaxDepth(curDepth);
+			currentConditions.setTimeDeadline(calcDeadLine);
+			
 			//Time measurement
 			long preTime = System.currentTimeMillis();
 			
 			//outsource the work to the given Calculator
 			//calculate the given nextDepth
 			if(gamePhase == GamePhase.BUILDING_PHASE) {
-				evaluationCurDepth = usedCalcBuilding.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm,
-						currentConditions);
+				evaluationCurDepth = usedCalcBuilding.calculateBestMove(eval, playerNumber, currentForm, currentConditions);
 			} else //Bombing Phase
 			{
-				evaluationCurDepth = usedCalcBombing.calculateBestMove(eval, playerNumber, curDepth, calcDeadLine, currentForm,
-						currentConditions);
+				evaluationCurDepth = usedCalcBombing.calculateBestMove(eval, playerNumber, currentForm,	currentConditions);
 			}
 			
 			long takenTime = System.currentTimeMillis() - preTime;

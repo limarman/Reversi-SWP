@@ -33,18 +33,22 @@ public class CalculatorConditions {
 	{
 		startingAlpha = Double.NEGATIVE_INFINITY;
 		startingBeta = Double.POSITIVE_INFINITY;
+		maxDepth = 0;
+		timeDeadline = 0;
 	}
 	
-	public CalculatorConditions(double startingAlpha, double startingBeta) 
+	public CalculatorConditions(int maxDepth, long calcDeadline) 
 	{
-		this.startingAlpha = startingAlpha;
-		this.startingBeta = startingBeta;
+		this.maxDepth = maxDepth;
+		this.timeDeadline = calcDeadline;
 	}
 	
 	public void resetConditions() 
 	{
 		startingAlpha = Double.NEGATIVE_INFINITY;
 		startingBeta = Double.POSITIVE_INFINITY;
+		maxDepth = 0;
+		timeDeadline = 0;
 	}
 
 	/**

@@ -1,8 +1,6 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.game.map.Map;
@@ -21,11 +19,16 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class ParanoidCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form, 
-			CalculatorConditions conditions) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, CalculatorForm form, CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
+		
+		//reading the conditions - this calculator ignores aspiration window condition
+		int depth = conditions.getMaxDepth();
+		long calcDeadLine = conditions.getTimeDeadline();
+		
+		
 		int realDepth = (depth == 0 ? 1 : depth);
 		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form);
 	}

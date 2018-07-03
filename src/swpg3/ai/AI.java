@@ -292,9 +292,10 @@ public class AI {
 	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
 	{
 		CalculatorForm form = new CalculatorForm();
-		CalculatorConditions conditions = new CalculatorConditions();
-		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit,
-				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form, conditions);
+		CalculatorConditions conditions = new CalculatorConditions(depthLimit,
+				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100));
+		
+		double evaluation = calc.calculateBestMove(eva, playerNumber, form, conditions);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 		return form.getBestMove();
 	}
