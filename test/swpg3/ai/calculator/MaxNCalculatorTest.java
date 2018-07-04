@@ -8,10 +8,8 @@ import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
-import swpg3.game.move.Move;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.LogTag;
-import swpg3.main.logging.Logger;
 
 class MaxNCalculatorTest {
 
@@ -70,7 +68,7 @@ class MaxNCalculatorTest {
 			Calculator paranoid = new ParanoidCalculator();
 			
 			CalculatorForm form = new CalculatorForm();
-			CalculatorConditions conditions = new CalculatorConditions();
+//			CalculatorConditions conditions = new CalculatorConditions();
 			
 			Map map = mm.getCurrentMap();	
 					

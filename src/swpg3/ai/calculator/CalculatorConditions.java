@@ -29,26 +29,18 @@ public class CalculatorConditions {
 	 */
 	private int maxDepth;
 	
-	public CalculatorConditions() 
-	{
-		startingAlpha = Double.NEGATIVE_INFINITY;
-		startingBeta = Double.POSITIVE_INFINITY;
-		maxDepth = 0;
-		timeDeadline = 0;
-	}
-	
+	/**
+	 * Only constructor of the class. Sets the maximal depth and the calculation deadline to the given parameters.
+	 * Furthermore it sets no aspiration window. This means alpha:=-inf and beta:=+inf
+	 * @param maxDepth - the maximal depth calculation is allowed to
+	 * @param calcDeadline - the deadline of the calculation in java system-time
+	 */
 	public CalculatorConditions(int maxDepth, long calcDeadline) 
 	{
+		this.startingAlpha = Double.NEGATIVE_INFINITY;
+		this.startingBeta = Double.POSITIVE_INFINITY;
 		this.maxDepth = maxDepth;
 		this.timeDeadline = calcDeadline;
-	}
-	
-	public void resetConditions() 
-	{
-		startingAlpha = Double.NEGATIVE_INFINITY;
-		startingBeta = Double.POSITIVE_INFINITY;
-		maxDepth = 0;
-		timeDeadline = 0;
 	}
 
 	/**

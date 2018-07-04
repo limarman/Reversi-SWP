@@ -13,7 +13,7 @@ import swpg3.main.perfLogging.PerfLogger;
 
 /**
  * Simple Calculator 
- * using Minimax algorithm and following the paranoid search
+ * using Minimax algorithm and following the paranoid search.
  * @author Ramil
  *
  */
@@ -38,9 +38,10 @@ public class ParanoidCalculator implements Calculator{
 	 * @param eval - Evaluator : used for position evaluation
 	 * @param maxPlayerNumber -  Entry point player number
 	 * @param depth - depth to calculate
+	 * @param calcDeadLine - the deadline of the calculation in java system-time.
 	 * @param map - current map
-	 * @param bestMove - reference to write the best move into
-	 * @return
+	 * @param form - CalculatorForm to fill out during the calculation process.
+	 * @return the position value in this position (node of the variation-tree).
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map,
 			CalculatorForm form) 
@@ -108,6 +109,17 @@ public class ParanoidCalculator implements Calculator{
 
 	}
 	
+	/**
+	 * The min-player of the min-max-recursion. Minimizes own position value.
+	 * @param eval - Evaluator used for evaluation of positions.
+	 * @param currentPlayerNumber - the play number of the current player (this max-player).
+	 * @param depth - the depth to calculate to.
+	 * @param calcDeadLine - the time deadline in java system-time.
+	 * @param form - CalculatorForm to fill out during calculation.
+	 * @param map - the map in the current variation path
+	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
+	 * @return the evaluation of this position (node in the variation tree).
+	 */
 	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow) 
 	{
@@ -213,6 +225,17 @@ public class ParanoidCalculator implements Calculator{
 		return minValue;
 	}
 	
+	/**
+	 * The max-player of the min-max-recursion. Maximizes own position value.
+	 * @param eval - Evaluator used for evaluation of positions.
+	 * @param currentPlayerNumber - the play number of the current player (this max-player).
+	 * @param depth - the depth to calculate to.
+	 * @param calcDeadLine - the time deadline in java system-time.
+	 * @param form - CalculatorForm to fill out during calculation.
+	 * @param map - the map in the current variation path
+	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
+	 * @return the evaluation of this position (node in the variation tree).
+	 */
 	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, 
 			CalculatorForm form, Map map, int passesInRow) 
 	{		

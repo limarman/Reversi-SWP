@@ -71,7 +71,7 @@ public class IterativeDeepeningCalculator implements Calculator{
 		double curAlpha = conditions.getStartingAlpha(),
 				curBeta = conditions.getStartingBeta(); //aspiration window variables
 		CalculatorForm currentForm = new CalculatorForm();	
-		CalculatorConditions currentConditions = new CalculatorConditions();
+		CalculatorConditions currentConditions = new CalculatorConditions(curDepth, calcDeadLine);
 		double evaluationCurDepth = 0;
 		
 		//The phase we are currently calculating in (we do not calculate into another gamePhase)
@@ -88,9 +88,9 @@ public class IterativeDeepeningCalculator implements Calculator{
 			currentForm.resetForm();
 			currentForm.setCalculatedToEnd(true); //staying true if no min-max Player argues
 			
-			//setting the conditions for the next depth - maxdepth and calcDeadline
+			//setting the conditions for the next depth - maxdepth 
+			//calculation deadline does not change
 			currentConditions.setMaxDepth(curDepth);
-			currentConditions.setTimeDeadline(calcDeadLine);
 			
 			//Time measurement
 			long preTime = System.currentTimeMillis();

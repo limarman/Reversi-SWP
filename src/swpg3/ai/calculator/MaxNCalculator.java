@@ -20,6 +20,9 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class MaxNCalculator implements Calculator{
 
+	/**
+	 * Ignores the aspiration window condition as no pruning is used.
+	 */
 	public double calculateBestMove(Evaluator eval, byte playerNumber, CalculatorForm form, CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
@@ -35,11 +38,11 @@ public class MaxNCalculator implements Calculator{
 	
 	/**
 	 * Entry-point for Max-n recursion. Actualizes the best possible move.
-	 * @param eval - Evaluator : used for position evaluation
-	 * @param maxPlayerNumber -  Entry point player number
+	 * @param eval - Evaluator : used for evaluation of positions.
+	 * @param maxPlayerNumber -  entry point player number.
 	 * @param depth - depth to calculate
 	 * @param map - current map
-	 * @param bestMove - reference to write the best move into
+	 * @param form - CalculatorForm to fill out during calculation.
 	 * @return
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
@@ -107,6 +110,17 @@ public class MaxNCalculator implements Calculator{
 
 	}
 	
+	/**
+	 * The max-player of the max^n recursion. Maximizes own position value.
+	 * @param eval - Evaluator used for evaluation of positions.
+	 * @param currentPlayerNumber - the play number of the current player (this max-player).
+	 * @param depth - the depth to calculate to.
+	 * @param calcDeadLine - the time deadline in java system-time.
+	 * @param form - CalculatorForm to fill out during calculation.
+	 * @param map - the map in the current variation path
+	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
+	 * @return an array of position values (one from every point of view) in this position (node in the variation-tree).
+	 */
 	private double[] maxPlayer(Evaluator eval, byte currentPlayerNumber, int depth, long calcDeadLine, 
 			CalculatorForm form, Map map, int passesInRow) 
 	{
