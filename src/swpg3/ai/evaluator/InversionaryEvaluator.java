@@ -41,6 +41,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	@Override
 	public double evaluatePosition(Map map, byte playerNumber)
 	{
+//		Logger.log(LogLevel.ERROR, "Evaluation:");
+		
 		double evaluation;
 		int numberOfPlayers = MapManager.getInstance().getNumberOfPlayers();
 		
