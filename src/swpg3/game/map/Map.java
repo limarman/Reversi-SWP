@@ -908,12 +908,26 @@ public class Map {
 					// Adjust Borders:
 					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						sb.setBorderA(move.getCoordinates());
-						sb.setNonBorderA(neighborBPos);
+						if(neighborB.isEmpty())
+						{
+							sb.setBorderA(move.getCoordinates());
+							sb.setNonBorderA(neighborBPos);
+						}
+						else
+						{
+							sb.setBorderA(null);
+						}
 					} else
 					{
-						sb.setBorderB(move.getCoordinates());
-						sb.setNonBorderB(neighborBPos);
+						if(neighborB.isEmpty())
+						{
+							sb.setBorderB(move.getCoordinates());
+							sb.setNonBorderB(neighborBPos);
+						}
+						else
+						{
+							sb.setBorderB(null);
+						}
 					}
 				} else if (neighborA.getBlockID(ori) == 0 && neighborB.getBlockID(ori) != 0)
 				{
@@ -924,12 +938,25 @@ public class Map {
 					// Adjust Borders:
 					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						sb.setBorderA(move.getCoordinates());
-						sb.setNonBorderA(neighborAPos);
+						if(neighborA.isEmpty())
+						{
+							sb.setBorderA(move.getCoordinates());
+							sb.setNonBorderA(neighborAPos);
+						} else
+						{
+							sb.setBorderA(null);
+						}
 					} else
 					{
-						sb.setBorderB(move.getCoordinates());
-						sb.setNonBorderB(neighborAPos);
+						if(neighborA.isEmpty())
+						{
+							sb.setBorderB(move.getCoordinates());
+							sb.setNonBorderB(neighborAPos);
+						}
+						else
+						{
+							sb.setBorderB(null);
+						}
 					}
 				}
 
