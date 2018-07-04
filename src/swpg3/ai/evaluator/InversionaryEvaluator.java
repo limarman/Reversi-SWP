@@ -569,11 +569,11 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		//resizing according to importance func
 		if(totalFieldControl < INV_TP_I)
 		{
-			factor = calcLinearInterpolation(0, INV_TP_I, INV_SV_I, INV_TV_I, totalFieldControl);
+			factor = MathHelper.calcLinearInterpolation(0, INV_TP_I, INV_SV_I, INV_TV_I, totalFieldControl);
 		}
 		else
 		{
-			factor = calcLinearInterpolation(INV_TP_I, 1, INV_TV_I, INV_EV_I, totalFieldControl);
+			factor =MathHelper.calcLinearInterpolation(INV_TP_I, 1, INV_TV_I, INV_EV_I, totalFieldControl);
 		}
 		
 		return factor;

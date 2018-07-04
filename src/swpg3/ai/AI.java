@@ -274,7 +274,7 @@ public class AI {
 		eva = new InversionaryEvaluator();
 //		eva = new RelativeEvaluator();
 		anna.analyseMap();
-		MathHelper.initialize();
+		MathHelper.preprocessCumulatedProbs();
 		setParameters();
 	}
 	

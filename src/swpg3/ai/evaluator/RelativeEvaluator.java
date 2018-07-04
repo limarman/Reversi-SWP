@@ -2,6 +2,7 @@ package swpg3.ai.evaluator;
 
 import swpg3.ai.AI;
 import swpg3.game.GamePhase;
+import swpg3.game.MathHelper;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
 import swpg3.game.map.Map;
@@ -341,12 +342,12 @@ public class RelativeEvaluator implements Evaluator{
 		//resizing according to importance func
 		if(totalFieldControl < AI.SC_TP_I)
 		{
-			double factor = calcLinearInterpolation(0, AI.SC_TP_I, AI.SC_SV_I, AI.SC_TV_I, totalFieldControl);
+			double factor = MathHelper.calcLinearInterpolation(0, AI.SC_TP_I, AI.SC_SV_I, AI.SC_TV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		else
 		{
-			double factor = calcLinearInterpolation(AI.SC_TP_I, 1, AI.SC_TV_I, AI.SC_EV_I, totalFieldControl);
+			double factor = MathHelper.calcLinearInterpolation(AI.SC_TP_I, 1, AI.SC_TV_I, AI.SC_EV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		
@@ -381,30 +382,16 @@ public class RelativeEvaluator implements Evaluator{
 		//resize according to importance func
 		if(totalFieldControl < AI.PP_TP_I)
 		{
-			double factor = calcLinearInterpolation(0, AI.PP_TP_I, AI.PP_SV_I, AI.PP_TV_I, totalFieldControl);
+			double factor = MathHelper.calcLinearInterpolation(0, AI.PP_TP_I, AI.PP_SV_I, AI.PP_TV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		else
 		{
-			double factor = calcLinearInterpolation(AI.PP_TP_I, 1, AI.PP_TV_I, AI.PP_EV_I, totalFieldControl);
+			double factor = MathHelper.calcLinearInterpolation(AI.PP_TP_I, 1, AI.PP_TV_I, AI.PP_EV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		
 		return evaluation;
-	}
-			
-	/**
-	 * Lagrange interpolation between the linear function through point (start, startVal) and (end, endVal) in point x
-	 * @param start
-	 * @param end
-	 * @param startVal
-	 * @param endVal
-	 * @param x
-	 * @return the linear interpolation from x in the line through (start,startVal) and (end,endVal)
-	 */
-	protected double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
-	{
-		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
 	}
 	
 	protected int calculateCurrentPrize(double[] stoneCount, byte playerNumber) 
