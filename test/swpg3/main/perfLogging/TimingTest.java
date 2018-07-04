@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import swpg3.ai.AI;
 import swpg3.ai.calculator.Calculator;
+import swpg3.ai.calculator.CalculatorConditions;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.ParanoidCalculator;
 import swpg3.ai.calculator.PruningParanoidCalculator;
@@ -287,9 +288,10 @@ class TimingTest {
 	}
 	
 	@Test
-	void alphaBetaMiniMaxTiming()
+	void BombingPhaseApplyMoveTimingTest()
 	{
 		boolean doTest = false;
+		int numberOfRuns = 1000000;
 		
 		if(!doTest)
 		{
@@ -320,14 +322,64 @@ class TimingTest {
 			Evaluator eva = new InversionaryEvaluator();
 			Calculator minCalc = new ParanoidCalculator();
 			CalculatorForm form = new CalculatorForm();
+			CalculatorConditions conditions = new CalculatorConditions();
 			
 			long pre_time_sum = System.nanoTime();
 			
 			for(int i = 0; i<100; i++) {
-				minCalc.calculateBestMove(eva, (byte)1, 4, Long.MAX_VALUE, form);
+				minCalc.calculateBestMove(eva, (byte)1, 4, Long.MAX_VALUE, form, conditions);
 			}
 			
 			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/100000.);
+		}
+	}
+	
+	@Test
+	void GenerateMovesTiming()
+	{
+		boolean doTest = true;
+		int numberOfRuns = 1000000;
+		
+		if(!doTest)
+		{
+			assertTrue(true);
+		}
+		else
+		{
+			String mapString = "2\n"
+					+ "0\n"
+					+ "0 1\n"
+					+ "14 14\n"
+					+ "0 0 0 1 1 1 1 2 0 0 0 0 0 0\n"
+					+ "0 0 2 2 2 2 2 2 1 0 0 0 0 0\n"
+					+ "0 0 1 1 2 2 2 2 2 0 0 0 0 0\n"
+					+ "0 2 1 2 1 2 1 1 1 0 0 0 0 0\n"
+					+ "0 0 1 2 2 2 1 0 1 1 2 1 2 2\n"
+					+ "0 0 0 0 2 2 2 2 2 2 1 2 1 2\n"
+					+ "0 0 0 0 0 2 1 1 2 1 2 2 2 2\n"
+					+ "0 0 0 0 0 0 2 1 1 1 1 2 1 1\n"
+					+ "0 0 0 1 1 1 1 2 0 0 0 0 0 0\n"
+					+ "0 0 2 2 2 2 2 2 1 0 0 0 0 0\n"
+					+ "0 0 1 1 2 2 2 2 2 0 0 0 0 0\n"
+					+ "0 2 1 2 1 2 1 1 1 0 0 0 0 0\n"
+					+ "0 0 1 2 2 2 1 0 1 1 2 1 2 2\n"
+					+ "0 0 0 0 2 2 2 2 2 2 1 2 1 2\n";	
+			
+			MapManager mm = MapManager.getInstance();
+			AI ai = AI.getInstance();
+			Logger.init(LogLevel.INFO);
+			
+			mm.initializeMap(mapString);
+			Map m = mm.getCurrentMap();
+			ai.initialize();
+			
+			long pre_time_sum = System.nanoTime();
+			
+			for(int i = 0; i<numberOfRuns; i++) {
+				m.getPossibleMovesOrderable((byte)1, true);
+			}
+			
+			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/(1000. * numberOfRuns));
 		}
 	}
 

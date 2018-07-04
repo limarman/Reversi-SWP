@@ -1,0 +1,50 @@
+\section{Task 3}
+Um einen möglichst großen Gewinn in der Performance zu erzielen, müssen wir versuchen, die \textit{Aspiration-Windows} möglichst klein zu halten, damit viele Zweige abgeschnitten werden.
+
+Da unsere Bewertungsfunktion uns einen Wert zwischen 0 und 250 liefert, kann die Größe des Fensters maximal 250 groß sein. Aber wir wollen ein möglichst kleines Fenster haben. Deshalb haben wir zuerst auf der Standard Karte eine binäre Suche ausgeführt, und haben festgestellt, dass erst ab einer Größe von ca. 15-20 die oben beschriebenen \textit{Aspiration-Window Fails} auftreten.
+
+Um diesen Wert besser ausfeilen zu können, haben wir ein Script geschrieben, dass auf fünf Karten je sieben Spiele spielt und dabei die folgenden Fenstergrößen ausprobiert:
+
+$$ 50, 40, 30, 20, 15, 10, 5$$
+
+Dabei haben wir festgestellt, dass auf verschiedenen Karten die Schwelle, ab der \textit{Aspiration-Window Fails} auftreten, unterschiedlich ist. Somit macht es keinen  Sinn, die optimale Fenstergröße exakt zu bestimmen und eine Auflösung von 5 sollte genügen.
+
+Die genauen Ergebnisse können in der Datei Aspiration-Ergebnisse.txt eingesehen werden.
+Hier deshalb nur die wichtigsten Eckdaten:
+
+\begin{tabular}{|c|c|c|}
+\hline 
+Map & Aspiration Window Size & Fails \\ 
+\hline 
+\hline
+\multirow{3}{*}{standard\_map.txt} & 20 & 0  \\
+                                   & 15 & 3  \\ 
+                                   & 10 & 20 \\ 
+\hline 
+
+\multirow{3}{*}{005\_g5\_map2.txt} & 20 & 1 \\ 
+                                   & 15 & 9 \\ 
+                                   & 10 & 5 \\ 
+\hline 
+
+\multirow{3}{*}{006\_g6\_question\_mark.map} & 20 & 0 \\
+                                             & 15 & 2 \\ 
+                                             & 10 & 2 \\ 
+\hline 
+
+\multirow{3}{*}{009\_g7\_Map\_Pirate\_Heist} & 20 & 6 \\
+                                             & 15 & 10 \\ 
+                                             & 10 & 24 \\ 
+\hline 
+ 
+\multirow{3}{*}{011\_g3\_Map1.txt} & 20 & 0 \\
+                                   & 15 & 0 \\ 
+                                   & 10 & 0 \\ 
+\hline 
+\end{tabular} 
+
+Da ein \textit{Aspiration-Window Fail} dazu führt, dass eine Suche erneut gestartet wird, kann es, vor allem in großen Tiefen, sehr teuer sein, weshalb wir den optimalen Wert sehr konservativ entschieden haben. 
+
+Dieser optimale Wert ist für uns: 15
+
+Auf allen getesteten Maps führt dieser Wert dazu, dass weniger als 0,03\% der Suchen fehlschlagen. Der nächst bessere Wert von 10 hätte auf einigen der Karten diese Grenze überschritten. Insgesamt denken wir also, dass dies ein guter Kompromiss ist.

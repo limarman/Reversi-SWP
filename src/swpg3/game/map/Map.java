@@ -11,7 +11,7 @@ import swpg3.game.Vector2i;
 import swpg3.game.map.blocks.Block;
 import swpg3.game.map.blocks.BlockOrientation;
 import swpg3.game.move.Move;
-import swpg3.game.move.MoveType;
+import swpg3.game.move.MoveTypeValue;
 
 /**
  * A class to store Map information
@@ -20,13 +20,6 @@ import swpg3.game.move.MoveType;
  *
  */
 public class Map {
-	// private int numberOfPlayers;
-	// private int numberOfOverrides;
-	// private int numberOfBombs;
-	// private int bombStrength;
-	// private int height;
-	// private int width;
-	// private int transitionCount;
 
 	private Tile[]		grid;
 	private Player[]	playerInfo;
@@ -479,11 +472,12 @@ public class Map {
 	 * make.
 	 * 
 	 * @param playerNumber
+	 * @param considerOverrides - whether override moves should even be considered
 	 * 
 	 * @return Possible Moves - HashSet of all possible Moves with extra info to
 	 *         make an order by calling any sort method
 	 */
-	public HashSet<Move> getPossibleMovesOrderable(byte playerNumber)
+	public HashSet<Move> getPossibleMovesOrderable(byte playerNumber, boolean considerOverrides)
 	{
 		MapManager mm = MapManager.getInstance();
 		HashSet<Move> possibleMoves = new HashSet<>();
@@ -516,7 +510,6 @@ public class Map {
 								continue; // there is no possible move in this direction
 							}
 							mw.step();
-							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
 							if (mw.getCurrentTile().isEmpty() || !mw.canStep() || mw.getCurrentTile()
 									.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
@@ -539,11 +532,11 @@ public class Map {
 							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
 									.getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								if (overridePossible)
+								if (considerOverrides && overridePossible)
 								{
 									// a new Move is found
 									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE);
+											MoveTypeValue.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
 								// remembering from where the MapWalker came from and which direction he walked
@@ -559,46 +552,47 @@ public class Map {
 									break;
 								}
 							}
-
 							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
 								// stopped on an owned stone
 
 								// if not the starting stone
-								if (!mw.getPosition().equals(pos) && overridePossible)
+								if (!mw.getPosition().equals(pos) && considerOverrides && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.SELF_OVERRIDE_USE));
+											MoveTypeValue.SELF_OVERRIDE_USE));
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
+								//find out how many empty adjacent squares for move sorting
+								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
 								{
 									case EMPTY:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.NORMAL_BUILDING));
+												MoveTypeValue.NORMAL_BUILDING - adjacentEmpty));
 										break;
 									case CHOICE:
 										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
 										{
 											// there are #player possible ways to switch players
 											possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber,
-													MoveType.CHOICE));
+													MoveTypeValue.CHOICE - adjacentEmpty));
 										}
 										break;
 									case INVERSION:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.INVERSION));
+												MoveTypeValue.INVERSION - adjacentEmpty));
 										break;
 									case BONUS:
 										// There is a choice between an extra bomb and an extra override stone
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE,
-												playerNumber, MoveType.BONUS_BOMB));
+												playerNumber, MoveTypeValue.BONUS_BOMB - adjacentEmpty));
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
-												playerNumber, MoveType.BONUS_OVERRIDE));
+												playerNumber, MoveTypeValue.BONUS_OVERRIDE - adjacentEmpty));
 										break;
 									default:
 										// cannot be the case
@@ -608,16 +602,16 @@ public class Map {
 							{
 								// no further step possible
 								// field is not empty (and not own stone)
-								if (overridePossible)
+								if (considerOverrides && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE));
+											MoveTypeValue.OVERRIDE_USE));
 								}
 							}
 						}
-					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides && overridePossible)
 					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveType.OVERRIDE_USE));
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
 				}
 			}
@@ -637,12 +631,12 @@ public class Map {
 							// bombing an own stone in the first place
 							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.SELF_BOMB));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.SELF_BOMB));
 							}
 							// not bombing an own stone - most liekly a wiser choice
 							else
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.NORMAL_BOMBING));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.NORMAL_BOMBING));
 							}
 						}
 					}
@@ -723,7 +717,7 @@ public class Map {
 								{
 									// a new Move is found
 									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE);
+											MoveTypeValue.OVERRIDE_USE);
 									possibleMoves.add(move);
 								}
 								// remembering from where the MapWalker came from and which direction he walked
@@ -748,37 +742,40 @@ public class Map {
 								if (!mw.getPosition().equals(pos) && overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.SELF_OVERRIDE_USE));
+											MoveTypeValue.SELF_OVERRIDE_USE));
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
+								//find out how many empty adjacent squares for move sorting
+								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
+								
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
 								{
 									case EMPTY:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.NORMAL_BUILDING));
+												MoveTypeValue.NORMAL_BUILDING));
 										break;
 									case CHOICE:
 										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
 										{
 											// there are #player possible ways to switch players
 											possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber,
-													MoveType.CHOICE));
+													MoveTypeValue.CHOICE));
 										}
 										break;
 									case INVERSION:
 										// There is only a regular move possible
 										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-												MoveType.INVERSION));
+												MoveTypeValue.INVERSION));
 										break;
 									case BONUS:
 										// There is a choice between an extra bomb and an extra override stone
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE,
-												playerNumber, MoveType.BONUS_BOMB));
+												playerNumber, MoveTypeValue.BONUS_BOMB));
 										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
-												playerNumber, MoveType.BONUS_OVERRIDE));
+												playerNumber, MoveTypeValue.BONUS_OVERRIDE));
 										break;
 									default:
 										// cannot be the case
@@ -791,13 +788,13 @@ public class Map {
 								if (overridePossible)
 								{
 									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
-											MoveType.OVERRIDE_USE));
+											MoveTypeValue.OVERRIDE_USE));
 								}
 							}
 						}
 					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
 					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveType.OVERRIDE_USE));
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
 				}
 			}
@@ -817,12 +814,12 @@ public class Map {
 							// bombing an own stone in the first place
 							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.SELF_BOMB));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.SELF_BOMB));
 							}
 							// not bombing an own stone - most liekly a wiser choice
 							else
 							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveType.NORMAL_BOMBING));
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.NORMAL_BOMBING));
 							}
 						}
 					}
@@ -1168,7 +1165,7 @@ public class Map {
 		}
 		List<Vector2i> positionsToBomb = new LinkedList<>();
 		checkFieldsToBomb(radius, position.clone(), positionsToBomb, integerMap);
-
+		
 		for (Vector2i positionToBomb : positionsToBomb)
 		{
 			getTileAt(positionToBomb).setStatus(TileStatus.HOLE); // bombing the positionField
@@ -1187,7 +1184,9 @@ public class Map {
 	private void checkFieldsToBomb(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap)
 	{
 		if (radius < 0)
+		{
 			return; // no bombing
+		}
 
 		if (integerMap[position.x][position.y] == -1)
 		{
@@ -1220,6 +1219,56 @@ public class Map {
 		}
 	}
 
+	/**
+	 * Breadth-First-Search (BFS) with IntegerMap to mark the visited squares with corresponding radius visited. 
+	 * @param radius
+	 * @param position
+	 * @param positionsToBomb
+	 * @param integerMap
+	 */
+	@SuppressWarnings("unused")
+	private void checkFieldsToBomb2(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap) 
+	{
+		if(radius < 0)
+		{
+			return; //no fields are bombed
+		}
+		MapWalker mw = new MapWalker(this);
+		LinkedList<Vector2i> positionQueue = new LinkedList<>();
+		positionQueue.add(position);
+		positionsToBomb.add(position);
+		integerMap[position.x][position.y] = radius;
+		while(!positionQueue.isEmpty()) 
+		{
+			Vector2i curPos = positionQueue.pollFirst(); //point of view in the iteration
+			int curRadius = integerMap[curPos.x][curPos.y];
+			if(curRadius > 0)
+			{
+				mw.setPosition(curPos.clone());
+				for(int i = 0; i<8; i++) 
+				{
+					mw.setDirection(Vector2i.mapDirToVector(i));
+					if (mw.canStep())
+					{ // adjacent Field is not a hole
+						mw.step();
+						Vector2i newPos = mw.getPosition(); //possibly new unseen field
+						if(integerMap[newPos.x][newPos.y] == -1) //if not visited yet
+						{
+							positionQueue.add(newPos);
+							positionsToBomb.add(newPos);
+							integerMap[newPos.x][newPos.y] = curRadius-1;
+						}
+						
+						mw.setPosition(curPos.clone()); //move back
+					}
+				}
+			}
+			
+		}
+		
+		
+	}
+	
 	/**
 	 * Get a reference to a Tile
 	 * 
@@ -1500,5 +1549,34 @@ public class Map {
 			}
 			System.out.println("");
 		}
+	}
+	
+	/**
+	 * Given a position on the map, the function looks at the adjacent fields and counts how many of them are empty squares.
+	 * @param position - position on the map to look from
+	 * @return the number of adjacent empty squares
+	 */
+	private int getNumberOfAdjacentEmptySqures(Vector2i position) 
+	{
+		int adjacentEmptys = 0;
+		
+		MapWalker mw = new MapWalker(this);
+		mw.setPosition(position.clone());
+		
+		//looking in every direction
+		for(int i = 0; i<9; i++) 
+		{
+			mw.setDirection(Vector2i.mapDirToVector(i));
+			if(mw.step()) //try to step
+			{
+				if(mw.getCurrentTile().isEmpty()) 
+				{
+					adjacentEmptys++;
+				}
+				mw.setPosition(position.clone()); //return to starting position
+			}
+		}
+		
+		return adjacentEmptys;
 	}
 }

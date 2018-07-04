@@ -8,8 +8,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
@@ -228,6 +232,51 @@ class MapTest {
 	}
 	
 	@Test
+	void testcheckFieldsToBomb() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException 
+	{
+		String mapString = "3\n3\n2 2\n6 6\n000100\n000120\n0c-100\n0031i0\n000200\n000000";
+		
+		MapManager mm = MapManager.getInstance();
+		
+		try{
+			mm.initializeMap(mapString);
+		}
+		catch(Exception e) {
+			fail("map could not be read.");
+		}
+		
+		Method cfb1 = Map.class.getDeclaredMethod("checkFieldsToBomb", int.class, Vector2i.class, List.class, int[][].class);
+		Method cfb2 = Map.class.getDeclaredMethod("checkFieldsToBomb", int.class, Vector2i.class, List.class, int[][].class);
+		cfb1.setAccessible(true);
+		cfb2.setAccessible(true);
+		
+		List<Vector2i> positionsToBomb1 = new LinkedList<>();
+		List<Vector2i> positionsToBomb2 = new LinkedList<>();
+		
+		int[][] integerMap1 = new int[mm.getWidth()][mm.getHeight()];
+		int[][] integerMap2 = new int[mm.getWidth()][mm.getHeight()];
+		
+		for(int w = 0; w<mm.getWidth(); w++) 
+		{
+			for(int h = 0; h<mm.getWidth(); h++) 
+			{
+				integerMap1[w][h] = -1;
+				integerMap2[w][h] = -1;
+			}
+		}
+
+		Map map = mm.getCurrentMap();
+		
+		cfb1.invoke(map, 2, new Vector2i(2,2), positionsToBomb1, integerMap1);
+		cfb2.invoke(map, 2, new Vector2i(2,2), positionsToBomb2, integerMap2);
+		
+		assertTrue(positionsToBomb1.size() == positionsToBomb2.size(), "More positions to bomb.");
+		
+		
+		map.print();
+	}
+	
+	@Test
 	void testGetPossibleMoves()
 	{
 		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n"
@@ -296,12 +345,12 @@ class MapTest {
 	void testGetPossibleMovesOrdered()
 	{
 		String mapString = "3\r\n3\r\n2 2\r\n6 6\r\n"
-				+ "000100\r\n"
-				+ "000120\r\n"
-				+ "0c-100\r\n"
-				+ "0031i0\r\n"
-				+ "000200\r\n"
-				+ "0000xx";
+				+ "0 0 0 1 0 0\r\n"
+				+ "0 0 0 1 2 0\r\n"
+				+ "0 c - 1 0 0\r\n"
+				+ "0 0 3 1 i 0\r\n"
+				+ "0 0 0 2 0 0\r\n"
+				+ "0 0 0 0 x x";
 		
 		MapManager mm = MapManager.getInstance();
 		
@@ -316,7 +365,7 @@ class MapTest {
 		
 		//testing the building phase
 		
-		HashSet<Move> possibleMovesTest = map.getPossibleMovesOrderable((byte)3);
+		HashSet<Move> possibleMovesTest = map.getPossibleMovesOrderable((byte)3, true);
 				
 //		possibleMovesTest.forEach(System.out::println);
 		
@@ -329,19 +378,20 @@ class MapTest {
 		Arrays.sort(sorted);
 		for(int i = 0; i<sorted.length; i++) 
 		{
-			System.out.println(sorted[i] + "Type: " + sorted[i].getMoveType());
+			System.out.println(sorted[i] + "MoveValue: " + sorted[i].getMoveValue());
 		}
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1, true);
 		
 		//asserting that every added move was legal
 		for(Move m : possibleMovesTest)
 		{
+			System.out.println("MoveFound: " + m);
 			assertTrue(map.isMoveValid(m), "invalid move was added as possible move!");
 		}
 		assertTrue(possibleMovesTest.size() == 8, "not every possible move was discovered!");
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 2);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 2, true);
 		
 		//asserting that every added move was legal
 		for(Move m : possibleMovesTest)
@@ -354,7 +404,7 @@ class MapTest {
 		//testing the bombing phase
 		mm.toggleGamePhase();
 		
-		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1);
+		possibleMovesTest = map.getPossibleMovesOrderable((byte) 1, true);
 		
 		for(Move m : possibleMovesTest)
 		{
@@ -525,7 +575,7 @@ class MapTest {
 		Map map = mm.getCurrentMap();
 		
 		assertFalse(map.isMoveValid(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
-		assertFalse(map.getPossibleMovesOrderable((byte)1).contains(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
+		assertFalse(map.getPossibleMovesOrderable((byte)1, true).contains(new Move(3,2,(byte)0,(byte)1)), "invalid move is considered valid!");
 	}
 	
 	
@@ -839,7 +889,7 @@ class MapTest {
 				
 				//another interesting bug
 				//as well in the getPossibleMoves, isMoveValid fails to verify that the move is illegal
-				assertFalse(m.getPossibleMovesOrderable((byte) 1).contains(new Move(18,9,(byte)0,(byte)1)));
+				assertFalse(m.getPossibleMovesOrderable((byte) 1, true).contains(new Move(18,9,(byte)0,(byte)1)));
 				assertFalse(m.isMoveValid(new Move(new Vector2i(18,9), (byte) 0 , (byte) 1)));
 	}
 	
@@ -869,7 +919,6 @@ class MapTest {
 		
 		// Success, because no exception is thrown
 	}
-
 	
 	@Test
 	void mapReadBugMap2Test()

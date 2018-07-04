@@ -32,8 +32,8 @@ public class MapWalker {
 
 	/**
 	 * @param map
-	 * @param position
-	 * @param direction
+	 * @param position gets cloned
+	 * @param direction gets cloned
 	 */
 	public MapWalker(Map map, Vector2i position, Vector2i direction)
 	{
@@ -45,6 +45,7 @@ public class MapWalker {
 	}
 
 	/**
+	 * Return a clone of the Position
 	 * @return the position
 	 */
 	public Vector2i getPosition()
@@ -54,7 +55,7 @@ public class MapWalker {
 
 	/**
 	 * @param position
-	 *            the position to set
+	 *            the position to set. gets cloned
 	 */
 	public void setPosition(Vector2i position)
 	{
@@ -62,6 +63,7 @@ public class MapWalker {
 	}
 
 	/**
+	 * Return a clone of the direction
 	 * @return the direction
 	 */
 	public Vector2i getDirection()
@@ -71,7 +73,7 @@ public class MapWalker {
 
 	/**
 	 * @param direction
-	 *            the direction to set
+	 *            the direction to set. gets cloned
 	 */
 	public void setDirection(Vector2i direction)
 	{

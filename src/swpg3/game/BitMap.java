@@ -38,5 +38,25 @@ public class BitMap {
 	{
 		map[x + y * width] = val;
 	}
+
+	/**
+	 * 
+	 * @param position on the map
+	 * @return boolean value in the bitmap at the position
+	 */
+	public boolean get(Vector2i position) {
+		
+		return get(position.x, position.y);
+	}
+	
+	/**
+	 * 
+	 * @param position on the map
+	 * @param value to set at the position
+	 */
+	public void set(Vector2i position, boolean val) 
+	{
+		set(position.x, position.y, val);
+	}
 	
 }

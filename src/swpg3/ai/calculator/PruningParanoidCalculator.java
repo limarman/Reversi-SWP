@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.BogoSorter;
@@ -41,12 +42,13 @@ public class PruningParanoidCalculator implements Calculator{
 		this.sorter = sorter;
 	}
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
+			CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
 		int realDepth = (depth == 0 ? 1 : depth);
-		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form);
+		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form, conditions);
 	}
 	
 	/**
@@ -55,11 +57,17 @@ public class PruningParanoidCalculator implements Calculator{
 	 * @param maxPlayerNumber -  Entry point player number
 	 * @param depth - depth to calculate
 	 * @param map - current map
-	 * @param bestMove - reference to write the best move into
+	 * @param form - form to fill out during calculation process
+	 * @param conditions - conditions for the calculation process to follow
 	 * @return
 	 */
-	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
+	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form,
+			CalculatorConditions conditions) 
 	{	
+		
+		//another node has been reached
+		form.incrementReachedNodes();
+		
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
@@ -74,7 +82,16 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -87,7 +104,7 @@ public class PruningParanoidCalculator implements Calculator{
 			Logger.log(LogLevel.WARNING, "No moves to search in..");
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, 0,
-					Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+					conditions.getStartingAlpha(), conditions.getStartingBeta());
 		}
 		
 		//sorting the moves with the provided MoveSorter
@@ -131,9 +148,13 @@ public class PruningParanoidCalculator implements Calculator{
 	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
+				
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+			
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 
@@ -153,7 +174,16 @@ public class PruningParanoidCalculator implements Calculator{
 			
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -188,6 +218,11 @@ public class PruningParanoidCalculator implements Calculator{
 			{
 				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
 			} 
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		double minValue = beta;
@@ -237,9 +272,13 @@ public class PruningParanoidCalculator implements Calculator{
 	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
+		
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 			
@@ -257,7 +296,16 @@ public class PruningParanoidCalculator implements Calculator{
 			return evalErg;
 		}
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(currentPlayerNumber);
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		}
+		
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -282,6 +330,11 @@ public class PruningParanoidCalculator implements Calculator{
 			
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1, alpha, beta);
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		double maxValue = alpha;

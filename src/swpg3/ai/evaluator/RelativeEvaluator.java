@@ -13,9 +13,11 @@ import swpg3.game.move.Move;
 public class RelativeEvaluator implements Evaluator{
 
 	
-	protected final int FIRST_PRIZE = 100;
-	protected final int SECOND_PRIZE = 50;
-	protected final int THIRD_PRIZE = 30;
+	protected final int FIRST_PRIZE = 250;
+	protected final int SECOND_PRIZE = 110;
+	protected final int THIRD_PRIZE = 50;
+	protected final int FOURTH_PRIZE = 20;
+	protected final int FIFTH_PRIZE = 10;
 	
 	//##################################################
 	// Evaluation Function
@@ -56,7 +58,8 @@ public class RelativeEvaluator implements Evaluator{
 				evaluations[i] += evaluateOverrideCount(map.getPlayer(i+1).getNumberOfOverrideStones());
 				if(AI.numberOfSolidSquares != 0) 
 				{
-					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES));
+					evaluations[i] += evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 
+							occupiedSquares/((double)AI.PLAYABLE_SQUARES));
 				}
 			}
 			
@@ -87,9 +90,35 @@ public class RelativeEvaluator implements Evaluator{
 			double[] probs = calculateProbabilities(playerNumber, stoneCount);
 			
 			//expected prize - according to probabilites
-			evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			double stone_evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
+			
+			//calculate absolute bombingPower
+			int bombStrength = MapManager.getInstance().getBombStrength();
+			int bombingPower = 0;
+			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
+			{
+				Player p = map.getPlayer(i);
+				if(!p.isDisqualified()) {
+					//A bomb with radius x bombs a square with width (x+1) and height (x+1)
+					bombingPower += p.getBombs() * (bombStrength+1) * (bombStrength+1);
+				}
+			}
+			
+			//calculate the prize of player if there would not be any bombs left (current standing)
+			int currentPrize = calculateCurrentPrize(stoneCount, playerNumber);
 			
 			
+			//calculate weighting factor
+			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
+			int CONST = 2; //can be modified
+			double weight = bombingPower / ((double)(CONST * AI.PLAYABLE_SQUARES));
+			if(weight > 1) 
+			{
+				weight = 1; //should not be over 1
+			}
+			
+			//weighted evaluation
+			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
 		}
 		return evaluation;
 	}
@@ -168,8 +197,6 @@ public class RelativeEvaluator implements Evaluator{
 			}
 		}
 		
-		//TODO: It might be the case, that function fails because divided by 0
-
 		double[] probalities = {firstPlaceProbs[playerNumber-1], secondPlaceProb, thirdPlaceProb};
 		
 		return probalities;
@@ -345,15 +372,11 @@ public class RelativeEvaluator implements Evaluator{
 	 * @param totalFieldControl
 	 * @return scaled positional evaluation according to parameters in AI class
 	 */
-	protected double evaluatePositionalFactors(double solidSquareRatio, int weakSquares, int bonusWeakSquares, int choiceWeakSquares
-			, double totalFieldControl)
+	protected double evaluatePositionalFactors(double solidSquareRatio, double totalFieldControl)
 	{
 		double evaluation = 0;
 		
 		evaluation += AI.SOLID_SQUARE_BONUS * solidSquareRatio * 100;
-		evaluation += AI.WEAK_SQUARE_BONUS * weakSquares;
-		evaluation += AI.BONUS_WEAK_SQUARE_BONUS * bonusWeakSquares;
-		evaluation += AI.CHOICE_WEAK_SQUARE_BONUS * choiceWeakSquares;
 		
 		//resize according to importance func
 		if(totalFieldControl < AI.PP_TP_I)
@@ -382,6 +405,38 @@ public class RelativeEvaluator implements Evaluator{
 	protected double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
 	{
 		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
+	}
+	
+	protected int calculateCurrentPrize(double[] stoneCount, byte playerNumber) 
+	{
+		int place = 1;
+		for(int i = 0; i<stoneCount.length; i++)
+		{
+			if(stoneCount[i] > stoneCount[playerNumber-1]) 
+			{
+				place++;
+			}
+		}
+		
+		int currentPrize = 0;
+		if(place == 1) 
+		{
+			currentPrize = FIRST_PRIZE;
+		} else if(place == 2) 
+		{
+			currentPrize = SECOND_PRIZE;
+		} else if(place == 3) 
+		{
+			currentPrize = THIRD_PRIZE;
+		} else if(place == 4) 
+		{
+			currentPrize = FOURTH_PRIZE;
+		} else if(place == 5) 
+		{
+			currentPrize = FIFTH_PRIZE;
+		} //otherwise it stays 0
+		
+		return currentPrize;
 	}
 			
 		

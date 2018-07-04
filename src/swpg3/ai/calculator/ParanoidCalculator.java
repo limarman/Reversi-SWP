@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
@@ -20,7 +21,8 @@ import swpg3.main.perfLogging.PerfLogger;
  */
 public class ParanoidCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form, 
+			CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
@@ -37,8 +39,12 @@ public class ParanoidCalculator implements Calculator{
 	 * @param bestMove - reference to write the best move into
 	 * @return
 	 */
-	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
+	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map,
+			CalculatorForm form) 
 	{
+		//another node has been reached
+		form.incrementReachedNodes();
+		
 		// there is no calculating possible
 		// should not happen
 		if(depth == 0) 
@@ -54,7 +60,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -81,6 +87,8 @@ public class ParanoidCalculator implements Calculator{
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0);
 									
+			//System.out.println("Move: " + move + " Value: " + value);
+			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);
@@ -100,9 +108,13 @@ public class ParanoidCalculator implements Calculator{
 	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow) 
 	{
+		
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+			
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 			if(GlobalSettings.log_performance)
@@ -121,7 +133,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -154,6 +166,11 @@ public class ParanoidCalculator implements Calculator{
 			{
 				return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1);
 			} 
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		if(GlobalSettings.log_performance)
@@ -195,10 +212,13 @@ public class ParanoidCalculator implements Calculator{
 	
 	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine, 
 			CalculatorForm form, Map map, int passesInRow) 
-	{
+	{		
 		//reached maximal depth
 		if(depth == 0) 
 		{
+			//another node has been reached
+			form.incrementReachedNodes();
+			
 			double evalErg = eval.evaluatePosition(map, maxPlayerNumber);
 			form.setCalculatedToEnd(false);
 
@@ -218,7 +238,7 @@ public class ParanoidCalculator implements Calculator{
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber);
+		HashSet<Move> posMoves = map.getPossibleMovesOrderable(currentPlayerNumber, true);
 		int branchingFactor = posMoves.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
 		{
@@ -242,6 +262,11 @@ public class ParanoidCalculator implements Calculator{
 			}
 			
 			return minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth, calcDeadLine, form, map, passesInRow+1);
+		}
+		else 
+		{
+			//another node has been reached
+			form.incrementReachedNodes();
 		}
 		
 		if(GlobalSettings.log_performance)

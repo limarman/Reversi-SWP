@@ -1,0 +1,100 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+\begin{filecontents}{standard_map.txt-dep}
+15.0	7.173947132616487
+10.0	7.224507168458782
+5.0	7.0040975955794496
+4.0	6.99777937303139
+3.0	7.120818119525426
+2.0	7.175881123058543
+1.0	7.0684794447534305
+0.0	7.343356108124251
+\end{filecontents}
+\begin{filecontents}{005_g5_map2.txt-dep}
+15.0	3.8417714318149248
+10.0	3.8131034374932438
+5.0	3.8431146070264726
+4.0	3.820372052078328
+3.0	3.8163358188482794
+2.0	3.8404628467443853
+1.0	3.7690140626054562
+0.0	3.8546187820233957
+\end{filecontents}
+\begin{filecontents}{006_g6_question_mark.map-dep}
+15.0	5.8655147524890845
+10.0	5.72980491956421
+5.0	5.742755157251437
+4.0	5.692395387839715
+3.0	5.822163205918503
+2.0	5.373182014191776
+1.0	5.437156555902781
+0.0	5.83106716413441
+\end{filecontents}
+\begin{filecontents}{009_g7_Map_Pirate_Heist-dep}
+15.0	3.4289941287181342
+10.0	3.7194646762692707
+5.0	3.774632691200526
+4.0	3.7346041617063324
+3.0	3.662964897909079
+2.0	3.5736498151391243
+1.0	3.5077869789261396
+0.0	3.352045346606739
+\end{filecontents}
+\begin{filecontents}{011_g3_Map1.txt-dep}
+15.0	3.042868586344774
+10.0	2.786222734608109
+5.0	2.826555101507585
+4.0	2.961459634426784
+3.0	3.199204237943022
+2.0	3.111296132697066
+1.0	3.231878393878508
+0.0	3.0954190090481393
+\end{filecontents}
+\begin{document}
+\begin{tikzpicture}[y=2cm, x=.7cm,font=\sffamily]
+ 	%axis
+	\draw (0,0) -- coordinate (x axis mid) (16,0);
+    	\draw (0,0) -- coordinate (y axis mid) (0,10);
+    	%ticks
+    	\foreach \x in {0,...,16}
+     		\draw (\x,1pt) -- (\x,-3pt)
+			node[anchor=north] {\x};
+    	\foreach \y in {0,1,...,10}
+     		\draw (1pt,\y) -- (-3pt,\y) 
+     			node[anchor=east] {\y}; 
+	%labels      
+	\node[below=0.8cm] at (x axis mid) {asp-window Size};
+	\node[rotate=90, above=0.8cm] at (y axis mid) {Avg. Depth};%plots
+	\draw plot[mark=*, mark options={fill=white}] 
+		file {standard_map.txt-dep};
+	\draw plot[mark=triangle*, mark options={fill=white} ] 
+		file {005_g5_map2.txt-dep};
+	\draw plot[mark=square*, mark options={fill=white}]
+		file {006_g6_question_mark.map-dep};
+	\draw plot[mark=*]
+		file {009_g7_Map_Pirate_Heist-dep};  
+	\draw plot[mark=square*]
+		file {011_g3_Map1.txt-dep};  
+
+    
+	%legend
+	\begin{scope}[shift={(-10,5)}] 
+	\draw (0,0) -- 
+		plot[mark=*, mark options={fill=white}] (0.25,0) -- (0.5,0) 
+		node[right]{standard\_map.txt};
+	\draw[yshift=\baselineskip] (0,0) -- 
+		plot[mark=triangle*, mark options={fill=white}] (0.25,0) -- (0.5,0)
+		node[right]{005\_g5\_map2.txt};
+	\draw[yshift=2\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=white}] (0.25,0) -- (0.5,0)
+		node[right]{006\_g6\_question\_mark.map};
+	\draw[yshift=3\baselineskip] (0,0) -- 
+		plot[mark=*, mark options={fill=black}] (0.25,0) -- (0.5,0)
+		node[right]{009\_g7\_Map\_Pirate\_Heist};
+	\draw[yshift=4\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=black}] (0.25,0) -- (0.5,0)
+		node[right]{011\_g3\_Map1.txt};
+	\end{scope}
+\end{tikzpicture}
+\end{document}
