@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import sun.net.www.protocol.http.spnego.NegotiateCallbackHandler;
 import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
