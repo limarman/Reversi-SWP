@@ -17,21 +17,21 @@ public class Clockmaster {
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the start of the game (filling degree 0%).
 	 */
-	private static double TM_SV = 0.6;
+	private static double TM_SV = 0.4;
 	
 	/**
 	 * Time Management parameter:
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the turning point of the game.
 	 */
-	private static double TM_TV = 0.8;
+	private static double TM_TV = 0.55;
 	
 	/**
 	 * Time Management parameter:
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the end of the game and bombing phase (filling degree 100%).
 	 */
-	private static double TM_EV = 0.85;
+	private static double TM_EV = 0.6;
 	
 	/**
 	 * Time Management parameter:
@@ -74,12 +74,13 @@ public class Clockmaster {
 	/**
 	 * Calculates the amount of time in milliseconds the Calculator has, to calculate the best move.
 	 * @param time - maximal time in milliseconds, which is given by the server.
-	 * @param map - the current GameState in form of the map.
+	 * @return the maximal time allowed to use during the next calculation in milliseconds.
 	 */
-	public static long getAllowedUseTime(long time, Map map) 
+	public static long getAllowedUseTime(long time) 
 	{
 		MapManager mm = MapManager.getInstance();
-		
+		Map map = mm.getCurrentMap();
+				
 		double decay_factor;
 		
 		//If GamePhase is BombingPhase use the End-Value Parameter

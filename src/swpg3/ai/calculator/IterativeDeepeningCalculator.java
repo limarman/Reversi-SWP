@@ -17,12 +17,13 @@ public class IterativeDeepeningCalculator implements Calculator{
 	public static int depthsCalculated = 0;
 	public static int movesAsked = 0;
 	public static int timeouts = 0;
+	public static int[] timesDepthCalculated = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; 
 	
 	//parameter
 	/**
-	 * weight in the interval [0,1] where 0 forcec maximum branching factor and 1 forces average branching factor.
+	 * weight in the interval [0,1] where 0 forces maximum branching factor and 1 forces average branching factor.
 	 */
-	double branching_factor_estimation = 0;
+	double branching_factor_estimation = 0.8;
 	
 	/**
 	 * The Calculator which is used during the building-phase of the game.
@@ -124,6 +125,14 @@ public class IterativeDeepeningCalculator implements Calculator{
 				
 				//Leave the iteration
 				Logger.log(LogLevel.INFO, "Timeouted with Depth: " + (curDepth-1));
+				if(curDepth-1 < 10) 
+				{
+					timesDepthCalculated[curDepth-1]++;
+				}
+				else 
+				{
+					timesDepthCalculated[10]++;
+				}
 				return evaluation;
 			}
 			else //search has not time-outed
@@ -164,6 +173,16 @@ public class IterativeDeepeningCalculator implements Calculator{
 					{
 						form.setCalculatedToEnd(false);
 						Logger.log(LogLevel.INFO, "Aborted with Depth: " + curDepth);
+						
+						if(curDepth < 10) 
+						{
+							timesDepthCalculated[curDepth]++;
+						}
+						else 
+						{
+							timesDepthCalculated[10]++;
+						}
+						
 						return evaluation;
 					}
 				}
@@ -183,6 +202,14 @@ public class IterativeDeepeningCalculator implements Calculator{
 					{
 						form.setCalculatedToEnd(false);
 						Logger.log(LogLevel.INFO, "Aborted with Depth: " + curDepth);
+						if(curDepth < 10) 
+						{
+							timesDepthCalculated[curDepth]++;
+						}
+						else 
+						{
+							timesDepthCalculated[10]++;
+						}
 						return evaluation;
 					}
 				
@@ -216,6 +243,14 @@ public class IterativeDeepeningCalculator implements Calculator{
 		}
 		else {
 			Logger.log(LogLevel.INFO, "Calculated to given depth.");
+			if(depth < 10) 
+			{
+				timesDepthCalculated[depth]++;
+			}
+			else 
+			{
+				timesDepthCalculated[10]++;
+			}
 		}
 		return evaluation;
 	}

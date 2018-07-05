@@ -289,11 +289,27 @@ public class AI {
 	 * @param timeLimit - the maximum time which is allowed to be used
 	 * @return the best move according to the evaluation-function of the used Evaluator
 	 */
-	public Move getBestMove(byte playerNumber, int depthLimit, int timeLimit)
+	public Move getBestMove(byte playerNumber, int depthLimit, long timeLimit)
 	{
 		CalculatorForm form = new CalculatorForm();
-		CalculatorConditions conditions = new CalculatorConditions(depthLimit,
-				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100));
+		
+		//figuring out the calculation deadline
+		long calcDeadLine;
+		
+		if(timeLimit == 0) 
+		{
+			calcDeadLine = Clockmaster.getTimeDeadLine(15 * 1000 - 500);
+		}
+		else if(GlobalSettings.iterative_deepening) 
+		{
+			calcDeadLine = Clockmaster.getTimeDeadLine(Clockmaster.getAllowedUseTime(timeLimit));
+		}
+		else 
+		{
+			calcDeadLine = Clockmaster.getTimeDeadLine(timeLimit - 150);
+		}
+		
+		CalculatorConditions conditions = new CalculatorConditions(depthLimit,	calcDeadLine);
 		
 		double evaluation = calc.calculateBestMove(eva, playerNumber, form, conditions);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
