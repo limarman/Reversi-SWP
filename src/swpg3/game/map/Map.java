@@ -1003,6 +1003,7 @@ public class Map {
 					{
 						newBlock.setStoneAmount(i, a.getStoneAmount(i) + b.getStoneAmount(i));
 					}
+					newBlock.addStone(move.getPlayerNumber());
 					// mark as the Superblock
 					a.setSuperblock(numberOfBlocks);
 					b.setSuperblock(numberOfBlocks);

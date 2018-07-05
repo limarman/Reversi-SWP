@@ -12,6 +12,8 @@ import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
 import swpg3.game.map.Tile;
 import swpg3.game.move.Move;
+import swpg3.main.logging.LogLevel;
+import swpg3.main.logging.Logger;
 
 /**
  * @author eric
@@ -249,6 +251,33 @@ class BlockTest {
 		assertEquals(5, map.mobilityByBlocks(1));
 		assertEquals(4, map.mobilityByBlocks(2));
 		assertEquals(3, map.mobilityByBlocks(3));
+	}
+	
+	@Test
+	void testMobilityByBlocks2()
+	{
+		String mapString = "2\n" + "0\n" + "0 1\n" + "8 8\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 1 2 0 0 0\n"
+				+ "0 0 0 2 1 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0";
+		
+		Logger.init(LogLevel.INFO);
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
+		
+		map.applyMove(new Move(2,4, (byte)0,(byte)1));
+		map.applyMove(new Move(4,5, (byte)0,(byte)2));
+		map.applyMove(new Move(5,4, (byte)0,(byte)1));
+		map.applyMove(new Move(2,5, (byte)0,(byte)2));
+		map.applyMove(new Move(3,5, (byte)0,(byte)1));
+		Logger.logMap(LogLevel.ERROR, map);
+		assertEquals(11, map.mobilityByBlocks(1));
 	}
 
 }
