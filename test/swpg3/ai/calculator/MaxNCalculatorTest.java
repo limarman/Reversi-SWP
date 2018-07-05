@@ -8,10 +8,8 @@ import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.map.Map;
 import swpg3.game.map.MapManager;
-import swpg3.game.move.Move;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.LogTag;
-import swpg3.main.logging.Logger;
 
 class MaxNCalculatorTest {
 
@@ -70,7 +68,7 @@ class MaxNCalculatorTest {
 			Calculator paranoid = new ParanoidCalculator();
 			
 			CalculatorForm form = new CalculatorForm();
-			CalculatorConditions conditions = new CalculatorConditions();
+//			CalculatorConditions conditions = new CalculatorConditions();
 			
 			Map map = mm.getCurrentMap();	
 					
@@ -127,12 +125,16 @@ class MaxNCalculatorTest {
 	//
 	//		System.out.println(eva.evaluatePosition(mm.getCurrentMap(), (byte) 1));
 			
-			System.out.println(max.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form, conditions));
+			CalculatorConditions conditions_max = new CalculatorConditions(2, Clockmaster.getTimeDeadLine(30*1000));
+			
+			System.out.println(max.calculateBestMove(eva, (byte)1, form, conditions_max));
 			System.out.println(form.getBestMove());
 			
 			form.resetForm();
 			
-			System.out.println(paranoid.calculateBestMove(eva, (byte)1, 2, Clockmaster.getTimeDeadLine(30*1000), form, conditions));
+			CalculatorConditions conditions_paranoid = new CalculatorConditions(2, Clockmaster.getTimeDeadLine(30*1000));
+			
+			System.out.println(paranoid.calculateBestMove(eva, (byte)1, form, conditions_paranoid));
 			System.out.println(form.getBestMove());
 		}
 
