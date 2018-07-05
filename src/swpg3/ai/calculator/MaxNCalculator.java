@@ -1,7 +1,6 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.evaluator.Evaluator;
@@ -14,29 +13,36 @@ import swpg3.main.logging.Logger;
 import swpg3.main.perfLogging.PerfLogger;
 
 /**
- * Simple Calculator 
- * using Minimax algorithm and following the paranoid search
+ * Max^n Calculator implementation. Calculates the evaluation for every player in the leafs of the variation-tree.
+ * And calculates the best move assuming that every player is going to maximize their own value.
  * @author Ramil
  *
  */
 public class MaxNCalculator implements Calculator{
 
-	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
-			CalculatorConditions conditions) 
+	/**
+	 * Ignores the aspiration window condition as no pruning is used.
+	 */
+	public double calculateBestMove(Evaluator eval, byte playerNumber, CalculatorForm form, CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
+		
+		//reading the conditions - this calculator ignores aspiration window condition
+		int depth = conditions.getMaxDepth();
+		long calcDeadLine = conditions.getTimeDeadline();
+		
 		int realDepth = (depth == 0 ? 1 : depth);
 		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form);
 	}
 	
 	/**
 	 * Entry-point for Max-n recursion. Actualizes the best possible move.
-	 * @param eval - Evaluator : used for position evaluation
-	 * @param maxPlayerNumber -  Entry point player number
+	 * @param eval - Evaluator : used for evaluation of positions.
+	 * @param maxPlayerNumber -  entry point player number.
 	 * @param depth - depth to calculate
 	 * @param map - current map
-	 * @param bestMove - reference to write the best move into
+	 * @param form - CalculatorForm to fill out during calculation.
 	 * @return
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form) 
@@ -88,14 +94,6 @@ public class MaxNCalculator implements Calculator{
 			
 			double value = values[maxPlayerNumber-1];
 			
-//			System.out.print("Move: " + move);
-//			System.out.print("Values: ");
-//			for(int i = 0; i<values.length; i++) 
-//			{
-//				System.out.print(values[i] + ", ");
-//			}
-//			System.out.println("");
-			
 			if(value > maxValue) //updating the evaluation 
 			{
 				form.setBestMove(move);
@@ -112,6 +110,17 @@ public class MaxNCalculator implements Calculator{
 
 	}
 	
+	/**
+	 * The max-player of the max^n recursion. Maximizes own position value.
+	 * @param eval - Evaluator used for evaluation of positions.
+	 * @param currentPlayerNumber - the play number of the current player (this max-player).
+	 * @param depth - the depth to calculate to.
+	 * @param calcDeadLine - the time deadline in java system-time.
+	 * @param form - CalculatorForm to fill out during calculation.
+	 * @param map - the map in the current variation path
+	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
+	 * @return an array of position values (one from every point of view) in this position (node in the variation-tree).
+	 */
 	private double[] maxPlayer(Evaluator eval, byte currentPlayerNumber, int depth, long calcDeadLine, 
 			CalculatorForm form, Map map, int passesInRow) 
 	{
@@ -142,7 +151,6 @@ public class MaxNCalculator implements Calculator{
 			}
 			
 			return evals;
-			//return eval.evaluatePosition(map, maxPlayerNumber);
 		}
 		
 		byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
