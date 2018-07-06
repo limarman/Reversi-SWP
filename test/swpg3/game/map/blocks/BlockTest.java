@@ -276,8 +276,48 @@ class BlockTest {
 		map.applyMove(new Move(5,4, (byte)0,(byte)1));
 		map.applyMove(new Move(2,5, (byte)0,(byte)2));
 		map.applyMove(new Move(3,5, (byte)0,(byte)1));
-		Logger.logMap(LogLevel.ERROR, map);
+//		Logger.logMap(LogLevel.ERROR, map);
 		assertEquals(11, map.mobilityByBlocks(1));
+	}
+	
+	@Test
+	void testMobilityByBlocks3()
+	{
+		String mapString = "2\n" + "0\n" + "0 1\n" + "8 8\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 1 2 0 0 0\n"
+				+ "0 0 0 2 1 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0\n"
+				+ "0 0 0 0 0 0 0 0";
+		
+		Logger.init(LogLevel.INFO);
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
+		
+		//The played Varaiation
+		map.applyMove(new Move(2,4, (byte)0,(byte)1));
+		map.applyMove(new Move(2,5, (byte)0,(byte)2));
+		map.applyMove(new Move(5,3, (byte)0,(byte)1));
+		map.applyMove(new Move(3,2, (byte)0,(byte)2));
+		map.applyMove(new Move(2,6, (byte)0,(byte)1));
+		map.applyMove(new Move(6,3, (byte)0,(byte)2));
+		map.applyMove(new Move(5,2, (byte)0,(byte)1));
+		map.applyMove(new Move(4,1, (byte)0,(byte)2));
+		map.applyMove(new Move(7,3, (byte)0,(byte)1));
+
+		//variation player 2 has calculated
+		map.applyMove(new Move(3,5, (byte)0,(byte)2));
+		map.applyMove(new Move(4,2, (byte)0,(byte)1));
+		map.applyMove(new Move(7,4, (byte)0,(byte)2));
+		map.applyMove(new Move(4,6, (byte)0,(byte)1));
+		map.applyMove(new Move(4,5, (byte)0,(byte)2));
+		
+		Logger.logMap(LogLevel.ERROR, map);
+		assertEquals(7, map.mobilityByBlocks(1));
 	}
 
 }
