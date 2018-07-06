@@ -472,7 +472,8 @@ public class Map {
 	 * make.
 	 * 
 	 * @param playerNumber
-	 * @param considerOverrides - whether override moves should even be considered
+	 * @param considerOverrides
+	 *            - whether override moves should even be considered
 	 * 
 	 * @return Possible Moves - HashSet of all possible Moves with extra info to
 	 *         make an order by calling any sort method
@@ -564,7 +565,7 @@ public class Map {
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
-								//find out how many empty adjacent squares for move sorting
+								// find out how many empty adjacent squares for move sorting
 								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
@@ -609,7 +610,8 @@ public class Map {
 								}
 							}
 						}
-					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides && overridePossible)
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides
+							&& overridePossible)
 					{
 						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
@@ -746,9 +748,9 @@ public class Map {
 								}
 							} else if (mw.getCurrentTile().isEmpty())
 							{
-								//find out how many empty adjacent squares for move sorting
+								// find out how many empty adjacent squares for move sorting
 								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
-								
+
 								// stopped on a non-occupied field
 								switch (mw.getCurrentTile().getStatus())
 								{
@@ -904,23 +906,21 @@ public class Map {
 					// Adjust Borders:
 					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						if(neighborB.isEmpty())
+						if (neighborB.isEmpty())
 						{
 							sb.setBorderA(move.getCoordinates());
 							sb.setNonBorderA(neighborBPos);
-						}
-						else
+						} else
 						{
 							sb.setBorderA(null);
 						}
 					} else
 					{
-						if(neighborB.isEmpty())
+						if (neighborB.isEmpty())
 						{
 							sb.setBorderB(move.getCoordinates());
 							sb.setNonBorderB(neighborBPos);
-						}
-						else
+						} else
 						{
 							sb.setBorderB(null);
 						}
@@ -934,7 +934,7 @@ public class Map {
 					// Adjust Borders:
 					if (sb.getNonBorderA() != null && sb.getNonBorderA().equals(move.getCoordinates()))
 					{
-						if(neighborA.isEmpty())
+						if (neighborA.isEmpty())
 						{
 							sb.setBorderA(move.getCoordinates());
 							sb.setNonBorderA(neighborAPos);
@@ -944,12 +944,11 @@ public class Map {
 						}
 					} else
 					{
-						if(neighborA.isEmpty())
+						if (neighborA.isEmpty())
 						{
 							sb.setBorderB(move.getCoordinates());
 							sb.setNonBorderB(neighborAPos);
-						}
-						else
+						} else
 						{
 							sb.setBorderB(null);
 						}
@@ -1051,8 +1050,11 @@ public class Map {
 				// Adjust amount of stones in Blocks
 				for (BlockOrientation ori : BlockOrientation.values())
 				{
-					getRootBlock(blocks[tile.getBlockID(ori)])
-							.removeStone(Player.tileStatusToPlayerNumber(tile.getStatus()));
+					if (tile.getStatus() != TileStatus.EXPANSION)
+					{
+						getRootBlock(blocks[tile.getBlockID(ori)])
+								.removeStone(Player.tileStatusToPlayerNumber(tile.getStatus()));
+					}
 					getRootBlock(blocks[tile.getBlockID(ori)]).addStone(move.getPlayerNumber());
 				}
 				tile.setStatus(Player.mapPlayerNumberToTileStatus(move.getPlayerNumber()));
@@ -1166,7 +1168,7 @@ public class Map {
 		}
 		List<Vector2i> positionsToBomb = new LinkedList<>();
 		checkFieldsToBomb(radius, position.clone(), positionsToBomb, integerMap);
-		
+
 		for (Vector2i positionToBomb : positionsToBomb)
 		{
 			getTileAt(positionToBomb).setStatus(TileStatus.HOLE); // bombing the positionField
@@ -1221,55 +1223,56 @@ public class Map {
 	}
 
 	/**
-	 * Breadth-First-Search (BFS) with IntegerMap to mark the visited squares with corresponding radius visited. 
+	 * Breadth-First-Search (BFS) with IntegerMap to mark the visited squares with
+	 * corresponding radius visited.
+	 * 
 	 * @param radius
 	 * @param position
 	 * @param positionsToBomb
 	 * @param integerMap
 	 */
 	@SuppressWarnings("unused")
-	private void checkFieldsToBomb2(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap) 
+	private void checkFieldsToBomb2(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap)
 	{
-		if(radius < 0)
+		if (radius < 0)
 		{
-			return; //no fields are bombed
+			return; // no fields are bombed
 		}
 		MapWalker mw = new MapWalker(this);
 		LinkedList<Vector2i> positionQueue = new LinkedList<>();
 		positionQueue.add(position);
 		positionsToBomb.add(position);
 		integerMap[position.x][position.y] = radius;
-		while(!positionQueue.isEmpty()) 
+		while (!positionQueue.isEmpty())
 		{
-			Vector2i curPos = positionQueue.pollFirst(); //point of view in the iteration
+			Vector2i curPos = positionQueue.pollFirst(); // point of view in the iteration
 			int curRadius = integerMap[curPos.x][curPos.y];
-			if(curRadius > 0)
+			if (curRadius > 0)
 			{
 				mw.setPosition(curPos.clone());
-				for(int i = 0; i<8; i++) 
+				for (int i = 0; i < 8; i++)
 				{
 					mw.setDirection(Vector2i.mapDirToVector(i));
 					if (mw.canStep())
 					{ // adjacent Field is not a hole
 						mw.step();
-						Vector2i newPos = mw.getPosition(); //possibly new unseen field
-						if(integerMap[newPos.x][newPos.y] == -1) //if not visited yet
+						Vector2i newPos = mw.getPosition(); // possibly new unseen field
+						if (integerMap[newPos.x][newPos.y] == -1) // if not visited yet
 						{
 							positionQueue.add(newPos);
 							positionsToBomb.add(newPos);
-							integerMap[newPos.x][newPos.y] = curRadius-1;
+							integerMap[newPos.x][newPos.y] = curRadius - 1;
 						}
-						
-						mw.setPosition(curPos.clone()); //move back
+
+						mw.setPosition(curPos.clone()); // move back
 					}
 				}
 			}
-			
+
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * Get a reference to a Tile
 	 * 
@@ -1551,33 +1554,36 @@ public class Map {
 			System.out.println("");
 		}
 	}
-	
+
 	/**
-	 * Given a position on the map, the function looks at the adjacent fields and counts how many of them are empty squares.
-	 * @param position - position on the map to look from
+	 * Given a position on the map, the function looks at the adjacent fields and
+	 * counts how many of them are empty squares.
+	 * 
+	 * @param position
+	 *            - position on the map to look from
 	 * @return the number of adjacent empty squares
 	 */
-	private int getNumberOfAdjacentEmptySqures(Vector2i position) 
+	private int getNumberOfAdjacentEmptySqures(Vector2i position)
 	{
 		int adjacentEmptys = 0;
-		
+
 		MapWalker mw = new MapWalker(this);
 		mw.setPosition(position.clone());
-		
-		//looking in every direction
-		for(int i = 0; i<9; i++) 
+
+		// looking in every direction
+		for (int i = 0; i < 9; i++)
 		{
 			mw.setDirection(Vector2i.mapDirToVector(i));
-			if(mw.step()) //try to step
+			if (mw.step()) // try to step
 			{
-				if(mw.getCurrentTile().isEmpty()) 
+				if (mw.getCurrentTile().isEmpty())
 				{
 					adjacentEmptys++;
 				}
-				mw.setPosition(position.clone()); //return to starting position
+				mw.setPosition(position.clone()); // return to starting position
 			}
 		}
-		
+
 		return adjacentEmptys;
 	}
 }
