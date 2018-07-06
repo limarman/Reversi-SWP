@@ -965,8 +965,8 @@ public class Map {
 					Block newBlock = blocks[numberOfBlocks];
 
 					// joining the blocks:
-					Block a = blocks[neighborA.getBlockID(ori)];
-					Block b = blocks[neighborB.getBlockID(ori)];
+					Block a = blocks[getRootBlockId(neighborA.getBlockID(ori))];
+					Block b = blocks[getRootBlockId(neighborB.getBlockID(ori))];
 
 					if (a.getNonBorderA() != null && a.getNonBorderA().equals(b.getNonBorderA()))
 					{
@@ -1408,7 +1408,7 @@ public class Map {
 		{
 			if (blocks[i].isActive()) // only look at superblocks and Active blocks
 			{
-				// Look that all criterea are met:
+				// Look that all criteria are met:
 				// The Player has Stones in the Block
 				if (blocks[i].getStoneAmount(playernumber) > 0)
 				{

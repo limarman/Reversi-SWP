@@ -309,6 +309,9 @@ class BlockTest {
 		map.applyMove(new Move(4,1, (byte)0,(byte)2));
 		map.applyMove(new Move(7,3, (byte)0,(byte)1));
 
+		map.blockify();
+		Logger.logMap(LogLevel.ERROR, map);
+		
 		//variation player 2 has calculated
 		map.applyMove(new Move(3,5, (byte)0,(byte)2));
 		map.applyMove(new Move(4,2, (byte)0,(byte)1));
