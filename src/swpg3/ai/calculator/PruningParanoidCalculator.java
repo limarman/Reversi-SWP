@@ -121,7 +121,7 @@ public class PruningParanoidCalculator implements Calculator{
 		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-			Logger.log(LogLevel.ERROR, "Thinking on: " + sortedMoves[i]);
+			Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
@@ -238,7 +238,7 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(sortedMoves[i]);
-			Logger.log(LogLevel.ERROR, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
+			Logger.log(LogLevel.DEBUG, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			double value;
 			
@@ -351,7 +351,7 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(sortedMoves[i]);
-			Logger.log(LogLevel.ERROR, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
+			Logger.log(LogLevel.DEBUG, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0, maxValue, beta);
