@@ -322,5 +322,47 @@ class BlockTest {
 		Logger.logMap(LogLevel.ERROR, map);
 		assertEquals(7, map.mobilityByBlocks(1));
 	}
+	
+	 
+	@Test
+	void testMobilityByBlocks4()
+	{
+
+		String mapString = "3\r\n" +
+		"20\r\n" +
+		"0 1\r\n" +
+		"17 20\r\n" +
+		"- - - 0 0 - - 0 0 0 0 - - - - - - - 0 0\r\n" +
+		"- - 0 c 0 0 0 i 0 0 0 0 - - - - - - 0 b\r\n" +
+		"0 0 b 0 0 0 0 0 0 0 0 0 0 - - 0 0 0 c 0\r\n" +
+		"0 0 0 0 x x x 0 - - b 0 3 1 0 0 0 2 0 0\r\n" +
+		"- 0 0 0 0 0 0 0 - - c 0 2 i 0 3 1 0 c 0\r\n" +
+		"- 0 0 0 1 2 3 0 - - 0 0 0 0 0 i 0 0 0 0\r\n" +
+		"- b 0 0 0 x 0 0 - - c 0 0 0 0 - - - 0 0\r\n" +
+		"0 0 0 0 c 0 0 0 0 x 3 2 1 0 0 - - - 0 c\r\n" +
+		"0 0 i 0 0 0 0 0 0 0 0 x x b 0 - - - 0 0\r\n" +
+		"0 0 0 0 0 x x 0 b 0 0 0 0 0 0 - - - 0 0\r\n" +
+		"- - - - 0 0 0 c - - - 0 0 0 0 - - - i 0\r\n" +
+		"- - - - 0 i 0 0 - - - 0 0 0 0 b 0 0 0 0\r\n" +
+		"- - - - 0 0 0 0 - - - i 0 0 0 0 0 0 0 0\r\n" +
+		"- - - - 0 0 0 0 - - - 0 0 x x x 0 0 0 0\r\n" +
+		"0 0 0 b 0 0 0 0 0 0 0 0 0 x x c 0 0 0 0\r\n" +
+		"x x x x 0 0 0 0 c 0 0 0 0 0 0 0 0 x x x\r\n" +
+		"0 0 0 c 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\r\n";
+		
+		Logger.init(LogLevel.INFO);
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
+				
+		//variation player 1 has calculated
+		map.applyMove(new Move(18,2, (byte)2,(byte)1)); //CHOICE MOVE!
+		map.applyMove(new Move(7,5, (byte)0,(byte)2));
+		map.applyMove(new Move(14,3, (byte)0,(byte)3));
+		
+		Logger.logMap(LogLevel.ERROR, map);
+		assertEquals(5, map.mobilityByBlocks(1));
+	}
+
 
 }
