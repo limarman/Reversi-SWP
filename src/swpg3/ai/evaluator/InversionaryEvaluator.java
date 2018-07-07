@@ -490,38 +490,38 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		//analysis of the mobility
 		
 //		creating the counter for free possibleMoves
-		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
-		for(int i = 0; i<noPossibleMoves.length; i++) 
-		{
-			noPossibleMoves[i] = new IntegerWrapper();
-		}
-		
-		//creating the bitmaps of the map
-		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
-		
-		for(int i = 0; i<bitmaps.length; i++) 
-		{
-			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
-		}
-		
-		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
-		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
+//		IntegerWrapper[] noPossibleMoves = new IntegerWrapper[MapManager.getInstance().getNumberOfPlayers()];
+//		for(int i = 0; i<noPossibleMoves.length; i++) 
+//		{
+//			noPossibleMoves[i] = new IntegerWrapper();
+//		}
+//		
+//		//creating the bitmaps of the map
+//		BitMap[] bitmaps = new BitMap[MapManager.getInstance().getNumberOfPlayers()];
+//		
+//		for(int i = 0; i<bitmaps.length; i++) 
+//		{
+//			bitmaps[i] = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());
+//		}
+//		
+//		fillFreeMovesHorizontallyEastSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesHorizontallyWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesVerticallyNorthSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesVerticallySouthSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesDiagonallyNorthEastSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesDiagonallySouthWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesSemiDiagonallyNorthWestSide(map, noPossibleMoves, bitmaps);
+//		fillFreeMovesSemiDiagonallySouthEastSide(map, noPossibleMoves, bitmaps);
 				
 		for(int i = 0; i<MapManager.getInstance().getNumberOfPlayers(); i++) 
 		{
 			attributesPerPlayer[i][FREE_POS_MOVES] = map.mobilityByBlocks(i+1);
-			if(map.mobilityByBlocks(i+1) != noPossibleMoves[i].getValue()) 
-			{
-				Logger.log(LogLevel.ERROR, (i+1) + ": BlockMob: " + map.mobilityByBlocks(i+1) + 
-						" PossibleMoves: " + noPossibleMoves[i].getValue());
-				Logger.logMap(LogLevel.ERROR, map);
-			}
+//			if(map.mobilityByBlocks(i+1) != noPossibleMoves[i].getValue()) 
+//			{
+//				Logger.log(LogLevel.ERROR, (i+1) + ": BlockMob: " + map.mobilityByBlocks(i+1) + 
+//						" PossibleMoves: " + noPossibleMoves[i].getValue());
+//				Logger.logMap(LogLevel.ERROR, map);
+//			}
 		}
 		
 		//finding out how many turns till own turn
