@@ -1084,7 +1084,16 @@ public class Map {
 								tile.setStatus(Player.mapPlayerNumberToTileStatus(playerNumber1));
 							}
 						}
-
+					}
+					
+					for(int b = 1; b <= numberOfBlocks; b++)
+					{
+						if(blocks[b].isSuperBlock())
+						{
+							int tmp = blocks[b].getStoneAmount(playerNumber1);
+							blocks[b].setStoneAmount(playerNumber1, blocks[b].getStoneAmount(playerNumber2));
+							blocks[b].setStoneAmount(playerNumber2, tmp);
+						}
 					}
 					break;
 				case INVERSION:
@@ -1107,7 +1116,20 @@ public class Map {
 								}
 							}
 						}
-
+					}
+					
+					for(int b = 1; b <= numberOfBlocks; b++)
+					{
+						int playernumbers = MapManager.getInstance().getNumberOfPlayers();
+						if (blocks[b].isSuperBlock())
+						{
+							int tmp = blocks[b].getStoneAmount(1);
+							for(int p = 1; p < playernumbers; p++)
+							{
+								blocks[b].setStoneAmount(p, blocks[b].getStoneAmount(p+1));
+							}
+							blocks[b].setStoneAmount(playernumbers,	tmp);
+						}
 					}
 					break;
 				case BONUS:

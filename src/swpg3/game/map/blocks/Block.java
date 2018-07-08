@@ -63,7 +63,7 @@ public class Block {
 	 * Retrieve the amount of Stones a player has in this block
 	 * 
 	 * @param playernumber
-	 *            playernumber of the requested player
+	 *            playernumber of the requested player. in [1,n]
 	 * @return amount of Stones in this block
 	 */
 	public int getStoneAmount(int playernumber)
@@ -71,6 +71,11 @@ public class Block {
 		return playerStoneCounts[playernumber-1];
 	}
 
+	/**
+	 * Set stone amount of a player
+	 * @param playernumber number of player whose stones should be changed. in [1,n]
+	 * @param stones number of stones the player should have.
+	 */
 	public void setStoneAmount(int playernumber, int stones)
 	{
 		playerStoneCounts[playernumber-1] = stones;
@@ -197,6 +202,15 @@ public class Block {
 	public boolean isActive()
 	{
 		return (superblock == 0) && !((borderA == null) && (borderB == null));
+	}
+	
+	/**
+	 * Checks if this block is a Superblock.
+	 * @return true if this Block is a superblock; false, otherwise
+	 */
+	public boolean isSuperBlock()
+	{
+		return superblock == 0;
 	}
 
 	/*
