@@ -8,8 +8,8 @@ import swpg3.game.Vector2i;
 import swpg3.game.move.Move;
 
 /**
- * A singleton class managing the general (non changing) attributes of the playing map
- * As well as holding an instance of the actual map 
+ * A singleton class managing the general (non changing) attributes of the playing map.
+ * As well as holding an instance of the actual map.
  * @author Ramil
  */
 

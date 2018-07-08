@@ -11,7 +11,7 @@ import swpg3.game.Vector2i;
  */
 public class Move implements Comparable<Move>{
 
-	public static final byte	ADD_BOMBSTONE		= 20;	// Now compliant with network specification
+	public static final byte	ADD_BOMBSTONE		= 20;
 	public static final byte	ADD_OVERRIDESTONE	= 21;
 
 	private Vector2i coordinates;

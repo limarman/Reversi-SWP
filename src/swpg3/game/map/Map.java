@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
@@ -12,7 +11,7 @@ import swpg3.game.move.Move;
 import swpg3.game.move.MoveTypeValue;
 
 /**
- * A class to store Map information
+ * A class to store Map information.
  * 
  * @author eric
  *
