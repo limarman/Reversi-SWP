@@ -364,5 +364,27 @@ class BlockTest {
 		assertEquals(5, map.mobilityByBlocks(1));
 	}
 
-
+	@Test
+	void testInversionStones()
+	{
+		String mapString = "3\n"
+				+ "0\n"
+				+ "0 1\n"
+				+ "3 3\n"
+				+ "3 0 0\n"
+				+ "i 1 2\n"
+				+ "0 0 0";
+				
+		Logger.init(LogLevel.INFO);
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
+		
+		map.applyMove(new Move(0,1,(byte)0, (byte)2));
+		
+		Logger.logMap(LogLevel.ERROR, map);
+		Block b = map.getBlock(map.getTileAt(1, 1).getBlockID(BlockOrientation.HORIZONTAL));
+		assertEquals(3, b.getStoneAmount(3));
+		
+	}
 }

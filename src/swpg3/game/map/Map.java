@@ -1117,18 +1117,18 @@ public class Map {
 							}
 						}
 					}
-					
+					int playernumbers = MapManager.getInstance().getNumberOfPlayers();
 					for(int b = 1; b <= numberOfBlocks; b++)
 					{
-						int playernumbers = MapManager.getInstance().getNumberOfPlayers();
+						
 						if (blocks[b].isSuperBlock())
 						{
-							int tmp = blocks[b].getStoneAmount(1);
-							for(int p = 1; p < playernumbers; p++)
+							int tmp = blocks[b].getStoneAmount(playernumbers);
+							for(int p = playernumbers; p >= 2; p--)
 							{
-								blocks[b].setStoneAmount(p, blocks[b].getStoneAmount(p+1));
+								blocks[b].setStoneAmount(p, blocks[b].getStoneAmount(p-1));
 							}
-							blocks[b].setStoneAmount(playernumbers,	tmp);
+							blocks[b].setStoneAmount(1,	tmp);
 						}
 					}
 					break;
