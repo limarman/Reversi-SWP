@@ -33,5 +33,8 @@ public final class GlobalSettings {
 	 */
 	public static boolean log_performance;
 
+	/**
+	 *  Flag indicating, whether extended performance logging should be enabled.
+	 */
 	public static boolean log_ext_perf;
 }
