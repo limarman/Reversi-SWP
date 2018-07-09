@@ -626,8 +626,15 @@ class BlockTest {
 		mm.initializeMap(mapString);
 		Map map = mm.getCurrentMap();
 		
+		//calculated variation
+		map.applyMove(new Move(8,4, (byte)0,(byte)1));
+		map.applyMove(new Move(6,4, (byte)0,(byte)2));
+		map.applyMove(new Move(4,6, (byte)0,(byte)1));
+		map.applyMove(new Move(10,8, (byte)0,(byte)2));
+		map.applyMove(new Move(8,10, (byte)0,(byte)1));
+		
 		int blockmobility = map.mobilityByBlocks(1);
-		assertEquals(4, blockmobility, "Mobility mismatch.");
+		assertEquals(7, blockmobility, "Mobility mismatch.");
 
 	}
 }
