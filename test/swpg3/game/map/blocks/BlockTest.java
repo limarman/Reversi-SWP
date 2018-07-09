@@ -626,7 +626,8 @@ class BlockTest {
 		mm.initializeMap(mapString);
 		Map map = mm.getCurrentMap();
 		
-		assertEquals(4, map.mobilityByBlocks(1),"Mobility mismatch.");
+		int blockmobility = map.mobilityByBlocks(1);
+		assertEquals(4, blockmobility, "Mobility mismatch.");
 
 	}
 }

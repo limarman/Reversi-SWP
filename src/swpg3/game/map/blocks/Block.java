@@ -1,5 +1,7 @@
 package swpg3.game.map.blocks;
 
+import java.util.Arrays;
+
 import swpg3.game.Vector2i;
 import swpg3.game.map.MapManager;
 
@@ -232,6 +234,17 @@ public class Block {
 		blockClone.playerStoneCounts = playerStoneCounts.clone();
 
 		return blockClone;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return "Block [nonBorderA=" + nonBorderA + ", borderA=" + borderA + ", borderB=" + borderB + ", nonBorderB="
+				+ nonBorderB + ", playerStoneCounts=" + Arrays.toString(playerStoneCounts) + ", superblock="
+				+ superblock + "]";
 	}
 
 }

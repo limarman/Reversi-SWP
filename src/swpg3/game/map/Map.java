@@ -1514,8 +1514,9 @@ public class Map {
 						if (mw.getCurrentTile().isEmpty())
 						{
 							blocks[blocksID].setNonBorderA(mw.getPosition());
-							blocks[blocksID]
-									.setBorderA(Vector2i.sum(mw.getPosition(), Vector2i.scaled(mw.getDirection(), -1)));
+							mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
+							mw.step();
+							blocks[blocksID].setBorderA(mw.getPosition());
 						} else
 						{
 							blocks[blocksID].setBorderA(null);
@@ -1539,8 +1540,9 @@ public class Map {
 						if (mw.getCurrentTile().isEmpty())
 						{
 							blocks[blocksID].setNonBorderB(mw.getPosition());
-							blocks[blocksID]
-									.setBorderB(Vector2i.sum(mw.getPosition(), Vector2i.scaled(mw.getDirection(), -1)));
+							mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
+							mw.step();
+							blocks[blocksID].setBorderB(mw.getPosition());
 						} else
 						{
 							blocks[blocksID].setBorderB(null);
