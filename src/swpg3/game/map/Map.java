@@ -865,6 +865,7 @@ public class Map {
 			// May create new Blocks or merge two together
 			for (BlockOrientation ori : BlockOrientation.values())
 			{
+				// We need to use a MapWalker here because a transition can be between border and nonBorder
 				MapWalker mw = new MapWalker(this, move.getCoordinates(), ori.dir);
 				mw.step();
 				Vector2i neighborAPos = mw.getPosition();
