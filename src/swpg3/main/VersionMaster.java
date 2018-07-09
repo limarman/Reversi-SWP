@@ -8,6 +8,11 @@ package swpg3.main;
  *
  */
 public final class VersionMaster {
+	
+	/**
+	 * 
+	 * @return the current version of Phteven.
+	 */
 	public static String getVersionString()
 	{
 		return assignment + "." + major + "." + minor + "-" + sub;

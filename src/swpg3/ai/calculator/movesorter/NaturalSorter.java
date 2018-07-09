@@ -14,6 +14,9 @@ import swpg3.game.move.Move;
  */
 public class NaturalSorter implements MoveSorter{
 
+	/**
+	 * Uses the MoveValue to sort the moves.
+	 */
 	@Override
 	public Move[] initialMoveSort(Evaluator eva, HashSet<Move> possibleMovesOrderable, Map map, byte playerNumber) {
 		
@@ -22,6 +25,9 @@ public class NaturalSorter implements MoveSorter{
 		return possibleMovesOrdered;
 	}
 
+	/**
+	 * Uses the MoveValue to sort the moves.
+	 */
 	@Override
 	public Move[] moveSort(Evaluator eva, HashSet<Move> possibleMovesOrderable, Map map, byte playerNumber) {
 		

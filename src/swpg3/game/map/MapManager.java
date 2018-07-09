@@ -8,8 +8,8 @@ import swpg3.game.Vector2i;
 import swpg3.game.move.Move;
 
 /**
- * A singleton class managing the general (non changing) attributes of the playing map
- * As well as holding an instance of the actual map 
+ * A singleton class managing the general (non changing) attributes of the playing map.
+ * As well as holding an instance of the actual map.
  * @author Ramil
  */
 
@@ -268,7 +268,7 @@ public class MapManager {
 		{
 			gamePhase = GamePhase.BOMBING_PHASE;
 		}
-		//else do not change (method should not be called twice
+		//else do not change (method should not be called twice)
 	}
 
 	/**

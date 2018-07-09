@@ -33,7 +33,7 @@ public class Tile {
 	}
 	
 	/**
-	 * private constructor - for clone method
+	 * private constructor - for clone method.
 	 * @param status
 	 */
 	private Tile(TileStatus status, Transition[] arbitraryTransitions) 
@@ -157,6 +157,10 @@ public class Tile {
 		return (status.value >= 1 && status.value <= 8);
 	}
 	
+	/**
+	 * 
+	 * @return whether the square is empty. That is when it is not occupied (expansion or player) and not a hole.
+	 */
 	public boolean isEmpty() 
 	{
 		return status == TileStatus.EMPTY || status == TileStatus.CHOICE || status == TileStatus.BONUS
