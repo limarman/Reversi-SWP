@@ -268,7 +268,7 @@ public class MapManager {
 		{
 			gamePhase = GamePhase.BOMBING_PHASE;
 		}
-		//else do not change (method should not be called twice
+		//else do not change (method should not be called twice)
 	}
 
 	/**

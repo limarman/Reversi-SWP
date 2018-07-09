@@ -4,7 +4,7 @@
 package swpg3.game.map;
 
 /**
- * Enum to represent possible status of a Tile
+ * Enum to represent possible status of a Tile.
  * 
  * @author eric
  */

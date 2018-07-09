@@ -6,8 +6,8 @@ package swpg3.game.map;
 import swpg3.game.Vector2i;
 
 /**
- * A Class to represent Transitions with one endpoint and an output direction
- * reverse Transition has to be attached to Endpoint
+ * A Class to represent Transitions with one end-point and an output direction.
+ * Reverse Transition has to be attached to the end-point.
  * 
  * @author eric
  *
@@ -17,11 +17,10 @@ public class Transition {
 	private final Vector2i targetIncomingDir;
 
 	/**
-	 * Simple Constructor initializing everything
+	 * Simple Constructor initializing everything.
 	 * 
-	 * @param targetPoint
-	 * @param inputDir
-	 * @param targetIncomingDir
+	 * @param targetPoint - the point the transition points to.
+	 * @param targetIncomingDir - the direction the transition comes into the target point.
 	 */
 	public Transition(Vector2i targetPoint, Vector2i targetIncomingDir)
 	{
@@ -30,7 +29,7 @@ public class Transition {
 	}
 
 	/**
-	 * @return the endpoint
+	 * @return clone of the end-point
 	 */
 	public Vector2i getTargetPoint()
 	{
@@ -38,7 +37,7 @@ public class Transition {
 	}
 
 	/**
-	 * @return the outputDir
+	 * @return clone of the direction into the end-point.
 	 */
 	public Vector2i getTargetIncomingDir()
 	{
