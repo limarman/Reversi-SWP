@@ -865,8 +865,12 @@ public class Map {
 			// May create new Blocks or merge two together
 			for (BlockOrientation ori : BlockOrientation.values())
 			{
-				Vector2i neighborAPos = Vector2i.sum(move.getCoordinates(), ori.dir);
-				Vector2i neighborBPos = Vector2i.sum(move.getCoordinates(), Vector2i.scaled(ori.dir, -1));
+				MapWalker mw = new MapWalker(this, move.getCoordinates(), ori.dir);
+				mw.step();
+				Vector2i neighborAPos = mw.getPosition();
+				mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
+				mw.step();mw.step();
+				Vector2i neighborBPos = mw.getPosition();
 				Tile neighborA = getTileAt(neighborAPos);
 				Tile neighborB = getTileAt(neighborBPos);
 
