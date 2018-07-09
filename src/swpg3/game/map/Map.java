@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
@@ -611,44 +612,6 @@ public class Map {
 						}
 					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides
 							&& overridePossible)
-					{
-						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
-					}
-				}
-			}
-		} else // finding possible moves in bombing phase
-		{
-			// if player has any bombs
-			if (playerInfo[playerNumber - 1].getBombs() > 0)
-			{
-				// iterate over whole map and search for occupied fields
-				for (int i = 0; i < mm.getWidth(); i++)
-				{
-					for (int j = 0; j < mm.getHeight(); j++)
-					{
-						if (!getTileAt(i, j).isHole())
-						{
-							Vector2i pos = new Vector2i(i, j);
-							// bombing an own stone in the first place
-							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
-							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.SELF_BOMB));
-							}
-							// not bombing an own stone - most liekly a wiser choice
-							else
-							{
-								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.NORMAL_BOMBING));
-							}
-						}
-					}
-				}
-			}
-			// otherwise there are no possible moves
-		}
-
-		return possibleMoves;
-	}
-					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && considerOverrides && overridePossible)
 					{
 						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
 					}
