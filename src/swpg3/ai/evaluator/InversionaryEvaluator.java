@@ -20,14 +20,29 @@ import swpg3.game.map.TileStatus;
 public class InversionaryEvaluator implements Evaluator{
 	
 	//parameters for InversionStone analysis
-	// INV - Inversion Stone
-	// SV - Start Value
-	// TV - Turn Value
-	// EV - End Value
-	// I - Importance
+
+	/**
+	 * Inversion parameter - Importance function
+	 * Decay Factor in [0,1] representing the importance of the inverse player's evaluation at the start of the game
+	 * (filling degree 0%).
+	 */
 	private double INV_SV_I = 0;
+	/**
+	 * Inversion parameter - Importance function
+	 * Decay Factor in [0,1] representing the importance of the inverse player's evaluation
+	 * at the turning point of the game
+	 */
 	private double INV_TV_I = 0.5;
+	/**
+	 * Inversion parameter - Importance function
+	 * Decay Factor in [0,1] representing the importance of the inverse player's evaluation at the end of the game
+	 * (filling degree 100%).
+	 */
 	private double INV_EV_I = 0.9;
+	/**
+	 * Inversion parameter - Importance function
+	 * filling degree in [0,1] representing the turning point of the game.
+	 */
 	private double INV_TP_I = 0.65;
 	
 	//The prizes for the top 5 places
@@ -37,7 +52,6 @@ public class InversionaryEvaluator implements Evaluator{
 	private final int FOURTH_PRIZE = 20;
 	private final int FIFTH_PRIZE = 10;
 	
-	//Damn you Java for no pass by reference!
 	private int numberOfInversionStones = 0;
 	
 	//##################################################
@@ -46,9 +60,7 @@ public class InversionaryEvaluator implements Evaluator{
 
 	@Override
 	public double evaluatePosition(Map map, byte playerNumber)
-	{
-//		Logger.log(LogLevel.ERROR, "Evaluation:");
-		
+	{		
 		double evaluation;
 		int numberOfPlayers = MapManager.getInstance().getNumberOfPlayers();
 		
@@ -180,7 +192,6 @@ public class InversionaryEvaluator implements Evaluator{
 				}
 				int bombpower = map.getPlayer(rankings[rank]).getBombs() * (2*bombradius+1) * (2*bombradius+1);
 				int rankDifference = Math.abs(rank - playerRank);
-				//TODO: look why the function generates silly moves in bad starting positions
 				if(rankDifference == 1) 
 				{
 					//neighbor is bombing
@@ -369,54 +380,6 @@ public class InversionaryEvaluator implements Evaluator{
 						attributesPerPlayer[playerNumber-1][SOLID_STONES]++;
 					}
 				}
-				else if(t.isEmpty())
-				{
-//					for(byte i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++) 
-//					{
-//						//check whether move is possible
-//						if(t.getStatus() == TileStatus.BONUS) 
-//						{
-//							if(map.isMoveValid(new Move(new Vector2i(w, h), Move.ADD_OVERRIDESTONE, i)))
-//							{
-//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-//							}
-//						}
-//						else if(t.getStatus() == TileStatus.CHOICE)
-//						{
-//							if(map.isMoveValid(new Move(new Vector2i(w, h), i, i)))
-//							{
-//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-//							}
-//						}
-//						//counting the inversion tiles
-//						else if(t.getStatus() == TileStatus.INVERSION) 
-//						{
-//							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
-//							{
-//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-//							}
-//						}
-//						else //no special field info needed
-//						{
-//							if(map.isMoveValid(new Move(new Vector2i(w, h), (byte)0, i)))
-//							{
-//								attributesPerPlayer[i-1][FREE_POS_MOVES]++;
-//							}
-//						}
-//					}
-					
-//					//count free valid moves
-//					boolean valids[] = map.isMoveValidAllPlayers(w, h);
-//					
-//					for(int i = 0; i<valids.length; i++) 
-//					{
-//						if(valids[i]) 
-//						{
-//							attributesPerPlayer[i][FREE_POS_MOVES]++;
-//						}
-//					}
-					
-				}//otherwise it was a hole/expansion-stone
 				
 				//count the inversion stones
 				if(t.getStatus() == TileStatus.INVERSION) {
@@ -482,6 +445,14 @@ public class InversionaryEvaluator implements Evaluator{
 
 	}
 	
+	/**
+	 * Method which is mapping the given place to the prize.
+	 * That is: 
+	 * 1 - FIRST_PRIZE
+	 * 2- SECOND_PRIZE etc.
+	 * @param place - place to map
+	 * @return the corresponding prize
+	 */
 	private int mapPlaceToPrize(int place) 
 	{
 		switch(place) 
@@ -549,8 +520,6 @@ public class InversionaryEvaluator implements Evaluator{
 	 */
 	private void fillFreeMovesHorizontallyEastSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int width = MapManager.getInstance().getWidth();
-		int height = MapManager.getInstance().getHeight();
 		
 		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
@@ -631,8 +600,6 @@ public class InversionaryEvaluator implements Evaluator{
 	 */
 	private void fillFreeMovesHorizontallyWestSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps)
 	{
-		int width = MapManager.getInstance().getWidth();
-		int height = MapManager.getInstance().getHeight();
 		
 		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
@@ -713,8 +680,6 @@ public class InversionaryEvaluator implements Evaluator{
 	 */
 	private void fillFreeMovesVerticallyNorthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int width = MapManager.getInstance().getWidth();
-		int height = MapManager.getInstance().getHeight();
 		
 		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
@@ -794,8 +759,6 @@ public class InversionaryEvaluator implements Evaluator{
 	 */
 	private void fillFreeMovesVerticallySouthSide(Map map, IntegerWrapper[] noPossibleMoves, BitMap[] bitmaps) 
 	{
-		int width = MapManager.getInstance().getWidth();
-		int height = MapManager.getInstance().getHeight();
 		
 		int numberOfPlayers = noPossibleMoves.length; 
 		boolean[] hasXRay = new boolean[numberOfPlayers];
