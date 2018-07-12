@@ -218,7 +218,7 @@ public class AI {
 	 */
 	public static int numberOfSolidSquares;
 	
-	
+	public static BitMap reachableSquares;
 	/**
 	 * A private constructor to prevent initializing an AI object
 	 * differently than calling the getInstance function
