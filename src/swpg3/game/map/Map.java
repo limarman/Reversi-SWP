@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import swpg3.game.BitMap;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
@@ -11,7 +12,7 @@ import swpg3.game.move.Move;
 import swpg3.game.move.MoveTypeValue;
 
 /**
- * A class to store Map information.
+ * A class to store Map information
  * 
  * @author eric
  *
@@ -460,9 +461,9 @@ public class Map {
 
 	/**
 	 * Giving all the possible moves the player with specified playernumber can
-	 * make with set Move Value.
+	 * make.
 	 * 
-	 * @param playerNumber - the player number of player
+	 * @param playerNumber
 	 * @param considerOverrides - whether override moves should even be considered
 	 * 
 	 * @return Possible Moves - HashSet of all possible Moves with extra info to
@@ -636,9 +637,190 @@ public class Map {
 
 		return possibleMoves;
 	}
+	
+	/**
+	 * Giving all the possible moves the player with specified playernumber can
+	 * make.
+	 * 
+	 * @param playerNumber
+	 * 
+	 * @return Possible Moves - HashSet of all possible Moves with extra info to
+	 *         make an order by calling any sort method
+	 */
+	public HashSet<Move> getPossibleMovesOrderableWithoutOverride(byte playerNumber)
+	{
+		MapManager mm = MapManager.getInstance();
+		HashSet<Move> possibleMoves = new HashSet<>();
+
+		// searching for possible moves in building phase
+		if (MapManager.getInstance().getGamePhase() == GamePhase.BUILDING_PHASE)
+		{
+			MapWalker mw = new MapWalker(this);
+
+			boolean overridePossible = false;
+
+			// looking from every playerstone and searching the possible moves
+			for (int h = 0; h < mm.getHeight(); h++)
+			{
+				for (int w = 0; w < mm.getWidth(); w++)
+				{
+					Vector2i pos = new Vector2i(w, h);
+					if (getTileAt(w, h).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+					{
+						for (int i = 0; i < 8; i++) // creating a MapWalker in every direction
+						{
+							// creating MapWalker
+							mw.setPosition(pos.clone());
+							mw.setDirection(Vector2i.mapDirToVector(i));
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+
+							if (!mw.canStep())
+							{
+								// adjacent hole
+								continue; // there is no possible move in this direction
+							}
+							mw.step();
+							// Logger.log(LogLevel.DETAIL, mw.getPosition() + " " + mw.getDirection());
+							if (mw.getCurrentTile().isEmpty() || !mw.canStep() || mw.getCurrentTile()
+									.getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								// adjacent field is empty or already owned or next field is empty
+								continue; // no enclosing of stones possible
+							}
+							
+							Vector2i neighbourPos = mw.getPosition().clone(); //remember the direct neighbour tile
+							Vector2i lastDirection;
+							mw.step(); // making sure that direct adjacent fields are not valid moves
+							
+							// if the neighbour tile had a transition into itsself - enclosing is not possible
+							if(mw.getPosition().equals(neighbourPos))
+							{
+								continue;
+							}
+							
+
+							// iterate till a hole, an empty field or an own stone is found
+							while (mw.canStep() && !mw.getCurrentTile().isEmpty() && mw.getCurrentTile()
+									.getStatus() != TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								if (overridePossible)
+								{
+									// a new Move is found
+									Move move = new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveTypeValue.OVERRIDE_USE);
+									possibleMoves.add(move);
+								}
+								//remembering from where the MapWalker came from and which direction he walked
+								neighbourPos = mw.getPosition().clone();
+								lastDirection = mw.getDirection().clone();
+								mw.step();
+								
+								//if the walk made a loop over transition - there will be no (valid) new moves found
+								if(mw.getPosition().equals(neighbourPos) && Vector2i.scaled(mw.getDirection(), -1).equals(lastDirection)) 
+								{
+									break;
+								}
+							}
+
+							if (mw.getCurrentTile().getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								// stopped on an owned stone
+
+								// if not the starting stone
+								if (!mw.getPosition().equals(pos) && overridePossible)
+								{
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveTypeValue.SELF_OVERRIDE_USE));
+								}
+							} else if (mw.getCurrentTile().isEmpty())
+							{
+								//find out how many empty adjacent squares for move sorting
+								int adjacentEmpty = getNumberOfAdjacentEmptySqures(mw.getPosition());
+								
+								// stopped on a non-occupied field
+								switch (mw.getCurrentTile().getStatus())
+								{
+									case EMPTY:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+												MoveTypeValue.NORMAL_BUILDING));
+										break;
+									case CHOICE:
+										for (int j = 1; j <= mm.getNumberOfPlayers(); j++)
+										{
+											// there are #player possible ways to switch players
+											possibleMoves.add(new Move(mw.getPosition().clone(), (byte) j, playerNumber,
+													MoveTypeValue.CHOICE));
+										}
+										break;
+									case INVERSION:
+										// There is only a regular move possible
+										possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+												MoveTypeValue.INVERSION));
+										break;
+									case BONUS:
+										// There is a choice between an extra bomb and an extra override stone
+										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_BOMBSTONE,
+												playerNumber, MoveTypeValue.BONUS_BOMB));
+										possibleMoves.add(new Move(mw.getPosition().clone(), Move.ADD_OVERRIDESTONE,
+												playerNumber, MoveTypeValue.BONUS_OVERRIDE));
+										break;
+									default:
+										// cannot be the case
+										break;
+								}
+							} else
+							{
+								// no further step possible
+								// field is not empty (and not own stone)
+								if (overridePossible)
+								{
+									possibleMoves.add(new Move(mw.getPosition().clone(), (byte) 0, playerNumber,
+											MoveTypeValue.OVERRIDE_USE));
+								}
+							}
+						}
+					} else if (getTileAt(w, h).getStatus() == TileStatus.EXPANSION && overridePossible)
+					{
+						possibleMoves.add(new Move(pos.clone(), (byte) 0, playerNumber, MoveTypeValue.OVERRIDE_USE));
+					}
+				}
+			}
+		} else // finding possible moves in bombing phase
+		{
+			// if player has any bombs
+			if (playerInfo[playerNumber - 1].getBombs() > 0)
+			{
+				// iterate over whole map and search for occupied fields
+				for (int i = 0; i < mm.getWidth(); i++)
+				{
+					for (int j = 0; j < mm.getHeight(); j++)
+					{
+						if (!getTileAt(i, j).isHole())
+						{
+							Vector2i pos = new Vector2i(i, j);
+							// bombing an own stone in the first place
+							if (getTileAt(i, j).getStatus() == TileStatus.getStateByPlayerNumber(playerNumber))
+							{
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.SELF_BOMB));
+							}
+							// not bombing an own stone - most liekly a wiser choice
+							else
+							{
+								possibleMoves.add(new Move(pos, (byte) 0, playerNumber, MoveTypeValue.NORMAL_BOMBING));
+							}
+						}
+					}
+				}
+			}
+			// otherwise there are no possible moves
+		}
+
+		return possibleMoves;
+	}
 
 	/**
-	 * Applys move to the given map. Expecting the move to be valid.
+	 * Expecting the move to be valid
 	 * 
 	 * @param move
 	 *            to be applied to the map
@@ -779,9 +961,9 @@ public class Map {
 	}
 
 	/**
-	 * Returning the player instance with the given playerNumber
+	 * 
 	 * @param playernumber
-	 * @return the PlayerObject with the corresponding player number
+	 * @return the PlayerObject with the corresponding playernumber
 	 */
 	public Player getPlayer(int playernumber)
 	{
@@ -792,7 +974,7 @@ public class Map {
 	}
 
 	/**
-	 * method bombing the field with given radius and center of bomb.
+	 * method bombing the field with given radius and center of bomb
 	 * 
 	 * @param radius
 	 *            of the bomb
@@ -822,12 +1004,11 @@ public class Map {
 	}
 
 	/**
-	 * recursive help Method for getting the fields which have to be bombed.
+	 * recursive help Method for getting the fields which have to be bombed
 	 * 
-	 * @param radius - the number of squares the bomb reaches from the position.
-	 * @param position - the currently examined position.
-	 * @param integerMap - a map, which is saving which squares have already been visited with which radius.
-	 * @param positionsToBomb
+	 * @param radius
+	 * @param position
+	 * @param fieldsToBomb
 	 *            - List which is going to be filled with positions
 	 */
 	private void checkFieldsToBomb(int radius, Vector2i position, List<Vector2i> positionsToBomb, int[][] integerMap)
@@ -918,7 +1099,7 @@ public class Map {
 	}
 	
 	/**
-	 * Get a reference to a Tile.
+	 * Get a reference to a Tile
 	 * 
 	 * @param x
 	 *            x coordinates of Tile
@@ -932,7 +1113,7 @@ public class Map {
 	}
 
 	/**
-	 * Get a reference to a Tile.
+	 * Get a reference to a Tile
 	 * 
 	 * @param pos
 	 *            Position of Tile
@@ -967,9 +1148,6 @@ public class Map {
 		return new Map(gridClone, playerInfoClone, nextPlayerTurn);
 	}
 
-	/**
-	 * Prints the Map in Sysout.
-	 */
 	public void print()
 	{
 		MapManager mm = MapManager.getInstance();

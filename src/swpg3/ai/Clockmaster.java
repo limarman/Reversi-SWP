@@ -31,13 +31,13 @@ public class Clockmaster {
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the end of the game and bombing phase (filling degree 100%).
 	 */
-	private static double TM_EV = 0.9;
+	private static double TM_EV = 0.8;
 	
 	/**
 	 * Time Management parameter:
 	 * The turning point of the game in [0,1] representing the filling degree of the map.
 	 */
-	private static double TM_TP = 0.75;
+	private static double TM_TP = 0.7;
 
 	/**
 	 * constant which is used to say that the search has time-outed and should finish as soon as possible.

@@ -1,7 +1,7 @@
 package swpg3.game.move;
 
 /**
- * Class holding constants for move values.
+ * Class holing constants for moveValues
  * @author Ramil
  *
  */

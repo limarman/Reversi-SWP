@@ -112,7 +112,6 @@ public class ParanoidCalculator implements Calculator{
 	/**
 	 * The min-player of the min-max-recursion. Minimizes own position value.
 	 * @param eval - Evaluator used for evaluation of positions.
-	 * @param maxPlayerNumber - the playernumber of the max player
 	 * @param currentPlayerNumber - the play number of the current player (this max-player).
 	 * @param depth - the depth to calculate to.
 	 * @param calcDeadLine - the time deadline in java system-time.
@@ -229,7 +228,6 @@ public class ParanoidCalculator implements Calculator{
 	/**
 	 * The max-player of the min-max-recursion. Maximizes own position value.
 	 * @param eval - Evaluator used for evaluation of positions.
-	 * @param maxPlayerNumber - the playernumber of the max player.
 	 * @param currentPlayerNumber - the play number of the current player (this max-player).
 	 * @param depth - the depth to calculate to.
 	 * @param calcDeadLine - the time deadline in java system-time.

@@ -8,7 +8,7 @@ import swpg3.game.Vector2i;
 /**
  * A class to walk over a Map in a specified direction.
  * This class will automatically follow Transitions and adjust its walking direction
- * accordingly. 
+ * accordingly 
  * 
  * @author eric
  */
@@ -29,9 +29,9 @@ public class MapWalker {
 	}
 
 	/**
-	 * @param map - map, the walker will move on.
-	 * @param position - starting position of the the walker (gets cloned).
-	 * @param direction - starting direction of the walker (gets cloned).
+	 * @param map
+	 * @param position gets cloned
+	 * @param direction gets cloned
 	 */
 	public MapWalker(Map map, Vector2i position, Vector2i direction)
 	{
@@ -42,7 +42,7 @@ public class MapWalker {
 	}
 
 	/**
-	 * Return a clone of the Position.
+	 * Return a clone of the Position
 	 * @return the position
 	 */
 	public Vector2i getPosition()

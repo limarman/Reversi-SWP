@@ -10,20 +10,9 @@ import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
 import swpg3.game.move.Move;
 
-/**
- * An Evaluator which is ignoring the other players and only rates own properties.
- * Based on two functions for every property. The expectancy function and the importance function.
- * Expectancy function tells what should be the normal value in the current situation.
- * If player has a smaller value (worse) the evaluation value is decremented. If it is larger (better), it gets incremented.
- * Has been redeemed by the Inversionary Evaluator.
- * @author Ramil
- *
- */
 public class EgocentricEvaluator implements Evaluator {
 
-	/**
-	 * Flag which is determining, whether the expectancy function is used.
-	 */
+	//whether the expection-function should be used
 	private boolean useExpectFunc = true;
 	
 	
