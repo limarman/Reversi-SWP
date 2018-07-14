@@ -17,21 +17,21 @@ public class Clockmaster {
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the start of the game (filling degree 0%).
 	 */
-	private static double TM_SV = 0.75;
+	private static double TM_SV = 0.5;
 	
 	/**
 	 * Time Management parameter:
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the turning point of the game.
 	 */
-	private static double TM_TV = 0.8;
+	private static double TM_TV = 0.6;
 	
 	/**
 	 * Time Management parameter:
 	 * Percentage in [0,1] representing the amount of time which is allowed to use during the calculation
 	 * at the end of the game and bombing phase (filling degree 100%).
 	 */
-	private static double TM_EV = 0.9;
+	private static double TM_EV = 0.75;
 	
 	/**
 	 * Time Management parameter:
