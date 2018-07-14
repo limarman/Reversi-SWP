@@ -4,9 +4,6 @@
 package swpg3.main.perfLogging;
 
 /**
- * A simple Stopwatch that measures time in nanoseconds by saving a start
- * timepoint and the endpoint and subtracting them.
- * 
  * @author eric
  *
  */
@@ -36,7 +33,7 @@ public class Stopwatch {
 	 */
 	public void stop()
 	{
-		if (running)
+		if(running)
 		{
 			endtime = System.nanoTime();
 			running = false;
@@ -44,9 +41,7 @@ public class Stopwatch {
 	}
 
 	/**
-	 * Returns the measured Time in nanoseconds. If not used correctly will return
-	 * -1;
-	 * 
+	 * Returns the measured Time in nanoseconds. If not used correctly will return -1;
 	 * @return measured time in ns
 	 */
 	public long getElapsedTime()
@@ -59,7 +54,7 @@ public class Stopwatch {
 			return System.nanoTime() - starttime;
 		}
 	}
-
+	
 	/**
 	 * Resets the stopwatch so that it can be used again.
 	 */
@@ -69,7 +64,7 @@ public class Stopwatch {
 		endtime = 0;
 		running = false;
 	}
-
+	
 	@Override
 	public String toString()
 	{

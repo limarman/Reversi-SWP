@@ -4,7 +4,6 @@
 package swpg3.main;
 
 /**
- * Class that contains the current Version number and a Changelog as a Comment
  * @author eric
  *
  */
@@ -19,19 +18,16 @@ public final class VersionMaster {
 		return assignment + "." + major + "." + minor + "-" + sub;
 	}
 
-	private static String	assignment	= "6";
-	private static String	major		= "0";
-	private static String	minor		= "0";
-	private static String	sub			= "0";
+	private static String	assignment	= "4";
+	private static String	major		= "2";
+	private static String	minor		= "2";
+	private static String	sub			= "3";
 
 	/*
 	 * CHANGELOG:
 	 * + new feature
 	 * * changed feature
 	 * - removed
-	 * 
-	 * 6.0.0-0: *Changed a lot. Can't remember what exactly.
-	 *           Something with aspiration windows is among these things
 	 * 
 	 * 4.2.2-3: *Fixed Bug in isMoveValidMethod
 	 * 

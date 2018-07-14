@@ -5,7 +5,6 @@ import java.util.Scanner;
 import swpg3.game.GamePhase;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
-import swpg3.game.map.blocks.Block;
 import swpg3.game.move.Move;
 
 /**
@@ -140,7 +139,7 @@ public class MapManager {
 			players[i] = new Player(i + 1, getNumberOfOverrides(), getNumberOfBombs());
 		}
 		
-		currentMap = new Map(grid, players, (byte)1, new Block[grid.length * 8]);
+		currentMap = new Map(grid, players, (byte)1);
 		
 		// read in Transitions
 		while (scan.hasNextLine() && scan.hasNextInt())
@@ -203,8 +202,6 @@ public class MapManager {
 			transitionCount++;
 		}
 		scan.close();
-		
-		currentMap.blockify();
 	}
 
 	/**
@@ -290,12 +287,4 @@ public class MapManager {
 		currentMap.applyMove(m);
 	}
 	
-	/**
-	 * This method cleans up all the blocks in the map. 
-	 * There should be less Blocks after the defragmentation if there were blocks merged together.
-	 */
-	public void defragmentMapBlocks()
-	{
-		currentMap.blockify();
-	}
 }

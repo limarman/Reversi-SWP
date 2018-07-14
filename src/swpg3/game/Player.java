@@ -169,36 +169,6 @@ public class Player {
 		}
 	}
 	
-	/**
-	 * MAps a given TileStatus to the corresponding player number
-	 * @param status
-	 * @return playernumber if TileStatus matches one; -1 otherwise
-	 */
-	public static int tileStatusToPlayerNumber(TileStatus status)
-	{
-		switch (status)
-		{
-			case PLAYER_1:
-				return 1;
-			case PLAYER_2:
-				return 2;
-			case PLAYER_3:
-				return 3;
-			case PLAYER_4:
-				return 4;
-			case PLAYER_5:
-				return 5;
-			case PLAYER_6:
-				return 6;
-			case PLAYER_7:
-				return 7;
-			case PLAYER_8:
-				return 8;
-			default:
-				return -1;
-		}
-	}
-	
 	@Override
 	public Player clone()
 	{

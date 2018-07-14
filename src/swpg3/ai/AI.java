@@ -135,7 +135,7 @@ public class AI {
 	 * Mobility Parameter - Importance Function:
 	 * Decay factor in interval [0,1] determining the importance-loss of mobility for every turn till own turn
 	 */
-	public static double M_ILF = 0.67;
+	public static double M_ILF = 0.7;
 	
 	//OverrideStone paramaters
 	

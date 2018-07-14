@@ -255,8 +255,6 @@ public class Phteven{
 				Stopwatch watch = new Stopwatch();
 				watch.start();
 				mapMan.applyMove(move);
-				// Defragment Bloks in the map
-				mapMan.defragmentMapBlocks();
 				watch.stop();
 				
 				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Applied Move: " + move + ": " + watch);
