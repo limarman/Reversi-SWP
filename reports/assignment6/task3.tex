@@ -1,16 +1,1 @@
 \section{Task 3}
-Für das finale Turnier haben wir die folgenden Neuerungen implementiert:
-
-\subsection{Blöcke}
-\textit{Blöcke} sind unsere Idee zur Verbesserung unserer Mobilitätsberechnung.
-
-Ein Block ist dabei eine eindimensionale Menge an zusammen liegenden Steinen. Jeder Stein liegt also in genau vier Blöcken: einem vertikalen, einem Horizontalen und zwei diagonalen. Ein Spielzug ist immer nur dann möglich, wenn er neben der Grenze eines Blockes liegt. Um die Zahl der mögliche Züge zu berechnen reicht es also zu Zählen, wie viele Blöcke Steine des entsprechenden Spielers beinhalten und die Grenzen zu betrachten, ob der Spieler dort einen Stein hat, denn er kann einen neuen Stein nicht direkt neben seinen anderen Platzieren (In einem eindimensionalem Streifen betrachtet zumindest).
-
-In diesem Konzept sind uns allerdings ein paar Probleme ausgefallen: Wenn ein neuer Stein gelegt wird, müssen die Blöcke angepasst werden. Sollte der Stein in einer Orientierung keinen Nachbar Block haben, so muss nur ein neuer erstellt werden. Auch wenn es genau einen Nachbarblock gibt, ist die Aktualisierung recht einfach. Die Grenzen des Nachbarblocks müssen angepasst werden und der neue Stein hinzugefügt. Das große Problem, tritt allerdings auf, wenn ein Stein zwischen zwei Blöcken gelegt wird und diese somit verbindet. Es muss in diesem Fall aus zwei Blöcken einer gemacht werden. Da aber jedes Feld seine Blöcke kennt, wäre es viel aufwand die alten zu löschen und durch einen neuen zu ersetzen, denn man müsste jede Referenz austauschen. Deshalb haben wir das Konzept der Superblöcke entwickelt: Jeder Block kann den Index eines Superblocks speichern. Ein Superblock ist dabei eine neue Version des Blocks. Sollten zwei Blöcke verschmolzen werden, wird ein neuer Block erstellt mit den äußeren Grenzen der alten Blöcke und entsprechenden Anzahlen von Steinen und die Superblock Indizes der alten Blöcke werden auf den neuen Block gerichtet. Sollte also auf den Block eines Feldes zugegriffen werden müssen, kann in maximal logarithmischer Zeit die Kette an Superblöcken traversiert werden und der aktuellste ermittelt werden. Um diesen Aufwand noch weiter zu minimieren teilen wir nach jedem erhaltenen Zug die Karte neu in Blöcke ein und eliminieren veraltete, inaktive Blöcke.
-
-Auf Karten mit vielen Transitionen erwiesen sich die Blöcke, gegenüber unserem alten Verfahren, als überlegen.
-
-\subsection{Erreichbare Komponenten}
-Mit \textit{Erreichbare Komponenten} meinen wir eine Suche nach Zusammenhangkomponenten in der Karte und insbesondere Abschnitte der Karte, die nicht erreichbar sind. Dies machen wir, da wir bisher jeden Inversionstone auf der Karte beachten und davon ausgehen, dass dieser ausgespielt wird. Wenn ein Stein also nicht gespielt wird, trifft Phteven Entscheidungen, die nicht gut für ihn sind. Wir erhoffen durch eine Suche über das Spielfeld am Anfang des Spiels zu ermitteln ob Inversionstones nicht gespielt werden können, um diese aus unseren Berechnungen auszuklammern.
-
-Dieses Feature ist noch nicht implementiert, ist allerdings unser nächster Fokuspunkt.
