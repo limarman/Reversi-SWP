@@ -71,28 +71,4 @@ public class BitMap {
 		set(position.x, position.y, val);
 	}
 	
-	/**
-	 * prints the Map with 0=false and 1 = true.
-	 * for Debug purposes only
-	 */
-	public void print()
-	{
-		int height = map.length / width;
-		
-		for(int y = 0; y < height; y++)
-		{
-			for(int x = 0; x < width; x++)
-			{
-				if(get(x,y))
-				{
-					System.out.print("1");
-				} else
-				{
-					System.out.print("0");
-				}
-			}
-			System.out.println();
-		}
-	}
-	
 }
