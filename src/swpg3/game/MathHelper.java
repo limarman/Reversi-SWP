@@ -76,8 +76,6 @@ public class MathHelper {
 	
 	/**
 	 * Lagrange interpolation between the linear function through point (start, startVal) and (end, endVal) in point x.
-	 * if x is not in the interval [start, end] x will be set to the closest border. For example if x < start then x := start
-	 * because interpolation out of the borders may lead to serious trouble.
 	 * @param start - start x value.
 	 * @param end - end x value.
 	 * @param startVal - start y value.
@@ -87,14 +85,6 @@ public class MathHelper {
 	 */
 	public static double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
 	{
-		if(x<start) 
-		{
-			x = start;
-		}
-		if(x > end) 
-		{
-			x = end;
-		}
 		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
 	}
 	

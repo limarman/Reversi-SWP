@@ -23,7 +23,7 @@ public class IterativeDeepeningCalculator implements Calculator{
 	/**
 	 * weight in the interval [0,1] where 0 forces maximum branching factor and 1 forces average branching factor.
 	 */
-	double branching_factor_estimation = 0;
+	double branching_factor_estimation = 0.8;
 	
 	/**
 	 * The Calculator which is used during the building-phase of the game.
