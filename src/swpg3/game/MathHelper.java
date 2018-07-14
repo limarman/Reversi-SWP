@@ -9,14 +9,14 @@ public class MathHelper {
 	private static double[] cumulated_probs;
 	
 	
-	public static void preprocessCumulatedProbs() 
+	public static void initialize() 
 	{
 		cumulated_probs = calculateCumulatedProbs(0.7);
 	}
 	
 	/**
 	 * Method to return the probability (ca.) for the percentage to be in the interval [a,b]
-	 * Preprocessing of the cumulated probabilities has to be done beforehand.
+	 * Initialization has to be done beforehand.
 	 * @param a - smaller interval border
 	 * @param b - bigger interval border
 	 * @return
@@ -51,8 +51,8 @@ public class MathHelper {
 	}
 	
 	/**
-	 * Method to return the probability (ca.) for the percentage to be in the interval [a,inf].
-	 * Preprocessing of the cumulated probabilities has to be done beforehand.
+	 * Method to return the probability (ca.) for the percentage to be in the interval [a,inf]
+	 * Initialization has to be done beforehand.
 	 * @param a - smaller interval border
 	 * @return
 	 */
@@ -72,20 +72,6 @@ public class MathHelper {
 		}
 		
 		return 1 - cumulated_probs[cumulated_probIndex_a];
-	}
-	
-	/**
-	 * Lagrange interpolation between the linear function through point (start, startVal) and (end, endVal) in point x.
-	 * @param start - start x value.
-	 * @param end - end x value.
-	 * @param startVal - start y value.
-	 * @param endVal - end y value.
-	 * @param x - the position, where the plotted value is asked for.
-	 * @return the linear interpolation from x in the line through (start,startVal) and (end,endVal)
-	 */
-	public static double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
-	{
-		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
 	}
 	
 	private static int[] calculateBins() 

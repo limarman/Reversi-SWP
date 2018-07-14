@@ -9,6 +9,8 @@ import swpg3.ai.calculator.Calculator;
 import swpg3.ai.calculator.CalculatorConditions;
 import swpg3.ai.calculator.CalculatorForm;
 import swpg3.ai.calculator.ParanoidCalculator;
+import swpg3.ai.calculator.PruningParanoidCalculator;
+import swpg3.ai.calculator.movesorter.BogoSorter;
 import swpg3.ai.evaluator.Evaluator;
 import swpg3.ai.evaluator.InversionaryEvaluator;
 import swpg3.game.map.Map;
@@ -320,12 +322,12 @@ class TimingTest {
 			Evaluator eva = new InversionaryEvaluator();
 			Calculator minCalc = new ParanoidCalculator();
 			CalculatorForm form = new CalculatorForm();
-			CalculatorConditions conditions = new CalculatorConditions(4, Long.MAX_VALUE);
+			CalculatorConditions conditions = new CalculatorConditions();
 			
 			long pre_time_sum = System.nanoTime();
 			
 			for(int i = 0; i<100; i++) {
-				minCalc.calculateBestMove(eva, (byte)1, form, conditions);
+				minCalc.calculateBestMove(eva, (byte)1, 4, Long.MAX_VALUE, form, conditions);
 			}
 			
 			System.out.println("Time taken: " + (System.nanoTime() - pre_time_sum)/100000.);
@@ -335,7 +337,7 @@ class TimingTest {
 	@Test
 	void GenerateMovesTiming()
 	{
-		boolean doTest = false;
+		boolean doTest = true;
 		int numberOfRuns = 1000000;
 		
 		if(!doTest)

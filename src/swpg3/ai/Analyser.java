@@ -7,33 +7,12 @@ import swpg3.game.map.MapManager;
 import swpg3.game.map.MapWalker;
 import swpg3.game.map.Tile;
 
-/**
- * A Singleton-class which provides functionality to "analyze" the starting map. Concretely this means that some
- * static properties of the map are found out and saved in the AI class.
- * These are:
- * - number of solid squares
- * - location of solid squares
- * - number of reachable squares
- * (- location of reachable squares)
- * @author Ramil
- *
- */
 public class Analyser {
 	
-	/**
-	 * A private instance of the Analyser class.
-	 */
 	private static Analyser instance = null;
 	
-	/**
-	 * A private constructor, so that getInstance() has to be called to get an instance of Analyser.
-	 */
 	private Analyser() {}
 	
-	/**
-	 * Method which returns the singleton instance of Analyser. Creating one if not done yet.
-	 * @return
-	 */
 	public static Analyser getInstance() 
 	{
 		if(instance == null) 
@@ -44,13 +23,9 @@ public class Analyser {
 		return instance;
 	}
 	
-	/**
-	 * The "main" method of this class. Iterates over the map and finds out static properties of the map as:
-	 * - number of solid stones
-	 * - location of solid stones
-	 * - number of reachable squares
-	 * (- location of reachable squares)
-	 */ 
+	//##################################################
+	// Function for initial map-analysis
+	//##################################################
 	public void analyseMap()
 	{
 		AI.solidSquares = new BitMap(MapManager.getInstance().getWidth(), MapManager.getInstance().getHeight());

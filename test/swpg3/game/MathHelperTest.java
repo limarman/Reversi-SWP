@@ -96,7 +96,7 @@ class MathHelperTest {
 	@Test
 	void test() 
 	{
-		MathHelper.preprocessCumulatedProbs();
+		MathHelper.initialize();
 		
 		int[] bombCount = {2,2,1,1};
 		int [] stoneCount = {150, 120, 50 ,200};
