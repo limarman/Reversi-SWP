@@ -255,7 +255,9 @@ public class Phteven{
 				Stopwatch watch = new Stopwatch();
 				watch.start();
 				mapMan.applyMove(move);
-				watch.stop();				
+				watch.stop();
+				mapMan.defragmentMapBlocks();
+				
 				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Applied Move: " + move + ": " + watch);
 			}
 			else
@@ -263,7 +265,7 @@ public class Phteven{
 				mapMan.applyMove(move);
 			}
 			
-			mapMan.defragmentMapBlocks();
+			
 			
 			
 			Logger.log(LogLevel.DETAIL, "Applied Move:");
