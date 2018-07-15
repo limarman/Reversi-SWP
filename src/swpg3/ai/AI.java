@@ -143,7 +143,7 @@ public class AI {
 	 * Override Count Parameter:
 	 * The factor with which one override stone flows into the evaluation function
 	 */
-	public static double OVERRIDE_BONUS = 270;
+	public static double OVERRIDE_BONUS = 250;
 	
 	/**
 	 * Override Count Parameter - Importance Function:
@@ -294,7 +294,7 @@ public class AI {
 		CalculatorForm form = new CalculatorForm();
 		CalculatorConditions conditions = new CalculatorConditions();
 		double evaluation = calc.calculateBestMove(eva, playerNumber, depthLimit,
-				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine((long) (timeLimit * 0.85)), form, conditions);
+				timeLimit == 0 ? Clockmaster.getTimeDeadLine(15*1000-500) : Clockmaster.getTimeDeadLine(timeLimit-100), form, conditions);
 		Logger.log(LogLevel.DETAIL, "Evaluation: " + evaluation);
 		return form.getBestMove();
 	}
