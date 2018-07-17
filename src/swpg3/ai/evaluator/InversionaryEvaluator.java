@@ -12,8 +12,8 @@ import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
 
 /**
- * A relative evaluator which is keeping an eye on the number of inversion stones left and the player with whom the stone change 
- * is most likely inevitable
+ * A Evaluator which has the same basic idea as the Relative Evaluator but is keeping an eye on the number of inversion stones
+ * left and the player with whom the stone change is most likely inevitable
  * @author Ramil
  *
  */
@@ -41,6 +41,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	@Override
 	public double evaluatePosition(Map map, byte playerNumber)
 	{
+//		Logger.log(LogLevel.ERROR, "Evaluation:");
+		
 		double evaluation;
 		int numberOfPlayers = MapManager.getInstance().getNumberOfPlayers();
 		
@@ -567,11 +569,11 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		//resizing according to importance func
 		if(totalFieldControl < INV_TP_I)
 		{
-			factor = calcLinearInterpolation(0, INV_TP_I, INV_SV_I, INV_TV_I, totalFieldControl);
+			factor = MathHelper.calcLinearInterpolation(0, INV_TP_I, INV_SV_I, INV_TV_I, totalFieldControl);
 		}
 		else
 		{
-			factor = calcLinearInterpolation(INV_TP_I, 1, INV_TV_I, INV_EV_I, totalFieldControl);
+			factor =MathHelper.calcLinearInterpolation(INV_TP_I, 1, INV_TV_I, INV_EV_I, totalFieldControl);
 		}
 		
 		return factor;

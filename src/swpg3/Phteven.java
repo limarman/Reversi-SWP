@@ -317,6 +317,13 @@ public class Phteven{
 						((double) IterativeDeepeningCalculator.movesAsked));
 				Logger.log(LogLevel.INFO, "Moves Played: " +
 						IterativeDeepeningCalculator.movesAsked);
+				Logger.log(LogLevel.INFO, "CalculatedDepthsTimes:");
+				for(int i = 0; i<10; i++) 
+				{
+					Logger.log(LogLevel.INFO, "Depth " + i + ": " + IterativeDeepeningCalculator.timesDepthCalculated[i]);
+				}
+				Logger.log(LogLevel.INFO, "Depth >=" + 10 + ": " + IterativeDeepeningCalculator.timesDepthCalculated[10]);
+
 			}
 		}
 		else if(m.getType() == MessageType.CURRENT_GAME_STATE) // MessageType 10

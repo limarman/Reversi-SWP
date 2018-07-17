@@ -14,11 +14,17 @@ import swpg3.game.move.Move;
  */
 public class BogoSorter implements MoveSorter{
 
+	/**
+	 * Does not sort at all.
+	 */
 	@Override
 	public Move[] initialMoveSort(Evaluator eva, HashSet<Move> possibleMovesOrderable, Map map, byte playerNumber) {
 		return possibleMovesOrderable.toArray(new Move[0]);
 	}
 
+	/**
+	 * Does not sort at all.
+	 */
 	@Override
 	public Move[] moveSort(Evaluator eva, HashSet<Move> possibleMovesOrderable, Map map, byte playerNumber) {
 		return possibleMovesOrderable.toArray(new Move[0]);
