@@ -1,16 +1,28 @@
 package swpg3.game;
 
 /**
- * Class representing a Bitmap
+ * Class representing a Bitmap.
  * @author Ramil
  *
  */
 public class BitMap {
 
+	/**
+	 * The pseudo 2-dimensional array, representing the bitmap.
+	 */
 	private boolean[] map;
+	
+	/**
+	 * The width of the map (height can be calculated with the length of the bitmap array)
+	 */
 	private int width;
 	
 	
+	/**
+	 * Constructor creating a bitmap with the given width and height.
+	 * @param width - width of the bitmap
+	 * @param height - height of the bitmap
+	 */
 	public BitMap(int width, int height) 
 	{
 		this.width = width;

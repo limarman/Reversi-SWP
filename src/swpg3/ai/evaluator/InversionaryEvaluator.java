@@ -17,7 +17,7 @@ import swpg3.game.map.TileStatus;
  * @author Ramil
  *
  */
-public class InversionaryEvaluator extends RelativeEvaluator implements Evaluator{
+public class InversionaryEvaluator implements Evaluator{
 	
 	//parameters for InversionStone analysis
 	// INV - Inversion Stone
@@ -30,7 +30,13 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 	private double INV_EV_I = 0.9;
 	private double INV_TP_I = 0.65;
 	
-	//TODO: very ugly to have this as a global variable - rewrite getAttributes function..
+	//The prizes for the top 5 places
+	private final int FIRST_PRIZE = 250;
+	private final int SECOND_PRIZE = 110;
+	private final int THIRD_PRIZE = 50;
+	private final int FOURTH_PRIZE = 20;
+	private final int FIFTH_PRIZE = 10;
+	
 	//Damn you Java for no pass by reference!
 	private int numberOfInversionStones = 0;
 	
@@ -73,11 +79,7 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 			//summing up the by inversion changeable evaluations for every player
 			for(int i = 0; i<numberOfPlayers; i++) 
 			{
-//				Logger.log(LogLevel.DETAIL, "Player " + (i+1) + ": ");
-//				Logger.log(LogLevel.DETAIL, "Mobility: " + evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]));
-//				Logger.log(LogLevel.DETAIL, "StoneCount: " + evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
-//						occupiedSquares/((double)AI.PLAYABLE_SQUARES)));
-//				Logger.log(LogLevel.DETAIL, "SolidSquares: " + evaluatePositionalFactors(attributesPerPlayer[i][0] / ((double) AI.numberOfSolidSquares), 0, 0, 0,	occupiedSquares/((double)AI.PLAYABLE_SQUARES)));
+
 				inversable_evaluations[i] = 0;
 				inversable_evaluations[i] += evaluateMobility(attributesPerPlayer[i][1], attributesPerPlayer[i][3]);
 				inversable_evaluations[i] += evaluateStoneCount(attributesPerPlayer[i][2]/((double)occupiedSquares),
@@ -115,69 +117,6 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		}
 		else //Bombing Phase
 		{			
-//			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
-//			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
-//			
-//			//counting the holes
-//			int holes = 0;
-//			
-//			//iterating over map counting stones from each player
-//			for(int w = 0; w<MapManager.getInstance().getWidth(); w++)
-//			{
-//				for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
-//				{
-//					if(map.getTileAt(w, h).isOccupiedbyPlayer())
-//					{
-//						byte player = map.getTileAt(w, h).getStatus().value;
-//						stoneCount[player-1]++;
-//					}
-//					else if(map.getTileAt(w, h).isHole())
-//					{
-//						holes++;
-//					}
-//				}	
-//			}
-//			
-//			
-//			double[] probs = calculateProbabilities(playerNumber, stoneCount);
-//			
-//			//expected prize - according to probabilites
-//			double stone_evaluation = probs[0] * FIRST_PRIZE + probs[1] * SECOND_PRIZE + probs[2] * THIRD_PRIZE;
-//			
-//			//calculate absolute bombingPower
-//			int bombStrength = MapManager.getInstance().getBombStrength();
-//			int bombingPower = 0;
-//			for(int i = 1; i<=MapManager.getInstance().getNumberOfPlayers(); i++)
-//			{
-//				Player p = map.getPlayer(i);
-//				if(!p.isDisqualified()) {
-//					//A bomb with radius x bombs a square with width (2x+1) and height (2x+1)
-//					bombingPower += p.getBombs() * (2*bombStrength+1) * (2*bombStrength+1);
-//				}
-//			}
-//			
-//			//calculate the prize of player if there would not be any bombs left (current standing)
-//			int currentPrize = calculateCurrentPrize(stoneCount, playerNumber);
-//			
-//			
-//			//calculate weighting factor
-//			//factor is in [0,1], if bombCount starts to shrink it converges to zero.
-//			double CONST = 1; //can be modified - the bigger - the more the old function plays a role
-//			int playableSquares = (MapManager.getInstance().getHeight() * MapManager.getInstance().getWidth() - holes);
-//			double weight;
-//			if(playableSquares > 0) {
-//				weight = bombingPower * CONST / ((double)playableSquares);
-//				if(weight > 1) 
-//				{
-//					weight = 1; //should not be over 1
-//				}
-//			}else 
-//			{
-//				weight = 1;
-//			}
-//			
-//			//weighted evaluation
-//			evaluation = stone_evaluation * weight + currentPrize * (1-weight);
 			
 			//array to count the amount of stones from each player, where player1's stones are saved in stonecount[0] and so forth
 			double [] stoneCount = new double[MapManager.getInstance().getNumberOfPlayers()];
@@ -1566,6 +1505,168 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 		}
 				
 		
+	}
+	
+	/**
+	 * Calculating the probabilities for the player with given playerNumber for the first, second and third place
+	 * @param playerNumber the perspective the value is made
+	 * @param evaluations evaluations for all the players
+	 * @return array of probabilities. a[0] = P(1). a[1] = P(2). a[2] = P(3).
+	 */
+	protected double[] calculateProbabilities(byte playerNumber, double[] evaluations) {
+		
+		//probabilities saved to not calculate all over again (dynamic programming)
+		double[] firstPlaceProbs = new double[evaluations.length];
+		
+		//probabilities for second and third place
+		double thirdPlaceProb = 0, secondPlaceProb = 0;
+		
+		//making sure, that there will be no divisions by zero
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			if(evaluations[i] == 0) 
+			{
+				evaluations[i] = 0.01;
+			}
+		}
+		
+		double evaluation_sum = 0;
+		for (double eval : evaluations) {
+			evaluation_sum += eval;
+		}
+		
+		//calculating the probabilities for the first place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			firstPlaceProbs[i] = evaluations[i] / evaluation_sum;
+		}
+		
+		//calculating the probability for the second place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			if(i==playerNumber-1) 
+			{
+				//same player cannot be first and second
+				continue;
+			}
+			
+			secondPlaceProb += firstPlaceProbs[i] * (evaluations[playerNumber-1] / (evaluation_sum - evaluations[i]));
+		}
+		
+		//calculating probability for the third place
+		for(int i = 0; i<evaluations.length; i++) 
+		{
+			//player cannot be first and third place
+			if(i == playerNumber-1) 
+			{
+				continue;
+			}
+			for(int j = 0; j<evaluations.length; j++) 
+			{
+				//playerNumber cannot be third and second. First and second cannot be the same.
+				if(playerNumber-1 == j || i == j) 
+				{
+					continue;
+				}
+				
+				thirdPlaceProb += firstPlaceProbs[i] * (evaluations[j] / (evaluation_sum - evaluations[i])) * 
+						(evaluations[playerNumber-1] / (evaluation_sum - evaluations[i] - evaluations[j]));
+			}
+		}
+		
+		double[] probalities = {firstPlaceProbs[playerNumber-1], secondPlaceProb, thirdPlaceProb};
+		
+		return probalities;
+	}
+	
+	/**
+	 * 
+	 * @param mobility
+	 * @param turns
+	 * @return scaled mobility evaluation according to parameters in AI class
+	 */
+	private double evaluateMobility(int mobility, int turns)
+	{
+		double evaluation = 0;
+		
+		 
+		evaluation = AI.MOBILITY_BONUS * mobility;
+		
+		
+		//resizing according to importance func
+		double factor = Math.pow(AI.M_ILF, turns);
+		evaluation = evaluation * factor;
+		
+		return evaluation;
+	}
+	
+	/**
+	 * 
+	 * @param controlOfOccupied - percentage of own controlled stones (within all controlled stones)
+	 * @param totalFieldControl - total percentage of field control
+	 * @return scaled stone count evaluation according to parameters in AI class
+	 */
+	private double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)
+	{
+		double evaluation = 0;
+		
+		//calculating the bonus
+		evaluation = 100 * AI.STONE_COUNT_BONUS * controlOfOccupied;
+		
+		
+		//resizing according to importance func
+		if(totalFieldControl < AI.SC_TP_I)
+		{
+			double factor = MathHelper.calcLinearInterpolation(0, AI.SC_TP_I, AI.SC_SV_I, AI.SC_TV_I, totalFieldControl);
+			evaluation = evaluation*factor;
+		}
+		else
+		{
+			double factor = MathHelper.calcLinearInterpolation(AI.SC_TP_I, 1, AI.SC_TV_I, AI.SC_EV_I, totalFieldControl);
+			evaluation = evaluation*factor;
+		}
+		
+		return evaluation;
+	}
+	
+	/**
+	 * 
+	 * @param numberOfOverrides
+	 * @return scaled ovveride stone count evaluation according to parameters in AI class
+	 */
+	private double evaluateOverrideCount(int numberOfOverrides)
+	{
+		return numberOfOverrides * AI.OVERRIDE_BONUS * AI.OVERRIDE_IMPORTANCE;
+	}
+	
+	/**
+	 * 
+	 * @param solidSquaresRatio - ratio between owned solid squares and total solid squares
+	 * @param weakSquares
+	 * @param bonusWeakSquares
+	 * @param choiceWeakSquares
+	 * @param totalFieldControl
+	 * @return scaled positional evaluation according to parameters in AI class
+	 */
+	private double evaluatePositionalFactors(double solidSquareRatio, double totalFieldControl)
+	{
+		double evaluation = 0;
+		
+		evaluation += AI.SOLID_SQUARE_BONUS * solidSquareRatio * 100;
+		
+		//resize according to importance func
+		if(totalFieldControl < AI.PP_TP_I)
+		{
+			double factor = MathHelper.calcLinearInterpolation(0, AI.PP_TP_I, AI.PP_SV_I, AI.PP_TV_I, totalFieldControl);
+			evaluation = evaluation*factor;
+		}
+		else
+		{
+			double factor = MathHelper.calcLinearInterpolation(AI.PP_TP_I, 1, AI.PP_TV_I, AI.PP_EV_I, totalFieldControl);
+			evaluation = evaluation*factor;
+		}
+		
+		return evaluation;
 	}
 			
 		
