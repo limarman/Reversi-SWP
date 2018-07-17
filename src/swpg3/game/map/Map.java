@@ -468,8 +468,8 @@ public class Map {
 	}
 
 	/**
-	 * Giving all the possible moves the player with specified playernumber can
-	 * make with set Move Value.
+	 * Giving all the possible moves the player with specified playernumber can make
+	 * with set Move Value.
 	 * 
 	 * @param playerNumber
 	 * @param considerOverrides
@@ -682,12 +682,14 @@ public class Map {
 			// May create new Blocks or merge two together
 			for (BlockOrientation ori : BlockOrientation.values())
 			{
-				// We need to use a MapWalker here because a transition can be between border and nonBorder
+				// We need to use a MapWalker here because a transition can be between border
+				// and nonBorder
 				MapWalker mw = new MapWalker(this, move.getCoordinates(), ori.dir);
 				mw.step();
 				Vector2i neighborAPos = mw.getPosition();
 				mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
-				mw.step();mw.step();
+				mw.step();
+				mw.step();
 				Vector2i neighborBPos = mw.getPosition();
 				Tile neighborA = getTileAt(neighborAPos);
 				Tile neighborB = getTileAt(neighborBPos);
@@ -907,10 +909,10 @@ public class Map {
 							}
 						}
 					}
-					
-					for(int b = 1; b <= numberOfBlocks; b++)
+
+					for (int b = 1; b <= numberOfBlocks; b++)
 					{
-						if(blocks[b].isSuperBlock())
+						if (blocks[b].isSuperBlock())
 						{
 							int tmp = blocks[b].getStoneAmount(playerNumber1);
 							blocks[b].setStoneAmount(playerNumber1, blocks[b].getStoneAmount(playerNumber2));
@@ -940,17 +942,17 @@ public class Map {
 						}
 					}
 					int playernumbers = MapManager.getInstance().getNumberOfPlayers();
-					for(int b = 1; b <= numberOfBlocks; b++)
+					for (int b = 1; b <= numberOfBlocks; b++)
 					{
-						
+
 						if (blocks[b].isSuperBlock())
 						{
 							int tmp = blocks[b].getStoneAmount(playernumbers);
-							for(int p = playernumbers; p >= 2; p--)
+							for (int p = playernumbers; p >= 2; p--)
 							{
-								blocks[b].setStoneAmount(p, blocks[b].getStoneAmount(p-1));
+								blocks[b].setStoneAmount(p, blocks[b].getStoneAmount(p - 1));
 							}
-							blocks[b].setStoneAmount(1,	tmp);
+							blocks[b].setStoneAmount(1, tmp);
 						}
 					}
 					break;
@@ -980,6 +982,7 @@ public class Map {
 
 	/**
 	 * Returning the player instance with the given playerNumber
+	 * 
 	 * @param playernumber
 	 * @return the PlayerObject with the corresponding player number
 	 */
@@ -1023,9 +1026,13 @@ public class Map {
 	/**
 	 * recursive help Method for getting the fields which have to be bombed.
 	 * 
-	 * @param radius - the number of squares the bomb reaches from the position.
-	 * @param position - the currently examined position.
-	 * @param integerMap - a map, which is saving which squares have already been visited with which radius.
+	 * @param radius
+	 *            - the number of squares the bomb reaches from the position.
+	 * @param position
+	 *            - the currently examined position.
+	 * @param integerMap
+	 *            - a map, which is saving which squares have already been visited
+	 *            with which radius.
 	 * @param positionsToBomb
 	 *            - List which is going to be filled with positions
 	 */
@@ -1315,10 +1322,18 @@ public class Map {
 						{
 							blocks[blocksID].addStone(Player.tileStatusToPlayerNumber(curTile.getStatus()));
 						}
-						MapWalker mw = new MapWalker(this, new Vector2i(x, y), o.dir);
+						boolean isCircle = false;
+						Vector2i startPos = new Vector2i(x, y);
+						Vector2i startDir = o.dir;
+						MapWalker mw = new MapWalker(this, startPos, startDir);
 						while (mw.canStep() && mw.getCurrentTile().isOccupied())
 						{
 							mw.step();
+							if (mw.getPosition().equals(startPos) && mw.getDirection().equals(startDir))
+							{
+								isCircle = true;
+								break;
+							}
 							// has passed Transistion?
 							if (mw.hasPassedTransition())
 							{
@@ -1334,40 +1349,48 @@ public class Map {
 								}
 							}
 						}
-						if (mw.getCurrentTile().isEmpty())
+						if (!isCircle)
 						{
-							blocks[blocksID].setNonBorderA(mw.getPosition());
-							mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
-							mw.step();
-							blocks[blocksID].setBorderA(mw.getPosition());
-						} else
-						{
-							blocks[blocksID].setBorderA(null);
-						}
-
-						mw.setPosition(new Vector2i(x, y));
-						mw.setDirection(Vector2i.scaled(o.dir, -1));
-						while (mw.canStep() && mw.getCurrentTile().isOccupied())
-						{
-							mw.step();
-							if (mw.getCurrentTile().isOccupied())
+							if (mw.getCurrentTile().isEmpty())
 							{
-								mw.getCurrentTile().setBlockID(o, blocksID);
-								if (mw.getCurrentTile().getStatus() != TileStatus.EXPANSION)
+								blocks[blocksID].setNonBorderA(mw.getPosition());
+								mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
+								mw.step();
+								blocks[blocksID].setBorderA(mw.getPosition());
+							} else
+							{
+								blocks[blocksID].setBorderA(null);
+							}
+
+							mw.setPosition(new Vector2i(x, y));
+							mw.setDirection(Vector2i.scaled(o.dir, -1));
+							while (mw.canStep() && mw.getCurrentTile().isOccupied())
+							{
+								mw.step();
+								if (mw.getCurrentTile().isOccupied())
 								{
-									blocks[blocksID]
-											.addStone(Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+									mw.getCurrentTile().setBlockID(o, blocksID);
+									if (mw.getCurrentTile().getStatus() != TileStatus.EXPANSION)
+									{
+										blocks[blocksID].addStone(
+												Player.tileStatusToPlayerNumber(mw.getCurrentTile().getStatus()));
+									}
 								}
 							}
+							if (mw.getCurrentTile().isEmpty())
+							{
+								blocks[blocksID].setNonBorderB(mw.getPosition());
+								mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
+								mw.step();
+								blocks[blocksID].setBorderB(mw.getPosition());
+							} else
+							{
+								blocks[blocksID].setBorderB(null);
+							}
 						}
-						if (mw.getCurrentTile().isEmpty())
+						else
 						{
-							blocks[blocksID].setNonBorderB(mw.getPosition());
-							mw.setDirection(Vector2i.scaled(mw.getDirection(), -1));
-							mw.step();
-							blocks[blocksID].setBorderB(mw.getPosition());
-						} else
-						{
+							blocks[blocksID].setBorderA(null);
 							blocks[blocksID].setBorderB(null);
 						}
 
