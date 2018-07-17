@@ -86,16 +86,16 @@ public class PruningParanoidCalculator implements Calculator{
 			PerfLogger.getInst().startNode();
 		}
 		
-//		//first do not consider override moves
-//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
-//		if(possibleMovesOrderable.isEmpty()) 
-//		{
-//			//have to be considered
-//			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
-//		}
+		//first do not consider override moves
+		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, false);
+		if(possibleMovesOrderable.isEmpty()) 
+		{
+			//have to be considered
+			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+		}
 		
 		
-		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
+//		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		
 		int branchingFactor = possibleMovesOrderable.size();
 		if(branchingFactor > form.getMaxBranchingFactor()) 
