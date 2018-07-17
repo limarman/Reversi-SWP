@@ -222,7 +222,7 @@ public class AI {
 	 * BitMap that marks all Tiles that are considered reachable.
 	 * 
 	 * A Tile is considered reachable as soon as there is at least one structure, in
-	 * the same connected component of the map, simmiliar to "0 X Y" in any
+	 * the same connected component of the map, similar to "0 X Y" in any
 	 * orientation, where 0 is an empty tile and X and Y are different types of
 	 * Stones(Expansion, Player 1,...). Connected components can be connected via transitions.
 	 * 

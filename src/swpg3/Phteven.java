@@ -216,12 +216,9 @@ public class Phteven{
 			// Request Move from AI
 			Move bestMove = AI.getInstance().getBestMove(playerNumber, depthLimit, timeLimit);
 			
-			long duration = (System.currentTimeMillis()-start);
-			
-			calculatedTime += duration;
+			calculatedTime += (System.currentTimeMillis()-start);
 			
 			Logger.log(LogLevel.INFO, LogTag.DEBUG ,String.format("%12d - Move calulated", System.nanoTime()));
-			Logger.log(LogLevel.INFO, "Time taken >= " + duration);
 			if(GlobalSettings.log_performance)
 			{
 				PerfLogger.getInst().stopTotal();
@@ -267,6 +264,7 @@ public class Phteven{
 			else
 			{
 				mapMan.applyMove(move);
+				mapMan.defragmentMapBlocks();
 			}
 			
 			

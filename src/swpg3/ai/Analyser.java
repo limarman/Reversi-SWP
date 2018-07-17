@@ -67,10 +67,10 @@ public class Analyser {
 			{
 				Vector2i pos = new Vector2i(w, h);
 				Tile t = map.getTileAt(w, h);
+				
+				
 				if (!t.isHole())
 				{
-					playableSquares++;
-
 					// is it a solid square?
 					// looking whether all 4 directions are blocked
 					boolean directionsBlocked[] = new boolean[4];
@@ -91,7 +91,6 @@ public class Analyser {
 					if (directionsBlocked[0] && directionsBlocked[1] && directionsBlocked[2] && directionsBlocked[3])
 					{
 						AI.solidSquares.set(pos.x, pos.y, true);
-						numberOfSolidSquares++;
 					}
 				}
 
@@ -123,6 +122,23 @@ public class Analyser {
 					}
 				}
 
+			}
+		}
+		
+		//iterate once again over the reachable squares bitmap and count the reachable squares
+		//as well as the reachable solid stones
+		for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
+		{
+			for(int h = 0; h < MapManager.getInstance().getHeight(); h++) 
+			{
+				if(AI.reachableSquares.get(w,h)) 
+				{
+					playableSquares++;
+					if(AI.solidSquares.get(w, h)) 
+					{
+						numberOfSolidSquares++;
+					}
+				}
 			}
 		}
 
