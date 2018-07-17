@@ -5,7 +5,9 @@ package swpg3.game.map.blocks;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.rules.Timeout;
 
 import swpg3.game.Vector2i;
 import swpg3.game.map.Map;
@@ -636,5 +638,20 @@ class BlockTest {
 		int blockmobility = map.mobilityByBlocks(1);
 		assertEquals(7, blockmobility, "Mobility mismatch.");
 
+	}
+	
+	@Test
+	void testInfiniteLoopDefrag()
+	{
+		String mapString = "2\n"
+				+ "0\n"
+				+ "0 1\n"
+				+ "1 3\n"
+				+ "1 2 1\n"
+				+ "0 0 6 <-> 2 0 2";
+		
+		MapManager mm = MapManager.getInstance();
+		mm.initializeMap(mapString);
+		Map map = mm.getCurrentMap();
 	}
 }
