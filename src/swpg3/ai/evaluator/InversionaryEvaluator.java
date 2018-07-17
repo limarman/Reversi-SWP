@@ -379,8 +379,8 @@ public class InversionaryEvaluator implements Evaluator{
 					}
 				}
 				
-				//count the inversion stones
-				if(t.getStatus() == TileStatus.INVERSION) {
+				//count the inversion stones which are reachable
+				if(t.getStatus() == TileStatus.INVERSION && AI.reachableSquares.get(w,h)) {
 					numberOfInversionStones++;
 				}
 
