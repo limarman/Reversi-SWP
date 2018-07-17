@@ -262,7 +262,6 @@ public class Phteven{
 			else
 			{
 				mapMan.applyMove(move);
-				mapMan.defragmentMapBlocks();
 			}
 			
 			
