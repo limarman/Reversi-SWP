@@ -20,9 +20,10 @@ import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
 
 /**
- * Singleton main class for handling the move-choice queries.
- * Holds general parameters for the evaluation function.
- * Requires initialize method to be called before using the functionality of the AI class.
+ * Singleton main class for handling the move-choice queries. Holds general
+ * parameters for the evaluation function. Requires initialize method to be
+ * called before using the functionality of the AI class.
+ * 
  * @author Ramil
  *
  */
@@ -220,8 +221,20 @@ public class AI {
 	
 	
 	/**
-	 * A private constructor to prevent initializing an AI object
-	 * differently than calling the getInstance function
+	 * BitMap that marks all Tiles that are considered reachable.
+	 * 
+	 * A Tile is considered reachable as soon as there is at least one structure, in
+	 * the same connected component of the map, similar to "0 X Y" in any
+	 * orientation, where 0 is an empty tile and X and Y are different types of
+	 * Stones(Expansion, Player 1,...). Connected components can be connected via transitions.
+	 * 
+	 * This BitMap is filled in the Analyser-analyseMap method.
+	 */
+	public static BitMap reachableSquares;
+
+	/**
+	 * A private constructor to prevent initializing an AI object differently than
+	 * calling the getInstance function
 	 */
 	private AI() {}
 	

@@ -477,8 +477,8 @@ public class InversionaryEvaluator extends RelativeEvaluator implements Evaluato
 					
 				}//otherwise it was a hole/expansion-stone
 				
-				//count the inversion stones
-				if(t.getStatus() == TileStatus.INVERSION) {
+				//count the inversion stones which are reachable
+				if(t.getStatus() == TileStatus.INVERSION && AI.reachableSquares.get(w,h)) {
 					numberOfInversionStones++;
 				}
 
