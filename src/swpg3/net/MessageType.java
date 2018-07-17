@@ -4,6 +4,8 @@
 package swpg3.net;
 
 /**
+ * Enum to describe the different types of messages that are distributed over the network.
+ * 
  * @author eric
  *
  */
@@ -26,6 +28,11 @@ public enum MessageType {
 		typeNumber = (byte) i;
 	}
 	
+	/**
+	 * Maps a number to the corresponding MessageType according to the specification.
+	 * @param b The number to be mapped.
+	 * @return The corresponding MessageType.
+	 */
 	public static MessageType fromTypeNumber(byte b)
 	{
 		switch(b)

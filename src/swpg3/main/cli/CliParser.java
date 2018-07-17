@@ -3,26 +3,67 @@ package swpg3.main.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A simple Parser that parses the commandline arguments.
+ * 
+ * All available options must be supplied via addOption method. After that the
+ * cmd args can be parsed with the parse method. All parsed information will be
+ * stored in the cliOption class.
+ * 
+ * @author eric
+ *
+ */
 public class CliParser {
 	private List<CliOption> options;
 
+	/**
+	 * Simple constructor. Initializes the list of options and adds the -h (Help)
+	 * option.
+	 */
 	public CliParser()
 	{
 		options = new ArrayList<CliOption>();
 		addOption('h', "help", false, CliOptionType.FLAG, "", "Prints help text");
 	}
 
+	/**
+	 * Add an already existing option to be parsed.
+	 * 
+	 * @param opt
+	 *            Option that should be parsed.
+	 */
 	public void addOption(CliOption opt)
 	{
 		options.add(opt);
 	}
 
+	/**
+	 * Creates a new CliOption. Data can be accessed by using getOption-method after
+	 * parsing.
+	 * 
+	 * @param shortName
+	 * @param longName
+	 * @param mandatory
+	 * @param type
+	 * @param defaultParam
+	 * @param description
+	 */
 	public void addOption(char shortName, String longName, boolean mandatory, CliOptionType type, String defaultParam,
 			String description)
 	{
 		options.add(new CliOption(shortName, longName, mandatory, type, defaultParam, description));
 	}
 
+	/**
+	 * Parses the commandline arguments and fills all options added to the parser.
+	 * 
+	 * If an error occurred while parsing that renders the program unusable, like a
+	 * missing mandatory parameter, false will be returned. If parsing is completed
+	 * successfully true will be returned.
+	 * 
+	 * @param args the args supplied via commandline.
+	 * @return true, if parsing went correctly; false, if an error occurred.
+	 */
 	public boolean parse(String[] args)
 	{
 		int i = 0;
@@ -172,6 +213,10 @@ public class CliParser {
 		return allMand;
 	}
 
+	/**
+	 * Prints a help text to better use application.
+	 * This text contains a list of all options and their description, that are listed in the parser.
+	 */
 	private void printHelp()
 	{
 		System.out.println("\nCall with these mandatory Arguements:");
@@ -196,6 +241,11 @@ public class CliParser {
 
 	}
 
+	/**
+	 * Retrieve an option listed by the parser by its short name.
+	 * @param shortname
+	 * @return
+	 */
 	public CliOption getOption(char shortname)
 	{
 		for (CliOption cliOption : options)
@@ -207,7 +257,12 @@ public class CliParser {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Retrieve an option listed by the parser by its long name.
+	 * @param shortname
+	 * @return
+	 */
 	public CliOption getOption(String longname)
 	{
 		for (CliOption cliOption : options)

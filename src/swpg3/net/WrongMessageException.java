@@ -4,6 +4,7 @@
 package swpg3.net;
 
 /**
+ * An Exception to be thrown if data is tried to be extracted from a wrong typed message.
  * @author eric
  *
  */
