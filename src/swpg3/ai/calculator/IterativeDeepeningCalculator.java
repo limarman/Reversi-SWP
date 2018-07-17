@@ -22,7 +22,7 @@ public class IterativeDeepeningCalculator implements Calculator{
 	/**
 	 * value in the interval [0,1] where 0 is maximum branching factor and 1 is average branching factor
 	 */
-	double branching_factor_estimation = 0;
+	double branching_factor_estimation = 0.8;
 	
 	private Calculator usedCalcBuilding;
 	private Calculator usedCalcBombing;
