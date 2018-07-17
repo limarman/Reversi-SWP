@@ -256,6 +256,7 @@ public class Phteven{
 				watch.start();
 				mapMan.applyMove(move);
 				watch.stop();
+				mapMan.defragmentMapBlocks();
 				
 				Logger.log(LogLevel.INFO, LogTag.PERFORMANCE, "Applied Move: " + move + ": " + watch);
 			}
