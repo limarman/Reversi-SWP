@@ -3,35 +3,23 @@ package swpg3.game;
 import swpg3.main.logging.LogLevel;
 import swpg3.main.logging.Logger;
 
-/**
- * Class managing mathematical tasks, appearing during calculation or evaluation.
- * @author Ramil
- *
- */
 public class MathHelper {
 
 	//array holding the cumulated probabilities for percentages in 5% steps. (21 entries)
-	/**
-	 * Array holding the cumulated probabilities for percentages in 5% steps. In total 21 entries. 
-	 * Is initialized by calling the pre-process method.
-	 */
 	private static double[] cumulated_probs;
 	
 	
-	/**
-	 * Pre-processes the cumulated probabilities. Using the binomial probability distribution with p = 0.7.
-	 */
-	public static void preprocessCumulatedProbs() 
+	public static void initialize() 
 	{
 		cumulated_probs = calculateCumulatedProbs(0.7);
 	}
 	
 	/**
 	 * Method to return the probability (ca.) for the percentage to be in the interval [a,b]
-	 * Preprocessing of the cumulated probabilities has to be done beforehand.
+	 * Initialization has to be done beforehand.
 	 * @param a - smaller interval border
 	 * @param b - bigger interval border
-	 * @return probability for the percentage to be in the interval [a,b].
+	 * @return
 	 */
 	public static double probabilityInInterval(double a, double b) 
 	{
@@ -63,10 +51,10 @@ public class MathHelper {
 	}
 	
 	/**
-	 * Method to return the probability (ca.) for the percentage to be in the interval [a,inf].
-	 * Preprocessing of the cumulated probabilities has to be done beforehand.
+	 * Method to return the probability (ca.) for the percentage to be in the interval [a,inf]
+	 * Initialization has to be done beforehand.
 	 * @param a - smaller interval border
-	 * @return the probability for the percentage to be in the interval [a,inf].
+	 * @return
 	 */
 	public static double probabilityBiggerThan(double a) 
 	{
@@ -86,34 +74,6 @@ public class MathHelper {
 		return 1 - cumulated_probs[cumulated_probIndex_a];
 	}
 	
-	/**
-	 * Lagrange interpolation between the linear function through point (start, startVal) and (end, endVal) in point x.
-	 * if x is not in the interval [start, end] x will be set to the closest border. For example if x < start then x := start
-	 * because interpolation out of the borders may lead to serious trouble.
-	 * @param start - start x value.
-	 * @param end - end x value.
-	 * @param startVal - start y value.
-	 * @param endVal - end y value.
-	 * @param x - the position, where the plotted value is asked for.
-	 * @return the linear interpolation from x in the line through (start,startVal) and (end,endVal)
-	 */
-	public static double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
-	{
-		if(x<start) 
-		{
-			x = start;
-		}
-		if(x > end) 
-		{
-			x = end;
-		}
-		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
-	}
-	
-	/**
-	 * Calculates the binomial coefficients 20 choose 0 to 20 choose 20.
-	 * @return An array with length 21 holding the binomial coefficients 20 choose 0 to 20 choose 20.
-	 */
 	private static int[] calculateBins() 
 	{
 		int[] bins = new int[21];
@@ -147,11 +107,6 @@ public class MathHelper {
 		return bins;
 	}
 	
-	/**
-	 * Calculates the values p^i * (1-p)^{20-i} for i in [0,20].
-	 * @param p - the probability p in [0,1].
-	 * @return an array of length 21 with the value p^i * (1-p)^{20-i} at the position i.
-	 */
 	private static double[] calculatePathProbs(double p) 
 	{
 		if(p < 0 || p>1) 
@@ -168,12 +123,6 @@ public class MathHelper {
 		return pathProbs;
 	}
 	
-	/**
-	 * Calculates the probabilities with the binomial distribution with probability p
-	 * using the binomial coefficients and "path" probabilities.
-	 * @param p - the probability p
-	 * @return an array of length 21 with the probability Bin(n,p,i) = Bin(20,p,i) at position i.
-	 */
 	private static double[] calculateProbs(double p) 
 	{
 		double[] probs = new double[21];
@@ -190,11 +139,6 @@ public class MathHelper {
 		
 	}
 	
-	/**
-	 * Calculates cumulated probabilities from the binomial distribution probabilites.
-	 * @param p - probability p
-	 * @return an array of length 21 with the probability for a value to be in [0,i] for every position i.
-	 */
 	private static double[] calculateCumulatedProbs(double p)
 	{
 		double[] cumProbs = calculateProbs(p);

@@ -73,10 +73,6 @@ public class Vector2i {
 	 */
 	public boolean equals(Vector2i b)
 	{
-		if(b == null)
-		{
-			return false;
-		}
 		return ((this.x == b.x) && (this.y == b.y));
 	}
 

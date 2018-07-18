@@ -2,7 +2,6 @@ package swpg3.ai.evaluator;
 
 import swpg3.ai.AI;
 import swpg3.game.GamePhase;
-import swpg3.game.MathHelper;
 import swpg3.game.Player;
 import swpg3.game.Vector2i;
 import swpg3.game.map.Map;
@@ -11,20 +10,9 @@ import swpg3.game.map.Tile;
 import swpg3.game.map.TileStatus;
 import swpg3.game.move.Move;
 
-/**
- * An Evaluator which is ignoring the other players and only rates own properties.
- * Based on two functions for every property. The expectancy function and the importance function.
- * Expectancy function tells what should be the normal value in the current situation.
- * If player has a smaller value (worse) the evaluation value is decremented. If it is larger (better), it gets incremented.
- * Has been redeemed by the Inversionary Evaluator.
- * @author Ramil
- *
- */
 public class EgocentricEvaluator implements Evaluator {
 
-	/**
-	 * Flag which is determining, whether the expectancy function is used.
-	 */
+	//whether the expection-function should be used
 	private boolean useExpectFunc = true;
 	
 	
@@ -176,13 +164,6 @@ public class EgocentricEvaluator implements Evaluator {
 	// Helping Methods
 	// ----------------------------------------------------
 	
-	/**
-	 * Method to calculate the Mobility Bonus according to properties.
-	 * @param mobility - number of free moves.
-	 * @param turns - turns to wait till own turn.
-	 * @param totalFieldControl - the filling degree of the map.
-	 * @return Mobility bonus.
-	 */
 	private double evaluateMobility(int mobility, int turns, double totalFieldControl)
 	{
 		double evaluation = 0;
@@ -193,7 +174,7 @@ public class EgocentricEvaluator implements Evaluator {
 			//calculating the bonus
 			if(totalFieldControl < AI.M_MRP)
 			{
-				double expectedValue = MathHelper.calcLinearInterpolation(0, AI.M_MRP, AI.M_SV, AI.M_MV, totalFieldControl);
+				double expectedValue = calcLinearInterpolation(0, AI.M_MRP, AI.M_SV, AI.M_MV, totalFieldControl);
 				evaluation = AI.MOBILITY_BONUS * (mobility - expectedValue);
 			}
 			else if(totalFieldControl >= AI.M_MRP && totalFieldControl < AI.M_MLP)
@@ -203,7 +184,7 @@ public class EgocentricEvaluator implements Evaluator {
 			}
 			else //totalFieldControl >= M_MLP
 			{
-				double expectedValue = MathHelper.calcLinearInterpolation(AI.M_MLP, 1, AI.M_MV, AI.M_EV, totalFieldControl);
+				double expectedValue = calcLinearInterpolation(AI.M_MLP, 1, AI.M_MV, AI.M_EV, totalFieldControl);
 				evaluation = AI.MOBILITY_BONUS * (mobility - expectedValue);
 			}
 		}
@@ -219,12 +200,6 @@ public class EgocentricEvaluator implements Evaluator {
 		return evaluation;
 	}
 	
-	/**
-	 * Method to calculate the stone count bonus according to given properties.
-	 * @param controlOfOccupied - percentage of players field control in [0,1].
-	 * @param totalFieldControl - filling degree of the map in [0,1].
-	 * @return stone count bonus.
-	 */
 	private double evaluateStoneCount(double controlOfOccupied, double totalFieldControl)
 	{
 		double evaluation = 0;
@@ -235,12 +210,12 @@ public class EgocentricEvaluator implements Evaluator {
 		
 			if(totalFieldControl < AI.SC_TP)
 			{
-				double expectedValue = MathHelper.calcLinearInterpolation(0, AI.SC_TP, AI.SC_SV, AI.SC_TV, totalFieldControl);
+				double expectedValue = calcLinearInterpolation(0, AI.SC_TP, AI.SC_SV, AI.SC_TV, totalFieldControl);
 				evaluation = 100 * AI.STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
 			}
 			else
 			{
-				double expectedValue = MathHelper.calcLinearInterpolation(AI.SC_TP, 1, AI.SC_TV, AI.SC_EV, totalFieldControl);
+				double expectedValue = calcLinearInterpolation(AI.SC_TP, 1, AI.SC_TV, AI.SC_EV, totalFieldControl);
 				evaluation = 100 * AI.STONE_COUNT_BONUS * (controlOfOccupied - expectedValue);
 			}
 		}
@@ -252,34 +227,23 @@ public class EgocentricEvaluator implements Evaluator {
 		//resizing according to importance func
 		if(totalFieldControl < AI.SC_TP_I)
 		{
-			double factor = MathHelper.calcLinearInterpolation(0, AI.SC_TP_I, AI.SC_SV_I, AI.SC_TV_I, totalFieldControl);
+			double factor = calcLinearInterpolation(0, AI.SC_TP_I, AI.SC_SV_I, AI.SC_TV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		else
 		{
-			double factor = MathHelper.calcLinearInterpolation(AI.SC_TP_I, 1, AI.SC_TV_I, AI.SC_EV_I, totalFieldControl);
+			double factor = calcLinearInterpolation(AI.SC_TP_I, 1, AI.SC_TV_I, AI.SC_EV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		
 		return evaluation;
 	}
 	
-	/**
-	 * Method to calculate the override bonus.
-	 * @param numberOfOverrides - the number of override stones
-	 * @return the override bonus.
-	 */
 	private double evaluateOverrideCount(int numberOfOverrides)
 	{
 		return numberOfOverrides * AI.OVERRIDE_BONUS * AI.OVERRIDE_IMPORTANCE;
 	}
 	
-	/**
-	 * Method to calculate the positional factors.
-	 * @param solidSquares - the  number of solid squares under player's control.
-	 * @param totalFieldControl - the filling degree of the map.
-	 * @return
-	 */
 	private double evaluatePositionalFactors(int solidSquares , double totalFieldControl)
 	{
 		double evaluation = 0;
@@ -289,16 +253,21 @@ public class EgocentricEvaluator implements Evaluator {
 		//resize according to importance func
 		if(totalFieldControl < AI.PP_TP_I)
 		{
-			double factor = MathHelper.calcLinearInterpolation(0, AI.PP_TP_I, AI.PP_SV_I, AI.PP_TV_I, totalFieldControl);
+			double factor = calcLinearInterpolation(0, AI.PP_TP_I, AI.PP_SV_I, AI.PP_TV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		else
 		{
-			double factor = MathHelper.calcLinearInterpolation(AI.PP_TP_I, 1, AI.PP_TV_I, AI.PP_EV_I, totalFieldControl);
+			double factor = calcLinearInterpolation(AI.PP_TP_I, 1, AI.PP_TV_I, AI.PP_EV_I, totalFieldControl);
 			evaluation = evaluation*factor;
 		}
 		
 		return evaluation;
+	}
+			
+	private double calcLinearInterpolation(double start, double end, double startVal, double endVal, double x)
+	{
+		return startVal * ((x - end)/(start - end)) + endVal * ((x - start)/(end - start));
 	}
 			
 	

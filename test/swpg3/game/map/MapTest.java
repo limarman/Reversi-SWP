@@ -33,18 +33,14 @@ class MapTest {
 	@Test
 	void testMapString()
 	{
-		String testString = "8\n3\n4 5\n3 4\n"
-				+ "0 1 2 3\n"
-				+ "4 5 6 7\n"
-				+ "8 - c i\n"
-				+ "0 0 0 <-> 2 2 4";
+		String testString = "2\n3\n4 5\n3 4\n0 1 2 3\n4 5 6 7\n8 - c i\n" + "0 0 0 <-> 2 2 4";
 		
 		MapManager mm = MapManager.getInstance();
 		mm.initializeMap(testString);
 		
 		Map testMap = mm.getCurrentMap();
 		testMap.print();
-		assertEquals(8, mm.getNumberOfPlayers(), "Missmatch in playercount");
+		assertEquals(2, mm.getNumberOfPlayers(), "Missmatch in playercount");
 		assertEquals(3, mm.getNumberOfOverrides(), "Missmatch in Overridestodes");
 		assertEquals(4, mm.getNumberOfBombs(), "Missmatch in bomb number");
 		assertEquals(5, mm.getBombStrength(), "Missmatch in Bomb strength");

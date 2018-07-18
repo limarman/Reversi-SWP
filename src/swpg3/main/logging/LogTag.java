@@ -1,7 +1,6 @@
 package swpg3.main.logging;
 
 /**
- * Tags that mark messages so its easy to relate them to a specific thing like performance measurement.
  * @author eric
  *
  */

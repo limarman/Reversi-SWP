@@ -1,6 +1,7 @@
 package swpg3.ai.calculator;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import swpg3.ai.Clockmaster;
 import swpg3.ai.calculator.movesorter.BogoSorter;
@@ -41,15 +42,11 @@ public class PruningParanoidCalculator implements Calculator{
 		this.sorter = sorter;
 	}
 	
-	public double calculateBestMove(Evaluator eval, byte playerNumber, CalculatorForm form, CalculatorConditions conditions) 
+	public double calculateBestMove(Evaluator eval, byte playerNumber, int depth, long calcDeadLine, CalculatorForm form,
+			CalculatorConditions conditions) 
 	{
 		Map map = MapManager.getInstance().getCurrentMap();
 		form.setCalculatedToEnd(true); //stays true if no min or max player argues!
-		
-		//reading the conditions - this calculator ignores aspiration window condition
-		int depth = conditions.getMaxDepth();
-		long calcDeadLine = conditions.getTimeDeadline();
-		
 		int realDepth = (depth == 0 ? 1 : depth);
 		return startingMaxPlayer(eval, playerNumber, realDepth, calcDeadLine, map, form, conditions);
 	}
@@ -59,16 +56,15 @@ public class PruningParanoidCalculator implements Calculator{
 	 * @param eval - Evaluator : used for position evaluation
 	 * @param maxPlayerNumber -  Entry point player number
 	 * @param depth - depth to calculate
-	 * @param calcDeadLine - the deadline of the calculation in java system-time.
 	 * @param map - current map
-	 * @param form - CalculatorForm to fill out during the calculation process.
-	 * @param conditions - holding the aspiration window to follow.
-	 * @return the position value in this position (node of the variation-tree).
+	 * @param form - form to fill out during calculation process
+	 * @param conditions - conditions for the calculation process to follow
+	 * @return
 	 */
 	private double startingMaxPlayer(Evaluator eval, byte maxPlayerNumber, int depth, long calcDeadLine, Map map, CalculatorForm form,
 			CalculatorConditions conditions) 
 	{	
-				
+		
 		//another node has been reached
 		form.incrementReachedNodes();
 		
@@ -93,7 +89,6 @@ public class PruningParanoidCalculator implements Calculator{
 			//have to be considered
 			possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		}
-		
 		
 //		HashSet<Move> possibleMovesOrderable = map.getPossibleMovesOrderable(maxPlayerNumber, true);
 		
@@ -126,11 +121,9 @@ public class PruningParanoidCalculator implements Calculator{
 		for(int i = sortedMoves.length-1; i>=0; i--) 
 		{
 			Map nextMap = map.clone();
-//			Logger.log(LogLevel.ERROR, "Thinking on: " + sortedMoves[i]);
+			//Logger.log(LogLevel.DEBUG, "Thinking on: " + sortedMoves[i]);
 			nextMap.applyMove(sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (maxPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			
-//			Logger.log(LogLevel.ERROR, "START: Thinking on: " + sortedMoves[i]);
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0,
 					maxValue, Double.POSITIVE_INFINITY);
@@ -152,20 +145,6 @@ public class PruningParanoidCalculator implements Calculator{
 
 	}
 	
-	/**
-	 * The min-player of the min-max-recursion. Minimizes own position value.
-	 * @param eval - Evaluator used for evaluation of positions.
-	 * @param maxPlayerNumber - the playerNumber of the max player
-	 * @param currentPlayerNumber - the play number of the current player (this max-player).
-	 * @param depth - the depth to calculate to.
-	 * @param calcDeadLine - the time deadline in java system-time.
-	 * @param form - CalculatorForm to fill out during calculation.
-	 * @param map - the map in the current variation path
-	 * @param alpha - the left border of the [alpha, beta] interval.
-	 * @param beta - the right border of the [alpha, beta] interval.
-	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
-	 * @return the evaluation of this position (node in the variation tree).
-	 */
 	private double minPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
@@ -259,7 +238,6 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(sortedMoves[i]);
-//			Logger.log(LogLevel.ERROR, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
 			double value;
 			
@@ -291,20 +269,6 @@ public class PruningParanoidCalculator implements Calculator{
 		return minValue;
 	}
 	
-	/**
-	 * The max-player of the min-max-recursion. Maximizes own position value.
-	 * @param eval - Evaluator used for evaluation of positions.
-	 * @param maxPlayerNumber - the playerNumber of the max player
-	 * @param currentPlayerNumber - the play number of the current player (this max-player).
-	 * @param depth - the depth to calculate to.
-	 * @param calcDeadLine - the time deadline in java system-time.
-	 * @param form - CalculatorForm to fill out during calculation.
-	 * @param map - the map in the current variation path
-	 * @param alpha - the left border of the [alpha, beta] interval.
-	 * @param beta - the right border of the [alpha, beta] interval.
-	 * @param passesInRow - the number of turns in the row, where no player had a possible move.
-	 * @return the evaluation of this position (node in the variation tree).
-	 */
 	private double maxPlayer(Evaluator eval, byte maxPlayerNumber, byte currentPlayerNumber, int depth, long calcDeadLine,
 			CalculatorForm form, Map map, int passesInRow, double alpha, double beta) 
 	{
@@ -386,10 +350,7 @@ public class PruningParanoidCalculator implements Calculator{
 		{
 			Map nextMap = map.clone();
 			nextMap.applyMove(sortedMoves[i]);
-//			Logger.log(LogLevel.ERROR, "DEPTH: " + depth + " Calculate: " + sortedMoves[i]);
 			byte nextPlayerNumber = (byte) (currentPlayerNumber % MapManager.getInstance().getNumberOfPlayers() + 1);
-			
-			//Logger.log(LogLevel.ERROR, "DEPTH: " + depth +  " Thinking on: " + sortedMoves[i]);
 			
 			double value = minPlayer(eval, maxPlayerNumber, nextPlayerNumber, depth-1, calcDeadLine, form, nextMap, 0, maxValue, beta);
 			

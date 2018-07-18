@@ -8,7 +8,7 @@ import swpg3.game.Vector2i;
 /**
  * A class to walk over a Map in a specified direction.
  * This class will automatically follow Transitions and adjust its walking direction
- * accordingly. 
+ * accordingly 
  * 
  * @author eric
  */
@@ -17,8 +17,6 @@ public class MapWalker {
 	private Vector2i	position;
 	private Vector2i	direction;
 	private boolean		movementStopped;
-	private boolean		hasPassedTransition;
-
 	/**
 	 * @param map
 	 */
@@ -28,13 +26,12 @@ public class MapWalker {
 		this.position = new Vector2i();
 		this.direction = new Vector2i();
 		movementStopped = false;
-		hasPassedTransition = false;
 	}
 
 	/**
-	 * @param map - map, the walker will move on.
-	 * @param position - starting position of the the walker (gets cloned).
-	 * @param direction - starting direction of the walker (gets cloned).
+	 * @param map
+	 * @param position gets cloned
+	 * @param direction gets cloned
 	 */
 	public MapWalker(Map map, Vector2i position, Vector2i direction)
 	{
@@ -42,11 +39,10 @@ public class MapWalker {
 		this.position = position.clone();
 		this.direction = direction.clone();
 		movementStopped = false;
-		hasPassedTransition = false;
 	}
 
 	/**
-	 * Return a clone of the Position.
+	 * Return a clone of the Position
 	 * @return the position
 	 */
 	public Vector2i getPosition()
@@ -82,11 +78,9 @@ public class MapWalker {
 	}
 
 	/**
-	 * Checks if the walker can step in the current direction.
+	 * Checks if the walker can step in the current direction. 
 	 * 
-	 * It can step, if the next Tile isn't a Hole or there is a transition in that
-	 * direction.
-	 * 
+	 * It can step, if the next Tile isn't a Hole or there is a transition in that direction.
 	 * @return true, if Walker can step; false, otherwise
 	 */
 	public boolean canStep()
@@ -111,18 +105,15 @@ public class MapWalker {
 		Tile thisTile = map.getTileAt(position);
 		if (!nextTile.isHole())
 		{
-			this.position.add(this.direction);
-			hasPassedTransition = false;
+			this.position.add(this.direction); //Yeah, this was a bug. Why? We do not know
 			return true;
-		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) // TODO: check the condition?
+		} else if (nextTile.isHole() && thisTile.hasTransitionTo(direction)) //TODO: check the condition?
 		{
 			this.position = thisTile.getTransitionTo(direction).getTargetPoint();
 			this.direction = thisTile.getTransitionTo(direction).getTargetIncomingDir();
-			hasPassedTransition = true;
 			return true;
 		} else
 		{
-			hasPassedTransition = false;
 			return false;
 		}
 
@@ -135,7 +126,7 @@ public class MapWalker {
 	{
 		return map.getTileAt(position);
 	}
-
+	
 	/**
 	 * disable Walkers ability to perform steps
 	 */
@@ -143,7 +134,6 @@ public class MapWalker {
 	{
 		movementStopped = true;
 	}
-
 	/**
 	 * re-enable Walkers movement
 	 */
@@ -151,17 +141,11 @@ public class MapWalker {
 	{
 		movementStopped = false;
 	}
-
 	/**
 	 * @return true, if Walkers movement isn't blocked; false, otherwise
 	 */
 	public boolean isMovementEnabled()
 	{
 		return !movementStopped;
-	}
-	
-	public boolean hasPassedTransition()
-	{
-		return hasPassedTransition;
 	}
 }

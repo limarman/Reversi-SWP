@@ -1,32 +1,21 @@
-
+/**
+ * 
+ */
 package swpg3.game;
 
 import swpg3.game.map.TileStatus;
 
 /**
- * Class managing the player data.
  * @author eric
  *
  */
 public class Player {
-	
-	/**
-	 * Number of override stones the player currently has.
-	 */
 	private int	overrideStones;
-	
-	/**
-	 * Number of bombs the player currently has.
-	 */
 	private int	bombs;
-	/**
-	 * The player's player number.
-	 */
 	private int	number;
-	/**
-	 * Flag indicating whether the plaer is disqualified.
-	 */
 	private boolean isDisqualified = false;
+	//private HashSet<Vector2i> stonePositions;
+	//private int numberOfStones;
 
 	/**
 	 * @param number
@@ -38,6 +27,7 @@ public class Player {
 		this.number = number;
 		this.overrideStones = overrideStones;
 		this.bombs = bombs;
+		//this.stonePositions = new HashSet<Vector2i>();
 	}
 	
 	/**
@@ -51,6 +41,7 @@ public class Player {
 		this.overrideStones = overrideStones;
 		this.bombs = bombs;
 		this.isDisqualified = disqualified;
+		//this.stonePositions = new HashSet<Vector2i>();
 	}
 
 	/**
@@ -139,10 +130,72 @@ public class Player {
 		this.bombs++;
 	}
 	
+//	/**
+//	 * 
+//	 * @param position where stone is deleted/flipped
+//	 */
+//	public void removeStone(Vector2i position)
+//	{
+//		if(stonePositions.remove(position))
+//			numberOfStones--;
+//	}
+	
+//	/**
+//	 * 
+//	 * @param position
+//	 * @return whether player has a stone at the given position
+//	 */
+//	public boolean containsStone(Vector2i position)
+//	{
+//		return stonePositions.contains(position);
+//	}
+	
+//	/**
+//	 * 
+//	 * @param position
+//	 */
+//	public void addStone(Vector2i position)
+//	{
+//		if(stonePositions.add(position))
+//			numberOfStones++;
+//	}
+	
+//	/**
+//	 * 
+//	 * @return the stone Positions
+//	 */
+//	public HashSet<Vector2i> getStonePositions()
+//	{
+//		return stonePositions;
+//	}
+	
+//	/**
+//	 *  Switches the stone coordinates with another player
+//	 * @param p
+//	 */
+//	public void switchStones(Player p) 
+//	{
+//		HashSet<Vector2i> temp = p.stonePositions;
+//		p.stonePositions = this.stonePositions;
+//		this.stonePositions = temp;
+//		// switch stone numbers too
+//		int tempCount = p.numberOfStones;
+//		p.numberOfStones = this.numberOfStones;
+//		this.numberOfStones = tempCount;
+//	}
+
+//	/**
+//	 * @return number of stones currently in the set of this player
+//	 */
+//	public int getNumberOfStones()
+//	{
+//		return numberOfStones;
+//	}
+	
 	/**
-	 * Returns the status of the tile which is corresponding to the given player number.
-	 * @param playerNumber - player number to map to tile status
-	 * @return the tile status representing a stone of the player with given player number.
+	 * 
+	 * @param playerNumber
+	 * @return
 	 */
 	public static TileStatus mapPlayerNumberToTileStatus(int playerNumber)
 	{
@@ -166,36 +219,6 @@ public class Player {
 				return TileStatus.PLAYER_8;
 			default:
 				return TileStatus.INVALID;
-		}
-	}
-	
-	/**
-	 * MAps a given TileStatus to the corresponding player number
-	 * @param status
-	 * @return playernumber if TileStatus matches one; -1 otherwise
-	 */
-	public static int tileStatusToPlayerNumber(TileStatus status)
-	{
-		switch (status)
-		{
-			case PLAYER_1:
-				return 1;
-			case PLAYER_2:
-				return 2;
-			case PLAYER_3:
-				return 3;
-			case PLAYER_4:
-				return 4;
-			case PLAYER_5:
-				return 5;
-			case PLAYER_6:
-				return 6;
-			case PLAYER_7:
-				return 7;
-			case PLAYER_8:
-				return 8;
-			default:
-				return -1;
 		}
 	}
 	
