@@ -71,13 +71,13 @@ public class AI {
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
 	 * at the beginning of the game (filling degree 0%)
 	 */
-	public static double SC_SV_I = 0.35;
+	public static double SC_SV_I = 0.25;
 	/**
 	 * Stone Count Parameter - Importance Function:
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
 	 * at the turning point of the game (filling degree turning point)
 	 */
-	public static double SC_TV_I = 0.5;
+	public static double SC_TV_I = 0.4;
 	/**
 	 * Stone Count Parameter - Importance Function:
 	 * Decay Factor in interval [0,1] representing the importance of the stone count 
