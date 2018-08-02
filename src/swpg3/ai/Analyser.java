@@ -125,6 +125,18 @@ public class Analyser {
 			}
 		}
 		
+		// mark Expansion stones and Player Stones as Playable
+		for(int h = 0; h < MapManager.getInstance().getHeight(); h++)
+		{
+			for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
+			{
+				if(map.getTileAt(w, h).isOccupied())
+				{
+					AI.reachableSquares.set(w, h, true);
+				}
+			}
+		}
+		
 		//iterate once again over the reachable squares bitmap and count the reachable squares
 		//as well as the reachable solid stones
 		for(int w = 0; w < MapManager.getInstance().getWidth(); w++) 
