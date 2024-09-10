@@ -1,4 +1,13 @@
 # Software Praktikum Group 3
+This is a project that we have worked on in a team of three during my Bachelor's degree (2018). The project was about building an AI to compete against other groups in a board game that is similar to Reversi (Othello), but with additional complicating rules and multiple players.
+
+The tasks included building a framework that:
+- can simulate the rules of the game
+- can communicate with the server 
+- implements an aritificial intelligence logic to choose the moves
+
+This AI is "traditional" in the sense that it uses a handcrafted evaluation function together with alpha-beta tree search to choose the next moves. Our resulting agent was able to beat and replace the annual course's all-time best AI, which was reigning for several years before that.
+
 ## How to compile our Project
 To compile our project simply go into the basedirectory and run:  
 1. `ant`
